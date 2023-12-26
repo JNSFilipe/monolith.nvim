@@ -318,7 +318,6 @@ require('lazy').setup({
   {
     "goolord/alpha-nvim",
     dependencies = { 'nvim-tree/nvim-web-devicons' },
-    cmd = 'Alpha',
     opts = function()
       local dashboard = require("alpha.themes.dashboard")
       -- customize the dashboard header
@@ -340,16 +339,13 @@ require('lazy').setup({
       dashboard.section.header.opts.hl = "DashboardHeader"
       dashboard.section.footer.opts.hl = "DashboardFooter"
 
-      -- local button, get_icon = require("astronvim.utils").alpha_button, require("astronvim.utils").get_icon
-      -- opts.section.buttons.val = {
-      --   button("LDR n  ", get_icon("FileNew", 2, true) .. "New File  "),
-      --   button("LDR f f", get_icon("Search", 2, true) .. "Find File  "),
-      --   button("LDR p  ", get_icon("FolderOpen", 2, true) .. "Open Project"),
-      --   button("LDR f o", get_icon("DefaultFile", 2, true) .. "Recents  "),
-      --   button("LDR p '", get_icon("Bookmarks", 2, true) .. "Bookmarks  "),
-      --   button("LDR S l", get_icon("Refresh", 2, true) .. "Last Session  "),
-      -- }
-
+      dashboard.section.buttons.val = {
+        dashboard.button("<Leader>ff", "  File Explorer"),
+        dashboard.button("<Leader>fo", "  Find File"),
+        dashboard.button("<Leader>fw", "  Find Word"),
+        dashboard.button("<Leader>ps", "  Update plugins"),
+        dashboard.button("q", "  Quit", ":qa<cr>")
+      }
 
       dashboard.config.layout = {
         { type = "padding", val = vim.fn.max { 2, vim.fn.floor(vim.fn.winheight(0) * 0.2) } },
