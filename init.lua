@@ -48,7 +48,6 @@ P.S. You can delete this when you're done too. It's your config now :)
 -- [ ] ToggleTerm, maybe?
 -- [ ] Autopairs
 -- [ ] Pairinfer / Pairindent
--- [ ] Errors below line pluggin
 
 
 -- Set <space> as the leader key
@@ -637,8 +636,9 @@ require('lazy').setup({
   },
 
   -- Format on save
-  { 'stevearc/conform.nvim', opts = {} },
+  { 'stevearc/conform.nvim',    opts = {} },
 
+  { "folke/todo-comments.nvim", opts = {} },
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
