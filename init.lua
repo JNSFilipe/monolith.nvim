@@ -212,8 +212,11 @@ require('lazy').setup({
     end,
   },
 
+  -- Undo tree
+  { 'mbbill/undotree' },
+
   -- Useful plugin to show you pending keybinds.
-  { 'folke/which-key.nvim',  opts = {} },
+  { 'folke/which-key.nvim', opts = {} },
   {
     -- Adds git related signs to the gutter, as well as utilities for managing changes
     'lewis6991/gitsigns.nvim',
@@ -405,7 +408,7 @@ require('lazy').setup({
   },
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim', opts = {} },
+  { 'numToStr/Comment.nvim',                  opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
   {
@@ -612,10 +615,9 @@ require('lazy').setup({
       }
     end,
   },
-  {
-    'stevearc/conform.nvim',
-    opts = {},
-  },
+
+  -- Format on save
+  { 'stevearc/conform.nvim', opts = {} },
 
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
@@ -690,7 +692,7 @@ vim.o.cursorline = true
 vim.o.expandtab = true
 
 -- File content encoding for the buffer
-vim.o.fileencoding = "utf-8"
+-- vim.o.fileencoding = "utf-8" -- Causes error when Lazy is lauched
 
 -- Disable `~` on nonexistent lines
 -- vim.o.fillchars = { eob = " " }
@@ -979,6 +981,7 @@ require('which-key').register {
   ['<leader>s'] = { name = '[S]earch', _ = 'which_key_ignore' },
   ['<leader>t'] = { name = '[T]oggle', _ = 'which_key_ignore' },
   ['<leader>w'] = { name = '[W]orkspace', _ = 'which_key_ignore' },
+  ['<leader>u'] = { name = '󱘎 UndoTree', _ = 'which_key_ignore' },
 }
 -- register which-key VISUAL mode
 -- required for visual <leader>hs (hunk stage) to work
@@ -987,24 +990,30 @@ require('which-key').register({
   ['<leader>h'] = { 'Git [H]unk' },
 }, { mode = 'v' })
 
+
+---- Keymaps ----
+-- UndoTree
+vim.keymap.set('n', '<leader>uu', vim.cmd.UndotreeToggle, { desc = 'Toggle' })
+vim.keymap.set('n', '<leader>uw', vim.cmd.UndotreePresistUndo, { desc = 'Write undo to file' })
+
 -- mason-lspconfig requires that these setup functions are called in this order
 -- before setting up the servers.
 require('mason').setup()
 require('mason-lspconfig').setup({
   ensure_installed = {
-    "lua_ls",
-    "rust_analyzer",
-    "pyright",
-    "clangd",
-    "bashls",
-    "neocmake",
-    "gopls",
-    "jsonls",
-    "marksman",
-    "taplo",
-    "texlab",
-    "arduino_language_server",
-    "fennel-language-server",
+    'lua_ls',
+    'rust_analyzer',
+    'pyright',
+    'clangd',
+    'bashls',
+    'neocmake',
+    'gopls',
+    'jsonls',
+    'marksman',
+    'taplo',
+    'texlab',
+    'arduino_language_server',
+    'fennel-language-server',
   }
 })
 require("conform").setup({
@@ -1132,4 +1141,3 @@ cmp.setup {
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
-
