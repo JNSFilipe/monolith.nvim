@@ -40,14 +40,11 @@ P.S. You can delete this when you're done too. It's your config now :)
 
 
 -- TODO:
--- [ ] TDOD plugin
 -- [ ] keymappings
 -- [ ] DAP
 -- [ ] Nice icons / configure lua line
 -- [ ] Disable cmp before typing starts
 -- [ ] ToggleTerm, maybe?
--- [ ] Autopairs
--- [ ] Pairinfer / Pairindent
 
 
 -- Set <space> as the leader key
@@ -638,7 +635,18 @@ require('lazy').setup({
   -- Format on save
   { 'stevearc/conform.nvim',    opts = {} },
 
+  -- Highlight TODOs and others
   { "folke/todo-comments.nvim", opts = {} },
+
+  -- Autopairs
+  {
+    'altermo/ultimate-autopair.nvim',
+    event = { 'InsertEnter', 'CmdlineEnter' },
+    branch = 'v0.6', --recomended as each new version will have breaking changes
+    opts = {
+      --Config goes here
+    },
+  }
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
