@@ -40,16 +40,12 @@ P.S. You can delete this when you're done too. It's your config now :)
 
 
 -- TODO:
--- [ ] Conjure
 -- [ ] TDOD plugin
 -- [ ] keymappings
 -- [ ] DAP
--- [ ] Splash screen (ongoing, ~:318)
 -- [ ] Nice icons / configure lua line
--- [ ] Make background opaque
 -- [ ] Disable cmp before typing starts
 -- [ ] ToggleTerm, maybe?
--- [ ] UndoTree
 -- [ ] Autopairs
 -- [ ] Pairinfer / Pairindent
 -- [ ] Errors below line pluggin
@@ -609,6 +605,34 @@ require('lazy').setup({
           },
         },
       }
+    end,
+  },
+
+  -- Conjure for REPL
+  {
+    'PaterJason/cmp-conjure',
+    config = function()
+      local cmp = require "cmp"
+      local config = cmp.get_config()
+      table.insert(config.sources, {
+        name = "buffer",
+        option = {
+          sources = {
+            { name = "conjure" },
+          },
+        },
+      })
+      cmp.setup(config)
+    end,
+  },
+
+  {
+    'Olical/conjure',
+
+    ft = { "scheme", "fennel", "lua", "python", "rust", "hy", "scheme", "guile", "common-lisp" }, -- etc
+    init = function()
+      -- Set configuration options here
+      -- vim.g["conjure#debug"] = true
     end,
   },
 
