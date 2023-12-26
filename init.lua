@@ -466,6 +466,9 @@ require('lazy').setup({
     build = ':TSUpdate',
   },
 
+  -- Show header of current function on top
+  { "nvim-treesitter/nvim-treesitter-context" },
+
   {
     "nvim-neo-tree/neo-tree.nvim",
     branch = "main", -- HACK: force neo-tree to checkout `main` for initial v3 migration since default branch has changed
