@@ -1,6 +1,5 @@
 -- TODO:
 -- [ ] Do the anchor thing / check harpoon?
--- [ ] Fix alpha listings
 -- [ ] Fix telescope moving up and down
 -- [ ] DAP
 -- [ ] Nice icons / configure lua line
@@ -293,11 +292,12 @@ require('lazy').setup({
       dashboard.section.footer.opts.hl = "DashboardFooter"
 
       dashboard.section.buttons.val = {
-        dashboard.button("<Leader>ff", "  File Explorer"),
-        dashboard.button("<Leader>fo", "  Find File"),
-        dashboard.button("<Leader>fw", "  Find Word"),
-        dashboard.button("<Leader>ps", "  Update plugins"),
-        dashboard.button("q", "  Quit", ":qa<cr>")
+        dashboard.button("SPC o", "  File Explorer"),
+        dashboard.button("SPC ff", "  Find File"),
+        dashboard.button("SPC fF", "  Find in Files"),
+        dashboard.button("SPC ft", "  Find TODOs"),
+        dashboard.button("u", "  Update plugins", '<cmd>Lazy sync<cr>'),
+        dashboard.button("q", "󰗼  Quit", "<cmd>qa<cr>")
       }
 
       dashboard.config.layout = {
@@ -974,6 +974,7 @@ vim.keymap.set('n', '<leader>uw', vim.cmd.UndotreePresistUndo, { desc = 'Write u
 -- Telescope
 -- See `:help telescope.builtin`
 vim.keymap.set('n', '<leader>ff', require('telescope.builtin').find_files, { desc = 'Find files' })
+vim.keymap.set('n', '<leader>fF', require('telescope.builtin').live_grep, { desc = 'Find in files' })
 vim.keymap.set('n', '<leader>fr', require('telescope.builtin').oldfiles, { desc = 'Find recently opened files' })
 vim.keymap.set('n', '<leader>fb', require('telescope.builtin').buffers, { desc = 'Find buffers' })
 vim.keymap.set('n', '<leader>f/',
