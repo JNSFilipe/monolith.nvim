@@ -616,6 +616,8 @@ require('lazy').setup({
     config = function(_, opts) require("illuminate").configure(opts) end,
   },
 
+  { 'JNSFilipe/anchor.nvim' }
+
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
   --       Uncomment any of the lines below to enable them.
@@ -930,6 +932,7 @@ require('which-key').register {
   ['<leader>c'] = { name = ' Code', _ = 'which_key_ignore' },
   ['<leader>e'] = { name = '󰘧 Evaluate', _ = 'which_key_ignore' },
   ['<leader>l'] = { name = ' Eval Buffer', _ = 'which_key_ignore' },
+  ['<leader>a'] = { name = ' Anchor', _ = 'which_key_ignore' },
 }
 -- register which-key VISUAL mode
 -- required for visual <leader>hs (hunk stage) to work
@@ -1023,6 +1026,21 @@ vim.g['conjure#mapping#eval_motion'] = 'eE'
 -- NeoTree
 vim.keymap.set('n', '<leader>o', '<cmd>Neotree toggle<cr>', { desc = 'Toggle File Tree' })
 
+-- Anchor
+-- <++>
+vim.keymap.set('n', '<leader>aa', require('anchor').dropAnchor, { desc = 'Drop Anchor' })
+vim.keymap.set('n', '<leader>aA', require('anchor').addToHistoryNoAnchor, { desc = 'Add to hist. w/o anchor' })
+vim.keymap.set('n', '<leader>ah', require('anchor').hoistAllAnchors, { desc = 'Hoist all anchors' })
+vim.keymap.set('n', '<leader>af', '<cmd>AnchorTelescope<cr>', { desc = 'Show anchors in project' })
+vim.keymap.set('n', '<leader>ar', require('anchor').jumpToRecentAnchor, { desc = 'Toggle between recent anchors' })
+vim.keymap.set('n', '<leader>aj', require('anchor').jumpToNextAnchor, { desc = 'Next anchor in buffer' })
+vim.keymap.set('n', '<leader>ak', require('anchor').jumpToPrevAnchor, { desc = 'Previous anchor in buffer' })
+vim.keymap.set('n', '<leader><leader>', '<cmd>AnchorTelescope<cr>', { desc = 'List Anchors' })
+vim.keymap.set('n', '<Tab>', require('anchor').jumpToRecentAnchor, { desc = 'Toggle between recent anchors' })
+vim.keymap.set('n', 'ç', require('anchor').jumpToNextAnchor, { desc = 'Next anchor in buffer' })
+vim.keymap.set('n', 'Ç', require('anchor').jumpToPrevAnchor, { desc = 'Previous anchor in buffer' })
+
+---- [[ Conform  ]] ----
 
 require("conform").setup({
   formatters_by_ft = {
