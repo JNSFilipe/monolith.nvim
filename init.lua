@@ -607,7 +607,9 @@ require('lazy').setup({
     opts = {
       --Config goes here
     },
-  }
+  },
+
+  -- vim-illuminate highlights the same words under the cursor
   {
     "RRethy/vim-illuminate",
     opts = {},
@@ -1022,28 +1024,6 @@ vim.g['conjure#mapping#eval_motion'] = 'eE'
 vim.keymap.set('n', '<leader>o', '<cmd>Neotree toggle<cr>', { desc = 'Toggle File Tree' })
 
 
----- [[ Mason/LSP ]] ----
-
--- mason-lspconfig requires that these setup functions are called in this order
--- before setting up the servers.
-require('mason').setup()
-require('mason-lspconfig').setup({
-  ensure_installed = {
-    'lua_ls',
-    'rust_analyzer',
-    'pyright',
-    'clangd',
-    'bashls',
-    'neocmake',
-    'gopls',
-    'jsonls',
-    'marksman',
-    'taplo',
-    'texlab',
-    'arduino_language_server',
-    'fennel_language_server',
-  }
-})
 require("conform").setup({
   formatters_by_ft = {
     lua = { 'stylua', 'luacheck' },
@@ -1064,6 +1044,15 @@ require("conform").setup({
   },
 })
 
+
+
+---- [[ Mason/LSP ]] ----
+
+-- mason-lspconfig requires that these setup functions are called in this order
+-- before setting up the servers.
+require('mason').setup()
+require('mason-lspconfig').setup()
+
 -- Enable the following language servers
 --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
 --
@@ -1073,13 +1062,18 @@ require("conform").setup({
 --  If you want to override the default filetypes that your language server will attach to you can
 --  define the property 'filetypes' to the map in question.
 local servers = {
-  -- clangd = {},
-  -- gopls = {},
-  -- pyright = {},
-  -- rust_analyzer = {},
-  -- tsserver = {},
-  -- html = { filetypes = { 'html', 'twig', 'hbs'} },
-
+  gopls = {},
+  taplo = {},
+  jsonls = {},
+  bashls = {},
+  texlab = {},
+  clangd = {},
+  pyright = {},
+  neocmake = {},
+  marksman = {},
+  rust_analyzer = {},
+  fennel_language_server = {},
+  arduino_language_server = {},
   lua_ls = {
     Lua = {
       workspace = { checkThirdParty = false },
