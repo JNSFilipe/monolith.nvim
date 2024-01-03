@@ -421,6 +421,14 @@ require('lazy').setup({
     end,
   },
 
+  -- An extension to list hunks in telecope
+  {
+    "radyz/telescope-gitsigns",
+    config = function()
+      require("telescope").load_extension("git_signs")
+    end
+  },
+
   {
     -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
@@ -982,6 +990,14 @@ vim.keymap.set('v', '<Tab>', '>gv', { desc = 'Indent line' })
 -- Escape insert mode
 vim.keymap.set('i', 'jj', '<Esc>', { desc = 'Escape insert mode' })
 vim.keymap.set('i', 'jk', '<Esc>', { desc = 'Escape insert mode' })
+
+-- Git
+vim.keymap.set('n', '<leader>gn', require('gitsigns').next_hunk, { desc = 'Jump to next hunk' })
+vim.keymap.set('n', '<leader>gp', require('gitsigns').prev_hunk, { desc = 'Jump to previous hunk' })
+vim.keymap.set('n', 'º', require('gitsigns').next_hunk, { desc = 'Jump to next hunk' })
+vim.keymap.set('n', 'ª', require('gitsigns').prev_hunk, { desc = 'Jump to previous hunk' })
+vim.keymap.set('n', 'ª', require('gitsigns').prev_hunk, { desc = 'Jump to previous hunk' })
+vim.keymap.set('n', '<leader>gg', "<cmd>Telescope git_signs<cr>", { desc = 'List git hunks in buffer' })
 
 -- UndoTree
 vim.keymap.set('n', '<leader>uu', vim.cmd.UndotreeToggle, { desc = 'Toggle' })
