@@ -1,5 +1,4 @@
 -- TODO:
--- [ ] Do the anchor thing / check harpoon?
 -- [ ] Fix telescope moving up and down
 -- [ ] DAP
 -- [ ] Nice icons / configure lua line
@@ -162,6 +161,14 @@ require('lazy').setup({
         },
       }
     end,
+  },
+
+  -- Trouble (lists error, warinings, etc)
+  {
+    "folke/trouble.nvim",
+    config = function()
+      require("trouble").setup()
+    end
   },
 
   -- Undo tree
@@ -357,7 +364,7 @@ require('lazy').setup({
   },
 
   -- "gc" to comment visual regions/lines
-  { 'numToStr/Comment.nvim',                  opts = {} },
+  { 'numToStr/Comment.nvim', opts = {} },
 
   -- Fuzzy Finder (files, lsp, etc)
   {
@@ -594,10 +601,10 @@ require('lazy').setup({
   },
 
   -- Format on save
-  { 'stevearc/conform.nvim',    opts = {} },
+  { 'stevearc/conform.nvim',                  opts = {} },
 
   -- Highlight TODOs and others
-  { "folke/todo-comments.nvim", opts = {} },
+  { "folke/todo-comments.nvim",               opts = {} },
 
   -- Autopairs
   {
@@ -631,6 +638,7 @@ require('lazy').setup({
   --
   --    For additional information see: https://github.com/folke/lazy.nvim#-structuring-your-plugins
   -- { import = 'custom.plugins' },
+  --
 }, {})
 
 -- [[ Setting options ]]
@@ -932,6 +940,7 @@ require('which-key').register {
   ['<leader>c'] = { name = ' Code', _ = 'which_key_ignore' },
   ['<leader>e'] = { name = '󰘧 Evaluate', _ = 'which_key_ignore' },
   ['<leader>l'] = { name = ' Eval Buffer', _ = 'which_key_ignore' },
+  ['<leader>t'] = { name = '󱍼 Trouble', _ = 'which_key_ignore' },
   ['<leader>a'] = { name = ' Anchor', _ = 'which_key_ignore' },
 }
 -- register which-key VISUAL mode
@@ -1039,6 +1048,13 @@ vim.keymap.set('n', '<leader><leader>', '<cmd>AnchorTelescope<cr>', { desc = 'Li
 vim.keymap.set('n', '<Tab>', require('anchor').jumpToRecentAnchor, { desc = 'Toggle between recent anchors' })
 vim.keymap.set('n', 'ç', require('anchor').jumpToNextAnchor, { desc = 'Next anchor in buffer' })
 vim.keymap.set('n', 'Ç', require('anchor').jumpToPrevAnchor, { desc = 'Previous anchor in buffer' })
+
+-- Trouble
+vim.keymap.set('n', '<leader>tt', require('trouble').toggle, { desc = 'Toggle trouble' })
+vim.keymap.set('n', '<leader>tn', function() require('trouble').next({ skip_groups = true, jump = true }) end,
+  { desc = 'Next trouble' })
+vim.keymap.set('n', '<leader>tp', function() require('trouble').previous({ skip_groups = true, jump = true }) end,
+  { desc = 'Previous trouble' })
 
 ---- [[ Conform  ]] ----
 
