@@ -1011,10 +1011,17 @@ vim.keymap.set('n', '<leader>fo',
       prompt_title = 'Live Grep in Open Files',
     }
   end, { desc = 'Find in open buffers' })
-vim.keymap.set('n', '<leader>fs', require('telescope.builtin').builtin, { desc = 'Find in selection' })
+vim.keymap.set('n', '<leader>fs', require('telescope.builtin').grep_string, { desc = 'Find string' })
 vim.keymap.set('n', '<leader>fg', require('telescope.builtin').git_files, { desc = 'Find in git project' })
 vim.keymap.set('n', '<leader>fh', require('telescope.builtin').help_tags, { desc = 'Find in help' })
-vim.keymap.set('n', '<leader>fw', require('telescope.builtin').grep_string, { desc = 'Find current word' })
+vim.keymap.set('n', '<leader>fw', function()
+  local word = vim.fn.expand("<cword>")
+  require('telescope.builtin').grep_string({ search = word })
+end, { desc = 'Find word under cursor' })
+vim.keymap.set('n', '<leader>fW', function()
+  local word = vim.fn.expand("<cWORD>")
+  require('telescope.builtin').grep_string({ search = word })
+end, { desc = 'Find WORD under cursor' })
 vim.keymap.set('n', '<leader>fd', require('telescope.builtin').diagnostics, { desc = 'Find diagnostics' })
 vim.keymap.set('n', '<leader>fR', require('telescope.builtin').resume, { desc = 'Find resume' })
 vim.keymap.set('n', '<leader>ft', '<cmd>TodoTelescope keywords=TODO,FIX,WARNING,NOTE,HACK,PERF<cr>',
