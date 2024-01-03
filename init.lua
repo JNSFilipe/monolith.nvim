@@ -614,7 +614,31 @@ require('lazy').setup({
   },
 
   -- Format on save
-  { 'stevearc/conform.nvim',                  opts = {} },
+  {
+    'stevearc/conform.nvim',
+    opts = {},
+    config = function(_, opts)
+      require("conform").setup({
+        formatters_by_ft = {
+          lua = { 'stylua', 'luacheck' },
+          python = { 'isort', 'black' },
+          bash = { 'shellcheck', 'shfmt' },
+          go = { 'gomodifytags', 'gofumpt', 'iferr', 'impl', 'goimports' },
+          markdown = { 'prettierd' },
+          -- Use the "*" filetype to run formatters on all filetypes.
+          ["*"] = { "codespell" },
+          -- Use the "_" filetype to run formatters on filetypes that don't
+          -- have other formatters configured.
+          ["_"] = { "trim_whitespace" },
+        },
+        format_on_save = {
+          -- These options will be passed to conform.format()
+          timeout_ms = 500,
+          lsp_fallback = true,
+        },
+      })
+    end
+  },
 
   -- Highlight TODOs and others
   { "folke/todo-comments.nvim",               opts = {} },
@@ -1075,29 +1099,6 @@ vim.keymap.set('n', '<leader>tn', function() require('trouble').next({ skip_grou
   { desc = 'Next trouble' })
 vim.keymap.set('n', '<leader>tp', function() require('trouble').previous({ skip_groups = true, jump = true }) end,
   { desc = 'Previous trouble' })
-
----- [[ Conform  ]] ----
-
-require("conform").setup({
-  formatters_by_ft = {
-    lua = { 'stylua', 'luacheck' },
-    python = { 'isort', 'black' },
-    bash = { 'shellcheck', 'shfmt' },
-    go = { 'gomodifytags', 'gofumpt', 'iferr', 'impl', 'goimports' },
-    markdown = { 'prettierd' },
-    -- Use the "*" filetype to run formatters on all filetypes.
-    ["*"] = { "codespell" },
-    -- Use the "_" filetype to run formatters on filetypes that don't
-    -- have other formatters configured.
-    ["_"] = { "trim_whitespace" },
-  },
-  format_on_save = {
-    -- These options will be passed to conform.format()
-    timeout_ms = 500,
-    lsp_fallback = true,
-  },
-})
-
 
 
 ---- [[ Mason/LSP ]] ----
