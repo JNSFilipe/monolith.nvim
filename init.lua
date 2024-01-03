@@ -918,7 +918,7 @@ local on_attach = function(_, bufnr)
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
   nmap('<leader>ck', vim.lsp.buf.hover, 'Hover documentation')
-  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation')
+  nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation') -- FIX: Doesn't it colide with the move window shortcuts?
   nmap('<leader>cK', vim.lsp.buf.signature_help, 'Signature documentation')
 
   -- Lesser used LSP functionality
@@ -1057,14 +1057,14 @@ vim.keymap.set('n', '<leader>o', '<cmd>Neotree toggle<cr>', { desc = 'Toggle Fil
 vim.keymap.set('n', '<leader>aa', require('anchor').dropAnchor, { desc = 'Drop Anchor' })
 vim.keymap.set('n', '<leader>aA', require('anchor').addToHistoryNoAnchor, { desc = 'Add to hist. w/o anchor' })
 vim.keymap.set('n', '<leader>ah', require('anchor').hoistAllAnchors, { desc = 'Hoist all anchors' })
-vim.keymap.set('n', '<leader>af', '<cmd>AnchorTelescope<cr>', { desc = 'Show anchors in project' })
+vim.keymap.set('n', '<leader>af', require('anchor').telescopeAnchorsInProject, { desc = 'Show anchors in project' })
 vim.keymap.set('n', '<leader>ar', require('anchor').jumpToRecentAnchor, { desc = 'Toggle between recent anchors' })
 vim.keymap.set('n', '<leader>aj', require('anchor').jumpToNextAnchor, { desc = 'Next anchor in buffer' })
 vim.keymap.set('n', '<leader>ak', require('anchor').jumpToPrevAnchor, { desc = 'Previous anchor in buffer' })
-vim.keymap.set('n', '<leader><leader>', '<cmd>AnchorTelescope<cr>', { desc = 'List Anchors' })
 vim.keymap.set('n', '<Tab>', require('anchor').jumpToRecentAnchor, { desc = 'Toggle between recent anchors' })
 vim.keymap.set('n', 'ç', require('anchor').jumpToNextAnchor, { desc = 'Next anchor in buffer' })
 vim.keymap.set('n', 'Ç', require('anchor').jumpToPrevAnchor, { desc = 'Previous anchor in buffer' })
+vim.keymap.set('n', '<leader><leader>', require('anchor').telescopeAnchorsInProject, { desc = 'List Anchors' })
 
 -- Trouble
 vim.keymap.set('n', '<leader>tt', require('trouble').toggle, { desc = 'Toggle trouble' })
