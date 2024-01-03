@@ -964,6 +964,10 @@ require('which-key').register({
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
+-- Move selection up and down
+vim.keymap.set('v', "J", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
+vim.keymap.set('v', "K", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
+
 -- Remap movements
 vim.keymap.set('n', "<C-h>", "<C-w>h", { desc = "Move to left split" })
 vim.keymap.set('n', "<C-j>", "<C-w>j", { desc = "Move to below split" })
