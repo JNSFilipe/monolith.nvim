@@ -640,6 +640,30 @@ require('lazy').setup({
     end
   },
 
+  -- Better yank
+  {
+    "AckslD/nvim-neoclip.lua",
+    requires = {
+      { 'nvim-telescope/telescope.nvim' },
+    },
+    config = function()
+      require('neoclip').setup({
+        keys = {
+          telescope = {
+            i = {
+              select = '<cr>',
+              paste = '<c-p>',
+              paste_behind = '<c-P>',
+              delete = '<c-d>', -- delete an entry
+              edit = '<c-e>',   -- edit an entry
+              custom = {},
+            },
+          },
+        },
+      })
+    end,
+  },
+
   -- Highlight TODOs and others
   { "folke/todo-comments.nvim",               opts = {} },
 
@@ -1078,6 +1102,10 @@ vim.g['conjure#mapping#eval_motion'] = 'eE'
 
 -- NeoTree
 vim.keymap.set('n', '<leader>o', '<cmd>Neotree toggle<cr>', { desc = 'Toggle File Tree' })
+
+-- NeoClip
+-- In linux, the system clipboar is the + register, but in windows it is * TODO: Fix accordingly
+vim.keymap.set('n', '<leader>y', '<cmd>Telescope neoclip plus<cr>', { desc = 'Yank history' })
 
 -- Anchor
 -- <++>
