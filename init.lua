@@ -989,7 +989,7 @@ require('which-key').register {
   ['<leader>c'] = { name = ' Code', _ = 'which_key_ignore' },
   ['<leader>e'] = { name = '󰘧 Evaluate', _ = 'which_key_ignore' },
   ['<leader>l'] = { name = ' Eval Buffer', _ = 'which_key_ignore' },
-  ['<leader>t'] = { name = '󱍼 Trouble', _ = 'which_key_ignore' },
+  ['<leader>d'] = { name = '󱍼 Diagnostics', _ = 'which_key_ignore' },
   ['<leader>a'] = { name = ' Anchor', _ = 'which_key_ignore' },
 }
 -- register which-key VISUAL mode
@@ -1026,10 +1026,6 @@ vim.keymap.set('n', "<C-Right>", "<cmd>vertical resize +2<CR>", { desc = "Resize
 -- Remap for dealing with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-
--- Diagnostic keymaps
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
 
 -- Indentation (Stay in indent mode)
 vim.keymap.set('v', '<S-Tab>', '<gv', { desc = 'Unindent line' })
@@ -1121,12 +1117,15 @@ vim.keymap.set('n', 'ç', require('anchor').jumpToNextAnchor, { desc = 'Next anc
 vim.keymap.set('n', 'Ç', require('anchor').jumpToPrevAnchor, { desc = 'Previous anchor in buffer' })
 vim.keymap.set('n', '<leader><leader>', require('anchor').telescopeAnchorsInProject, { desc = 'List Anchors' })
 
--- Trouble
-vim.keymap.set('n', '<leader>tt', require('trouble').toggle, { desc = 'Toggle trouble' })
-vim.keymap.set('n', '<leader>tn', function() require('trouble').next({ skip_groups = true, jump = true }) end,
+-- Trouble/Diagnostic
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
+vim.keymap.set('n', '<leader>dd', require('trouble').toggle, { desc = 'Toggle trouble' })
+vim.keymap.set('n', '<leader>dn', function() require('trouble').next({ skip_groups = true, jump = true }) end,
   { desc = 'Next trouble' })
-vim.keymap.set('n', '<leader>tp', function() require('trouble').previous({ skip_groups = true, jump = true }) end,
+vim.keymap.set('n', '<leader>dp', function() require('trouble').previous({ skip_groups = true, jump = true }) end,
   { desc = 'Previous trouble' })
+vim.keymap.set('n', '<leader>df', require('telescope.builtin').diagnostics, { desc = 'Find diagnostics' })
 
 
 ---- [[ Mason/LSP ]] ----
