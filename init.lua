@@ -134,6 +134,10 @@ require('lazy').setup({
 
       opts.preselect = cmp.PreselectMode.None
 
+      opts.snippet = {
+        expand = function(args) luasnip.lsp_expand(args.body) end,
+      }
+
       opts.duplicates = {
         nvim_lsp = 1,
         luasnip = 1,
