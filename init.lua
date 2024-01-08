@@ -1062,7 +1062,7 @@ require('which-key').register {
   ['<leader>gh'] = { name = 'Hunk', _ = 'which_key_ignore' },
   ['<leader>gt'] = { name = 'Toggle', _ = 'which_key_ignore' },
   -- ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' }, -- TODO: Remove this from menu!
-  ['<leader>u'] = { name = '󱘎 UndoTree', _ = 'which_key_ignore' },
+  ['<leader>u'] = { name = '󱓍 UndoTree', _ = 'which_key_ignore' },
   ['<leader>f'] = { name = ' Find', _ = 'which_key_ignore' },
   ['<leader>c'] = { name = ' Code', _ = 'which_key_ignore' },
   ['<leader>e'] = { name = '󰘧 Evaluate', _ = 'which_key_ignore' },
