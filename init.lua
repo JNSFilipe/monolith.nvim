@@ -3,6 +3,7 @@
 -- [ ] Nice icons / configure lua line
 -- [ ] Disable cmp before typing starts
 -- [ ] ToggleTerm, maybe?
+-- [ ] Fix no signature help on python code
 
 
 -- Set <space> as the leader key
@@ -10,6 +11,23 @@
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
+
+-- <++> [[ Utilities ]] --
+local signature_cache = {}
+
+local function fetch_signature_async()
+  local bufnr = vim.api.nvim_get_current_buf()
+  local params = vim.lsp.util.make_position_params()
+
+  vim.lsp.buf_request(bufnr, 'textDocument/signatureHelp', params, function(err, result, ctx)
+    if err or not result or not result.signatures or not result.signatures[1] then
+      signature_cache[bufnr] = ""
+      return
+    end
+    signature_cache[bufnr] = result.signatures[1].label
+  end)
+end
+
 
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    https://github.com/folke/lazy.nvim
@@ -314,6 +332,34 @@ require('lazy').setup({
         component_separators = '|',
         section_separators = '',
       },
+      sections = {
+        lualine_c = {
+          'filename',
+          {
+            function()
+              local bufnr = vim.api.nvim_get_current_buf()
+              local ts_utils = require 'nvim-treesitter.ts_utils'
+              local parsers = require 'nvim-treesitter.parsers'
+
+              if not parsers.has_parser() then return "" end
+
+              local cursor_node = ts_utils.get_node_at_cursor()
+              if not cursor_node then return signature_cache[bufnr] or "" end
+
+              while cursor_node do
+                if cursor_node:type() == 'function_call' or cursor_node:type() == 'call_expression' then
+                  fetch_signature_async() -- Asynchronously update the signature
+                  break
+                end
+                cursor_node = cursor_node:parent()
+              end
+
+              return signature_cache[bufnr] or ""
+            end,
+            color = { gui = "bold" }
+          }
+        },
+      }
     },
   },
 
