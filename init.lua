@@ -1205,6 +1205,12 @@ vim.keymap.set('n', '<leader>dp', function() require('trouble').previous({ skip_
   { desc = 'Previous trouble' })
 vim.keymap.set('n', '<leader>df', require('telescope.builtin').diagnostics, { desc = 'Find diagnostics' })
 
+-- <++> Tmux
+vim.keymap.set('n', '<C-h>', require("tmux").move_left, { noremap = true })
+vim.keymap.set('n', '<C-j>', require("tmux").move_down, { noremap = true })
+vim.keymap.set('n', '<C-k>', require("tmux").move_up, { noremap = true })
+vim.keymap.set('n', '<C-l>', require("tmux").move_right, { noremap = true })
+
 
 ---- [[ Mason/LSP ]] ----
 
