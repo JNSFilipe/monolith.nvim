@@ -1069,6 +1069,7 @@ require('which-key').register {
   ['<leader>l'] = { name = ' Eval Buffer', _ = 'which_key_ignore' },
   ['<leader>d'] = { name = '󱍼 Diagnostics', _ = 'which_key_ignore' },
   ['<leader>a'] = { name = ' Anchor', _ = 'which_key_ignore' },
+  ['<leader>t'] = { name = ' Tmux', _ = 'which_key_ignore' },
 }
 -- register which-key VISUAL mode
 -- required for visual <leader>hs (hunk stage) to work
@@ -1210,6 +1211,7 @@ vim.keymap.set('n', '<C-h>', require("tmux").move_left, { noremap = true })
 vim.keymap.set('n', '<C-j>', require("tmux").move_down, { noremap = true })
 vim.keymap.set('n', '<C-k>', require("tmux").move_up, { noremap = true })
 vim.keymap.set('n', '<C-l>', require("tmux").move_right, { noremap = true })
+vim.keymap.set('n', '<leader>tt', require("tmux").list_and_select_tmux_terminals, { desc = "Tmux panes in session" })
 
 
 ---- [[ Mason/LSP ]] ----
