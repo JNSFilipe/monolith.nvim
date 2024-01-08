@@ -751,16 +751,6 @@ require('lazy').setup({
   -- Highlight TODOs and others
   { "folke/todo-comments.nvim",               opts = {} },
 
-  -- Autopairs
-  {
-    'altermo/ultimate-autopair.nvim',
-    event = { 'InsertEnter', 'CmdlineEnter' },
-    branch = 'v0.6', --recomended as each new version will have breaking changes
-    opts = {
-      --Config goes here
-    },
-  },
-
   -- vim-illuminate highlights the same words under the cursor
   {
     "RRethy/vim-illuminate",
