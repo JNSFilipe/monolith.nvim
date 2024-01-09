@@ -74,7 +74,7 @@ function M.list_and_select_tmux_terminals()
         print("selection " .. selection.value)
         print("ID " .. pane_id)
         if pane_id then
-          -- <++> Switch focus to selected terminal in tmux
+          -- Switch focus to selected terminal in tmux
           -- Get the window ID for the given pane ID
           local window_id = vim.fn.system("tmux display-message -p -t " .. pane_id .. " '#{window_id}'"):gsub("\n", "")
 
@@ -88,6 +88,58 @@ function M.list_and_select_tmux_terminals()
       return true
     end,
   }):find()
+end
+
+function M.create_or_move_tmux_pane(opts)
+  -- <++> Prompt for pane name if not provided
+  -- TODO: Use telescope to select pane name and list existing panes
+  -- TODO: Pass a command to run in the new pane
+  if not opts.pane_name then
+    vim.ui.input({ prompt = "Enter pane name: " }, function(input)
+      opts.pane_name = input
+      print(opts.pane_name)
+      M.create_or_move_tmux_pane(opts)
+    end)
+    return
+  end
+
+  if not opts.split_direction then
+    opts.split_direction = "h"
+  end
+
+  local pane_size = 30
+  if opts.split_direction == "h" then
+    pane_size = 30
+  elseif opts.split_direction == "v" then
+    pane_size = 30
+  else
+    print("Invalid split direction")
+    return
+  end
+
+  if opts.pane_size then
+    pane_size = opts.pane_size
+  end
+
+  -- Check if a pane with the given name already exists
+  local handle = io.popen("tmux list-panes -s -F '#{pane_id} #{pane_title}'")
+  local result = handle:read("*a")
+  handle:close()
+
+  for id, title in string.gmatch(result, "([%%#]%d+) ([^\n]+)") do
+    print("ID " .. id)
+    print("Title " .. title)
+    if title == opts.pane_name then
+      -- Move existing pane
+      vim.fn.system("tmux join-pane -" .. opts.split_direction .. "b -t " .. id .. " -p " .. (100 - pane_size) .. " -d")
+      return
+    end
+  end
+
+  -- Create a new pane with the specified name
+  -- vim.fn.system("tmux split-window -h -p 30 -d \\; select-pane -T '" .. pane_name .. "'") -- -d to prevent focus switch
+  vim.fn.system("tmux split-window -" ..
+    opts.split_direction .. " -p " .. pane_size .. " \\; select-pane -T '" .. opts.pane_name .. "'")
 end
 
 return M

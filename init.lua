@@ -1212,7 +1212,10 @@ vim.keymap.set('n', '<C-j>', require("tmux").move_down, { noremap = true })
 vim.keymap.set('n', '<C-k>', require("tmux").move_up, { noremap = true })
 vim.keymap.set('n', '<C-l>', require("tmux").move_right, { noremap = true })
 vim.keymap.set('n', '<leader>tt', require("tmux").list_and_select_tmux_terminals, { desc = "Tmux panes in session" })
-
+vim.keymap.set('n', '<leader>tr', function() require("tmux").create_or_move_tmux_pane({ split_direction = "h" }) end,
+  { desc = "New pane on the right" })
+vim.keymap.set('n', '<leader>tb', function() require("tmux").create_or_move_tmux_pane({ split_direction = "v" }) end,
+  { desc = "New pane on the bottom" })
 
 ---- [[ Mason/LSP ]] ----
 
