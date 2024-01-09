@@ -1216,6 +1216,9 @@ vim.keymap.set('n', '<leader>tr', function() require("tmux").create_or_move_tmux
   { desc = "New pane on the right" })
 vim.keymap.set('n', '<leader>tb', function() require("tmux").create_or_move_tmux_pane({ split_direction = "v" }) end,
   { desc = "New pane on the bottom" })
+vim.keymap.set('n', '<leader>th',
+  function() require("tmux").create_or_move_tmux_pane({ split_direction = "h", pane_name = "htop", command = "htop" }) end,
+  { desc = "Pane with htop" })
 
 ---- [[ Mason/LSP ]] ----
 
