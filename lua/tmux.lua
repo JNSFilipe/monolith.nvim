@@ -93,7 +93,6 @@ end
 function M.create_or_move_tmux_pane(opts)
   -- <++> Prompt for pane name if not provided
   -- TODO: Use telescope to select pane name and list existing panes
-  -- TODO: Pass a command to run in the new pane
   if not opts.pane_name then
     vim.ui.input({ prompt = "Enter pane name: " }, function(input)
       opts.pane_name = input
@@ -126,20 +125,25 @@ function M.create_or_move_tmux_pane(opts)
   local result = handle:read("*a")
   handle:close()
 
+  -- Create a new pane with the specified name
+  -- vim.fn.system("tmux split-window -h -p 30 -d \\; select-pane -T '" .. pane_name .. "'") -- -d to prevent focus switch
+  local cmd = "tmux split-window -" ..
+      opts.split_direction .. " -p " .. pane_size .. " \\; select-pane -T '" .. opts.pane_name .. "'"
+
+  -- Chck if a pane with the given name already exists
   for id, title in string.gmatch(result, "([%%#]%d+) ([^\n]+)") do
-    print("ID " .. id)
-    print("Title " .. title)
     if title == opts.pane_name then
       -- Move existing pane
-      vim.fn.system("tmux join-pane -" .. opts.split_direction .. "b -t " .. id .. " -p " .. (100 - pane_size) .. " -d")
-      return
+      cmd = "tmux join-pane -" .. opts.split_direction .. "b -t " .. id .. " -p " .. (100 - pane_size) .. " -d"
+      break
     end
   end
 
-  -- Create a new pane with the specified name
-  -- vim.fn.system("tmux split-window -h -p 30 -d \\; select-pane -T '" .. pane_name .. "'") -- -d to prevent focus switch
-  vim.fn.system("tmux split-window -" ..
-    opts.split_direction .. " -p " .. pane_size .. " \\; select-pane -T '" .. opts.pane_name .. "'")
+  if opts.command then
+    cmd = cmd .. " \\; send-keys '" .. opts.command .. "' Enter"
+  end
+
+  vim.fn.system(cmd)
 end
 
 return M
