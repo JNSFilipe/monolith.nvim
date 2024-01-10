@@ -35,6 +35,28 @@ function M.move_right()
   end
 end
 
+function M.get_id_from_name(id)
+  local handle = io.popen("tmux list-panes -s -F '#{pane_id} #{pane_title}'")
+  local result = handle:read("*a")
+  handle:close()
+
+  for pane_id, pane_title in string.gmatch(result, "([%%#]%d+) ([^\n]+)") do
+    if pane_title == id then
+      return pane_id
+    end
+  end
+end
+
+function M.get_current_tmux_pane_id()
+  local tmux_cmd = "tmux display-message -p '#{pane_id}'"
+  local handle = io.popen(tmux_cmd)
+  local pane_id = handle:read("*a")
+  handle:close()
+
+  pane_id = pane_id:gsub("%s+", "") -- Remove any whitespace
+  return pane_id
+end
+
 function M.list_and_select_tmux_terminals()
   local actions = require('telescope.actions')
   local state = require('telescope.actions.state')
@@ -71,8 +93,6 @@ function M.list_and_select_tmux_terminals()
         actions.close(prompt_bufnr)
         local selection = state.get_selected_entry()
         local pane_id = string.match(selection.value, "([%%#]%d+)")
-        print("selection " .. selection.value)
-        print("ID " .. pane_id)
         if pane_id then
           -- Switch focus to selected terminal in tmux
           -- Get the window ID for the given pane ID
@@ -120,6 +140,11 @@ function M.create_or_move_tmux_pane(opts)
     pane_size = opts.pane_size
   end
 
+  local current_pane_id = nil
+  if not opts.focus then
+    current_pane_id = M.get_current_tmux_pane_id()
+  end
+
   -- Check if a pane with the given name already exists
   local handle = io.popen("tmux list-panes -s -F '#{pane_id} #{pane_title}'")
   local result = handle:read("*a")
@@ -144,6 +169,11 @@ function M.create_or_move_tmux_pane(opts)
   end
 
   vim.fn.system(cmd)
+
+  if not opts.focus then
+    -- Switch focus back to the original pane
+    vim.fn.system("tmux select-pane -t " .. current_pane_id)
+  end
 end
 
 return M
