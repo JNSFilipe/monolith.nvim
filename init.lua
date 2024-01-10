@@ -10,7 +10,7 @@
 -- See `:help mapleader`
 --  NOTE: Must happen before plugins are required (otherwise wrong leader will be used)
 vim.g.mapleader = ' '
-vim.g.maplocalleader = ' '
+vim.g.maplocalleader = ','
 
 -- <++> [[ Utilities ]] --
 local signature_cache = {}
@@ -1212,13 +1212,30 @@ vim.keymap.set('n', '<C-j>', require("tmux").move_down, { noremap = true })
 vim.keymap.set('n', '<C-k>', require("tmux").move_up, { noremap = true })
 vim.keymap.set('n', '<C-l>', require("tmux").move_right, { noremap = true })
 vim.keymap.set('n', '<leader>tt', require("tmux").list_and_select_tmux_terminals, { desc = "Tmux panes in session" })
-vim.keymap.set('n', '<leader>tr', function() require("tmux").create_or_move_tmux_pane({ split_direction = "h" }) end,
+vim.keymap.set('n', '<leader>tr',
+  function() require("tmux").create_or_move_tmux_pane({ split_direction = "h", focus = true }) end,
   { desc = "New pane on the right" })
-vim.keymap.set('n', '<leader>tb', function() require("tmux").create_or_move_tmux_pane({ split_direction = "v" }) end,
+vim.keymap.set('n', '<leader>tb',
+  function() require("tmux").create_or_move_tmux_pane({ split_direction = "v", focus = true }) end,
   { desc = "New pane on the bottom" })
 vim.keymap.set('n', '<leader>th',
   function() require("tmux").create_or_move_tmux_pane({ split_direction = "h", pane_name = "htop", command = "htop" }) end,
   { desc = "Pane with htop" })
+
+-- <++> REPL
+vim.keymap.set('n', '<leader>es', require("repl").start_repl, { desc = "Start REPL" })
+vim.keymap.set('v', '<leader>eE', require("repl").send_to_tmux_repl, { desc = "Eval selection" })
+vim.keymap.set('v', '<leader>ee', function() require("repl").send_to_tmux_repl(require("repl").capture_selection) end,
+  { desc = "Eval selection" })
+vim.keymap.set('n', '<leader>el', function() require("repl").send_to_tmux_repl(require("repl").capture_line) end,
+  { desc = "Eval line" })
+vim.keymap.set('n', '<leader>ef', function() require("repl").send_to_tmux_repl(require("repl").capture_function) end,
+  { desc = "Eval function" })
+vim.keymap.set('n', '<leader>ee',
+  function() require("repl").send_to_tmux_repl(require("repl").capture_outermost_expression) end,
+  { desc = "Eval outermost" })
+vim.keymap.set('n', '<leader>eb', function() require("repl").send_to_tmux_repl(require("repl").capture_buffer) end,
+  { desc = "Eval buffer" })
 
 ---- [[ Mason/LSP ]] ----
 
