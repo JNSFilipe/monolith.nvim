@@ -6,11 +6,11 @@ local tmux = require('tmux')
 -- [[ Configuration ]] --
 local fextensions = { -- TODO: Find more recent REPLs
   python = {
-    command = "python",
+    command = "rlwrap python | pygmentize -s -l python -O style=native",
     pane_name = "Python REPL",
   },
   lisp = {
-    command = "sbcl",
+    command = "rlwrap -i -b '()' sbcl | pygmentize -s -l lisp -O style=native",
     pane_name = "Common Lisp REPL",
   },
 }
@@ -42,7 +42,7 @@ end
 
 local function fix_indentation(text)
   -- Replace tabs with spaces (assuming a tab width of 4 spaces)
-  local tab_width = 4
+  local tab_width = 2
   local text_with_spaces = text:gsub("\t", string.rep(" ", tab_width))
 
   -- Determine the indentation of the first line
