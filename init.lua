@@ -1259,7 +1259,57 @@ local servers = {
   bashls = {},
   texlab = {},
   clangd = {},
-  pyright = {},
+  -- Setolen from https://github.com/jdhao/nvim-config/blob/master/lua/config/lsp.lua
+  -- And https://www.reddit.com/r/neovim/comments/tttofk/how_to_disable_annoying_pylint_warningespecially/
+  -- And https://www.reddit.com/r/neovim/comments/14316t9/help_me_to_get_the_best_python_neovim_environment/
+  pylsp = {
+    plugins = {
+      -- formatter options
+      black = { enabled = true },
+      autopep8 = { enabled = false },
+      yapf = { enabled = false },
+      -- linter options
+      mcabe = { enabled = false },
+      flake8 = { enabled = false, ignore = "E501,C901" },
+      pylint = { enabled = true, args = { "--disable=E501", "-" } }, -- Ignore line too long warning
+      ruff = { enabled = false },
+      pyflakes = { enabled = false },
+      pycodestyle = { enabled = false, ignore = { "E501" } }, -- Ignore line too long warning
+      -- type checker
+      pylsp_mypy = {
+        enabled = true,
+        overrides = { "--python-executable", "usr/bin/python3", true },
+        report_progress = true,
+        live_mode = false
+      },
+      -- auto-completion options
+      jedi_definition = {
+        enabled = true,
+        follow_imports = true,
+        follow_builtin_imports = true,
+        follow_builtin_definitions = true,
+      },
+      jedi_rename = { enabled = true },
+      jedi_completion = {
+        enabled = true,
+        fuzzy = true,
+        eager = true,
+        include_params = true,
+        cache_labels_for = {
+          "torch",
+          "numpy",
+          "pandas",
+          "yfinance",
+          "matplotlib",
+          "torchvision",
+        },
+      },
+      jedi_signature_help = { enabled = true },
+      jedi_hover = { enabled = true },
+      -- import sorting
+      isort = { enabled = true },
+    },
+  },
   neocmake = {},
   marksman = {},
   rust_analyzer = {},
