@@ -1162,6 +1162,7 @@ vim.keymap.set('n', '<leader>fd', require('telescope.builtin').diagnostics, { de
 vim.keymap.set('n', '<leader>fR', require('telescope.builtin').resume, { desc = 'Find resume' })
 vim.keymap.set('n', '<leader>ft', '<cmd>TodoTelescope keywords=TODO,FIX,WARNING,NOTE,HACK,PERF<cr>',
   { desc = 'Find TODOs, etc' })
+vim.keymap.set('n', '<leader>x', require('telescope.builtin').commands, { desc = 'M-x' })
 
 -- Code
 vim.keymap.set('v', '<leader>cc', '<esc><cmd>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<cr>',
@@ -1182,8 +1183,7 @@ vim.keymap.set('n', '<leader>o', '<cmd>Neotree toggle<cr>', { desc = 'Toggle Fil
 -- In linux, the system clipboar is the + register, but in windows it is * TODO: Fix accordingly
 vim.keymap.set('n', '<leader>y', '<cmd>Telescope neoclip plus<cr>', { desc = 'Yank history' })
 
--- Anchor
--- <++>
+-- <++> Anchor
 vim.keymap.set('n', '<leader>aa', require('anchor').dropAnchor, { desc = 'Drop Anchor' })
 vim.keymap.set('n', '<leader>aA', require('anchor').addToHistoryNoAnchor, { desc = 'Add to hist. w/o anchor' })
 vim.keymap.set('n', '<leader>ah', require('anchor').hoistAllAnchors, { desc = 'Hoist all anchors' })
