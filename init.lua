@@ -763,6 +763,15 @@ require('lazy').setup({
   },
 
   { 'JNSFilipe/anchor.nvim' }
+  -- Matchup - Extend % to match keywords that start and end a code block
+  {
+    "andymass/vim-matchup",
+    setup = function()
+      vim.g.matchup_matchparen_offscreen = { method = "popup" }
+      lvim.builtin.treesitter.matchup.enable = true
+    end,
+  },
+
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
