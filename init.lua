@@ -517,6 +517,14 @@ require('lazy').setup({
     end
   },
 
+  -- OCaml
+  {
+    "tjdevries/ocaml.nvim",
+    setup = function()
+      require('ocaml').setup()
+    end
+  },
+
   {
     -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
@@ -713,6 +721,7 @@ require('lazy').setup({
           bash = { 'shellcheck', 'shfmt' },
           go = { 'gomodifytags', 'gofumpt', 'iferr', 'impl', 'goimports' },
           markdown = { 'prettierd' },
+          ocaml = { 'ocamlformat' },
           -- Use the "*" filetype to run formatters on all filetypes.
           ["*"] = { "codespell" },
           -- Use the "_" filetype to run formatters on filetypes that don't
@@ -953,7 +962,7 @@ vim.api.nvim_create_user_command('LiveGrepGitRoot', live_grep_git_root, {})
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash', 'latex', 'cmake', 'ninja', 'fennel', 'arduino', 'bibtex', 'markdown', 'markdown_inline', 'commonlisp', 'cuda', 'json', 'toml', 'diff', 'git_config', 'git_rebase', 'gitattributes', 'gitcommit', 'gitignore', 'scheme', 'ssh_config' },
+    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash', 'latex', 'cmake', 'ninja', 'fennel', 'arduino', 'bibtex', 'markdown', 'markdown_inline', 'commonlisp', 'cuda', 'json', 'toml', 'diff', 'git_config', 'git_rebase', 'gitattributes', 'gitcommit', 'gitignore', 'scheme', 'ssh_config', 'ocaml' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
@@ -1331,6 +1340,12 @@ local servers = {
       -- NOTE: toggle below to ignore Lua_LS's noisy `missing-fields` warnings
       -- diagnostics = { disable = { 'missing-fields' } },
     },
+  },
+  ocaml_lsp = {
+    enable = true,
+    get_language_id = function(_, ftype)
+      return ftype
+    end,
   },
 }
 
