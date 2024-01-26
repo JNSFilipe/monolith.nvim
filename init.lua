@@ -851,6 +851,12 @@ vim.o.copyindent = true
 -- Highlight the text line of the cursor
 vim.o.cursorline = true
 
+-- Set default indent width to 2 spaces
+vim.o.shiftwidth = 2
+
+-- Set the number of spaces that a <Tab> in the file counts for
+vim.o.tabstop = 2
+
 -- Enable the use of space in tab
 vim.o.expandtab = true
 
