@@ -1347,7 +1347,7 @@ local servers = {
       -- diagnostics = { disable = { 'missing-fields' } },
     },
   },
-  ocaml_lsp = {
+  ocamllsp = {
     enable = true,
     get_language_id = function(_, ftype)
       return ftype
