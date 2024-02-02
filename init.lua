@@ -1218,7 +1218,22 @@ vim.keymap.set('n', '<leader>ak', require('anchor').jumpToPrevAnchor, { desc = '
 vim.keymap.set('n', '<Tab>', require('anchor').jumpToRecentAnchor, { desc = 'Toggle between recent anchors' })
 vim.keymap.set('n', 'ç', require('anchor').jumpToNextAnchor, { desc = 'Next anchor in buffer' })
 vim.keymap.set('n', 'Ç', require('anchor').jumpToPrevAnchor, { desc = 'Previous anchor in buffer' })
-vim.keymap.set('n', '<leader><leader>', require('anchor').telescopeAnchorsInProject, { desc = 'List Anchors' })
+vim.keymap.set('n', '<leader><leader>', function()
+  local results = {}
+  local Job = require('plenary.job')
+  Job:new({
+    command = "rg",
+    args = { "<\\+\\+>", "./" },
+    on_stdout = function(_, line)
+      table.insert(results, line)
+    end,
+  }):sync() -- Wait for the job to finish
+  if #results == 0 then
+    require('telescope.builtin').find_files()
+  else
+    require('anchor').telescopeAnchorsInProject()
+  end
+end, { desc = 'List Anchors' })
 
 -- Trouble/Diagnostic
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
