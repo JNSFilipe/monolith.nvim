@@ -1188,6 +1188,7 @@ vim.keymap.set('n', '<leader>fR', require('telescope.builtin').resume, { desc = 
 vim.keymap.set('n', '<leader>ft', '<cmd>TodoTelescope keywords=TODO,FIX,WARNING,NOTE,HACK,PERF<cr>',
   { desc = 'Find TODOs, etc' })
 vim.keymap.set('n', '<leader>x', require('telescope.builtin').commands, { desc = 'M-x' })
+vim.keymap.set('n', '<leader>;', ":lua ", { desc = 'Eval' })
 
 -- Code
 vim.keymap.set('v', '<leader>cc', '<esc><cmd>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<cr>',
