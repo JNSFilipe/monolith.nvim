@@ -1236,6 +1236,11 @@ vim.keymap.set('n', '<leader><leader>', function()
     require('anchor').telescopeAnchorsInProject()
   end
 end, { desc = 'List Anchors' })
+vim.keymap.set('n', '+', function()
+  vim.cmd("vsplit")
+  require('anchor').jumpToNextAnchor()
+  require('anchor').addToHistoryNoAnchor()
+end, { desc = 'Jump no next anchor in a new split' })
 
 -- Trouble/Diagnostic
 vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
