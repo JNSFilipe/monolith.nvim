@@ -1164,13 +1164,14 @@ vim.keymap.set('n', '<leader>f/',
       previewer = false,
     })
   end, { desc = 'Fuzzy search in buffer' })
-vim.keymap.set('n', '<leader>fo',
-  function()
-    require('telescope.builtin').live_grep {
-      grep_open_files = true,
-      prompt_title = 'Live Grep in Open Files',
-    }
-  end, { desc = 'Find in open buffers' })
+local find_in_open_buffers = function()
+  require('telescope.builtin').live_grep {
+    grep_open_files = true,
+    prompt_title = 'Live Grep in Open Files',
+  }
+end
+vim.keymap.set('n', '<leader>fo', find_in_open_buffers, { desc = 'Find in open buffers' })
+vim.keymap.set('n', '<leader>/', find_in_open_buffers, { desc = 'Find in open buffers' })
 vim.keymap.set('n', '<leader>fs', require('telescope.builtin').grep_string, { desc = 'Find string' })
 vim.keymap.set('n', '<leader>fg', require('telescope.builtin').git_files, { desc = 'Find in git project' })
 vim.keymap.set('n', '<leader>fh', require('telescope.builtin').help_tags, { desc = 'Find in help' })
