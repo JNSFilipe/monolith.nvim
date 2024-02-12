@@ -771,7 +771,6 @@ require('lazy').setup({
     config = function(_, opts) require("illuminate").configure(opts) end,
   },
 
-  { 'JNSFilipe/anchor.nvim' }
   -- Matchup - Extend % to match keywords that start and end a code block
   {
     "andymass/vim-matchup",
@@ -781,6 +780,9 @@ require('lazy').setup({
     end,
   },
 
+  -- <++>
+  -- { 'JNSFilipe/anchor.nvim' },
+  { dir = '~/Documents/GitHub/anchor.nvim' },
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -1304,7 +1306,14 @@ local servers = {
   jsonls = {},
   bashls = {},
   texlab = {},
-  clangd = {},
+  clangd = {
+    setup = {
+      cmd = {
+        "clangd",
+        "--offset-encoding=utf-16",
+      }
+    },
+  },
   -- Setolen from https://github.com/jdhao/nvim-config/blob/master/lua/config/lsp.lua
   -- And https://www.reddit.com/r/neovim/comments/tttofk/how_to_disable_annoying_pylint_warningespecially/
   -- And https://www.reddit.com/r/neovim/comments/14316t9/help_me_to_get_the_best_python_neovim_environment/
