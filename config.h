@@ -2,14 +2,20 @@
 #define CONFIG_H_
 
 #ifdef _WIN32
-// TODO: Define config path for windows
+// TODO: Define config paths for windows
 #else
+// NEOVIM
 #define NEOVIM_CONFIG_PATH "$XDG_CONFIG_HOME/nvim"
 #define NEOVIM_CONFIG_DATA "$XDG_DATA_HOME/.local/share/nvim"
 #define NEOVIM_CONFIG_CACHE "$XDG_CACHE_HOME/nvim"
+// DOOM EMCAS
+#define DEMACS_CONFIG_PATH "$XDG_CONFIG_HOME/doom"
+#define DEMACS_CONFIG_DATA "$XDG_CONFIG_HOME/emacs"
+#define DEMACS_CONFIG_CACHE "$HOME/.emacs_saves"
 #endif
 
 #define NEOVIM
+#define DEMACS
 // #define FORCE_INSTALL
 
 #endif // CONFIG_H_
