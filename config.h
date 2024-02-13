@@ -17,5 +17,6 @@
 #define NEOVIM
 #define DEMACS
 // #define FORCE_INSTALL
+// #define SYNC
 
 #endif // CONFIG_H_

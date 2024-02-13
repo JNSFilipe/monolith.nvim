@@ -18,6 +18,9 @@ int main() {
 #ifdef FORCE_INSTALL
   mono_log(MONO_WARNING, "FORCE DEPLOY ENABLED");
 #endif
+#ifdef SYNC
+  mono_log(MONO_WARNING, "SYNCING ENABLED");
+#endif
 
   MONO_PRINT_SEP;
 
@@ -38,7 +41,16 @@ int main() {
   mono_log(MONO_INFO, "[NEOVIM] CREATE SYMLINK TO:");
   mono_log(MONO_INFO, buffer);
   MONO_SYMLINK(buffer, MONO_RESOLVE_ENV_VARS(NEOVIM_CONFIG_PATH));
+
+#ifdef SYNC
+  mono_log(MONO_INFO, "[NEOVIM] SYNCING PACKAGES");
+  snprintf(buffer, sizeof(buffer), "nvim --headless \"+Lazy! sync\" +qa");
+  mono_log(MONO_INFO, buffer);
+  MONO_CMD(buffer);
 #endif
+#endif
+
+  MONO_PRINT_SEP;
 
 // Deploy Doom Emacs
 #ifdef DEMACS
@@ -70,7 +82,22 @@ int main() {
   mono_log(MONO_INFO, buffer);
   MONO_SYMLINK(buffer, MONO_RESOLVE_ENV_VARS(DEMACS_CONFIG_PATH));
 
+#ifdef SYNC
+  mono_log(MONO_INFO, "[DEMACS] PURGING OLD PACKAGES");
+  snprintf(buffer, sizeof(buffer), "%s/bin/doom purge",
+           MONO_RESOLVE_ENV_VARS(DEMACS_CONFIG_DATA));
+  mono_log(MONO_INFO, buffer);
+  MONO_CMD(buffer);
+
+  mono_log(MONO_INFO, "[DEMACS] SYNCING PACKAGES");
+  snprintf(buffer, sizeof(buffer), "%s/bin/doom sync",
+           MONO_RESOLVE_ENV_VARS(DEMACS_CONFIG_DATA));
+  mono_log(MONO_INFO, buffer);
+  MONO_CMD(buffer);
 #endif
+#endif
+
+  MONO_PRINT_SEP;
 
   return 0;
 }
