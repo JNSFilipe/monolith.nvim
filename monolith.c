@@ -2,33 +2,38 @@
 #include "config.h"
 
 int main() {
+  char buffer[MAX_OUT_SZ];
 
+  MONO_PRINT_SEP;
+
+// Inform about enabled flags
+#ifdef NEOVIM
+  mono_log(MONO_WARNING, "NEOVIM ENABLED");
+#endif
 #ifdef FORCE_INSTALL
-  mono_log(MONO_WARNING, "FORCE INSTALL ENABLED");
-  mono_log(MONO_INFO, "DELETING " NEOVIM_CONFIG_PATH);
-  MONO_DEL_FILE_OR_DIR(NEOVIM_CONFIG_PATH);
-  mono_log(MONO_INFO, "DELETING " NEOVIM_CONFIG_DATA);
-  MONO_DEL_FILE_OR_DIR();
-  mono_log(MONO_INFO, "DELETING " NEOVIM_CONFIG_CACHE);
-  MONO_DEL_FILE_OR_DIR();
+  mono_log(MONO_WARNING, "FORCE DEPLOY ENABLED");
 #endif
 
-  mono_log(MONO_INFO, MONO_RESOLVE_ENV_VARS(NEOVIM_CONFIG_PATH));
-  // mono_log(MONO_INFO, EVAL_ECHO_CMD("pwd"));
-  // mono_log(MONO_INFO, EVAL_ECHO_CMD("ls"));
+  MONO_PRINT_SEP;
 
-  char neovim[256];
-  snprintf(neovim, sizeof(neovim), "%s/%s", MONO_PWD(), "neovim/");
-  mono_log(MONO_INFO, neovim);
+// Deploy Neovim
+#ifdef NEOVIM
+  mono_log(MONO_INFO, "[NEOVIM] STARTING DEPLOYMENT");
+  mono_log(MONO_INFO, "[NEOVIM] DELETING (mv /tmp) " NEOVIM_CONFIG_PATH);
+  MONO_DEL_MV_TO_TMP(MONO_RESOLVE_ENV_VARS(NEOVIM_CONFIG_PATH));
 
-  // TO DEBUG TODO: Debug these functions
-  MONO_MK_FULL_PATH("/tmp/nvim/cenas");
-  MONO_MKDIR("/tmp/nvim/cenas");
+#ifdef FORCE_INSTALL
+  mono_log(MONO_INFO, "[NEOVIM] DELETING (mv /tmp) " NEOVIM_CONFIG_DATA);
+  MONO_DEL_MV_TO_TMP(MONO_RESOLVE_ENV_VARS(NEOVIM_CONFIG_DATA));
+  mono_log(MONO_INFO, "[NEOVIM] DELETING (mv /tmp) " NEOVIM_CONFIG_CACHE);
+  MONO_DEL_MV_TO_TMP(MONO_RESOLVE_ENV_VARS(NEOVIM_CONFIG_CACHE));
+#endif
 
-  // WORKINIG
-  // mono_log(MONO_INFO, MONO_RESOLVE_ENV_VARS(NEOVIM_CONFIG_PATH));
-  // MONO_CREATE_SYMLINK(neovim, "/tmp/cenas");
-  // MONO_DEL_FILE_OR_DIR("/tmp/cenas");
+  snprintf(buffer, sizeof(buffer), "%s/%s", MONO_PWD(), "neovim/");
+  mono_log(MONO_INFO, "[NEOVIM] CREATE SYMLINK TO:");
+  mono_log(MONO_INFO, buffer);
+  MONO_SYMLINK(buffer, MONO_RESOLVE_ENV_VARS(NEOVIM_CONFIG_PATH));
+#endif
 
   return 0;
 }

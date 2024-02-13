@@ -33,6 +33,50 @@ typedef enum {
 // MACROS
 
 /**
+ * MONO_PRINT_SEP Macro
+ *
+ * Print an horizonal separator to stderr
+ *
+ * Returns:
+ *   void
+ *
+ */
+#define MONO_PRINT_SEP                                                         \
+  fprintf(stderr, "------------------------------------\n");
+
+/**
+ * MONO_CMD Macro
+ *
+ * Runs commands in the interactive shell and returns result
+ *
+ * Returns:
+ *   A dynamically allocated string containing the resolved string. Empty on
+ * failure.
+ *
+ * Note:
+ *   - The caller is responsible for freeing the returned string to avoid memory
+ * * leaks.
+ *   - Ensure to check for empty string return in case of failure.
+ */
+char *run_cmd(char *input) {
+  char cmd[MAX_OUT_SZ];
+  char *output = (char *)malloc(MAX_OUT_SZ * sizeof(char));
+  snprintf(cmd, sizeof(cmd), input, input);
+  FILE *fp = popen(cmd, "r");
+  if (fp == NULL) {
+    output[0] = '\0';
+    return output;
+  }
+
+  if (fgets(output, MAX_OUT_SZ, fp) == NULL)
+    output[0] = '\0';
+
+  pclose(fp);
+  return output;
+}
+#define MONO_CMD(input) run_cmd(input)
+
+/**
  * MONO_RESOLVE_ENV_VARS Macro
  *
  * Resolves env vars, by running 'echo <comand>' and getting the result
@@ -56,24 +100,12 @@ typedef enum {
 #else
 #define ECHO_CMD "echo -n "
 #endif
-// TODO: Extract macro to run commands form the code below
 char *echo_eval(char *input) {
   char cmd[MAX_OUT_SZ];
-  char *output = (char *)malloc(MAX_OUT_SZ * sizeof(char));
   snprintf(cmd, sizeof(cmd), ECHO_CMD "%s", input);
-  FILE *fp = popen(cmd, "r");
-  if (fp == NULL) {
-    output[0] = '\0';
-    return output;
-  }
 
-  if (fgets(output, MAX_OUT_SZ, fp) == NULL)
-    output[0] = '\0';
-
-  pclose(fp);
-  return output;
+  return MONO_CMD(cmd);
 }
-
 #define MONO_RESOLVE_ENV_VARS(input) echo_eval(input)
 
 /**
@@ -130,7 +162,7 @@ char *get_current_dir_unix() {
 #endif
 
 /**
- * MONO_CREATE_SYMLINK Macro
+ * MONO_SYMLINK Macro
  *
  * Creates a symbolic link from 'dest' to 'src'.
  *
@@ -148,14 +180,13 @@ char *get_current_dir_unix() {
  * Note: Requires appropriate permissions on the respective platform.
  */
 #ifdef _WIN32
-#define MONO_CREATE_SYMLINK(src, dest)                                         \
-  (CreateSymbolicLinkA(dest, src, 0) ? 0 : -1)
+#define MONO_SYMLINK(src, dest) (CreateSymbolicLinkA(dest, src, 0) ? 0 : -1)
 #else
-#define MONO_CREATE_SYMLINK(src, dest) symlink(src, dest)
+#define MONO_SYMLINK(src, dest) symlink(src, dest)
 #endif
 
 /**
- * MONO_FILE_OR_DIR_EXISTS Macro
+ * MONO_EXISTS Macro
  *
  * Checks if a file or directory exists at the given path.
  *
@@ -173,10 +204,9 @@ char *get_current_dir_unix() {
  *
  */
 #ifdef _WIN32
-#define MONO_FILE_OR_DIR_EXISTS(path)                                          \
-  (GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES)
+#define MONO_EXISTS(path) (GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES)
 #else
-#define MONO_FILE_OR_DIR_EXISTS(path) (stat(path, &(struct stat){0}) == 0)
+#define MONO_EXISTS(path) (stat(path, &(struct stat){0}) == 0)
 #endif
 
 /**
@@ -197,6 +227,9 @@ char *get_current_dir_unix() {
  *
  * Note: The macro relies on the create_full_path function to handle the
  * creation of subdirectories in the path.
+ * All directories must be followed by a path separator ('\' in Windows, '/' in
+ * Linux). If they do not terminate with the separator, is assumed it is a file
+ * and folder won't be created.
  */
 #ifdef _WIN32
 #define MONO_MKDIR(path) CreateDirectoryA(path, NULL)
@@ -207,31 +240,27 @@ char *get_current_dir_unix() {
 #endif
 
 int create_full_path(const char *path) {
-  char temp[MAX_OUT_SZ];
-  char *p = NULL;
+  // TODO: there is probably a way to do this more efficiently
+  char tmp[MAX_OUT_SZ];
   size_t len;
-
-  snprintf(temp, sizeof(temp), "%s", path);
-  len = strlen(temp);
-  if (temp[len - 1] == PATH_SEPARATOR) {
-    temp[len - 1] = 0;
-  }
-  for (p = temp + 1; *p; p++) {
-    if (*p == PATH_SEPARATOR) {
-      *p = 0;
-      if (MONO_MKDIR(temp) != 0) {
-        return -1;
+  len = strlen(path);
+  for (int i = 0; i < len; i++) {
+    if (path[i] == PATH_SEPARATOR) {
+      memcpy(tmp, path, (MAX_OUT_SZ - 1) * sizeof(char));
+      tmp[i + 1] = '\0'; // place null char
+      if (!MONO_EXISTS(tmp)) {
+        if (MONO_MKDIR(tmp) != 0)
+          return -1;
       }
-      *p = PATH_SEPARATOR;
     }
   }
-  return MONO_MKDIR(temp);
+  return 0;
 }
 
 #define MONO_MK_FULL_PATH(path) create_full_path(path)
 
 /**
- * MONO_MV_FILE_OR_DIR Macro
+ * MONO_MV Macro
  *
  * Moves a file or directory from 'src' to 'dest'.
  *
@@ -252,13 +281,21 @@ int create_full_path(const char *path) {
  * all platforms.
  */
 #ifdef _WIN32
-#define MONO_MV_FILE_OR_DIR(src, dest) (MoveFileA(src, dest) ? 0 : -1)
+#define MONO_MV(src, dest) (MoveFileA(src, dest) ? 0 : -1)
 #else
-#define MONO_MV_FILE_OR_DIR(src, dest) rename(src, dest)
+int mv_file_or_dir(const char *input, const char *output) {
+  char cmd[MAX_OUT_SZ];
+  snprintf(cmd, sizeof(cmd), "mv %s %s", input, output);
+
+  MONO_CMD(cmd);
+
+  return 0;
+}
+#define MONO_MV(src, dest) mv_file_or_dir(src, dest)
 #endif
 
 /**
- * MONO_DEL_FILE_OR_DIR_BY_MV_TO_TEMP Macro
+ * MONO_DEL_MV_TO_TMP Macro
  *
  * 'Soft' deletes a file or directory by moving it to a temporary directory.
  * On Unix, it uses '/tmp'. On Windows, it uses the directory specified by the
@@ -279,21 +316,18 @@ int create_full_path(const char *path) {
  * the file or directory back from the temp directory.
  */
 #ifdef _WIN32
-#define TEMP_DIR getenv("TEMP")
+#define TMP_DIR getenv("TEMP")
 #else
-#define TEMP_DIR "/tmp"
+#define TMP_DIR "/tmp/"
 #endif
-
-#define MONO_DEL_FILE_OR_DIR_BY_MV_TO_TEMP(path)                               \
-  ({                                                                           \
-    char tempDest[512];                                                        \
-    snprintf(tempDest, sizeof(tempDest), "%s/%s", TEMP_DIR,                    \
-             strrchr(path, '/') ? strrchr(path, '/') + 1 : path);              \
-    MOVE_FILE_OR_DIR(path, tempDest);                                          \
-  })
+int mv_to_tmp(const char *input) {
+  MONO_MV(input, TMP_DIR);
+  return 0;
+}
+#define MONO_DEL_MV_TO_TMP(path) mv_to_tmp(path)
 
 /**
- * MONO_DEL_FILE_OR_DIR Macro
+ * MONO_DEL Macro
  *
  * Deletes a file or directory specified by 'path'.
  *
@@ -313,7 +347,7 @@ int create_full_path(const char *path) {
  *   - On Unix, the 'remove' function handles both files and empty directories.
  */
 #ifdef _WIN32
-int delete_file_or_dir_windows(const char *path) {
+int delete_file_or_dir(const char *path) {
   DWORD attrs = GetFileAttributesA(path);
   if (attrs == INVALID_FILE_ATTRIBUTES) {
     return -1; // Path not found or error
@@ -325,10 +359,18 @@ int delete_file_or_dir_windows(const char *path) {
     return DeleteFileA(path) ? 0 : -1;
   }
 }
-#define MONO_DEL_FILE_OR_DIR(path) delete_file_or_dir_windows(path)
 #else
-#define MONO_DEL_FILE_OR_DIR(path) (remove(path) == 0 ? 0 : -1)
+int delete_file_or_dir(const char *path) {
+  char cmd[MAX_OUT_SZ];
+  snprintf(cmd, sizeof(cmd), "rm -rf %s", path);
+
+  MONO_CMD(cmd);
+
+  return 0;
+}
 #endif
+// TODO: Check Tsoding for better implementation, problably
+#define MONO_DEL(path) (delete_file_or_dir(path) == 0 ? 0 : -1)
 
 // Functions
 

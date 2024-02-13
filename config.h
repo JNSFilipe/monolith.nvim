@@ -9,6 +9,7 @@
 #define NEOVIM_CONFIG_CACHE "$XDG_CACHE_HOME/nvim"
 #endif
 
+#define NEOVIM
 // #define FORCE_INSTALL
 
 #endif // CONFIG_H_
