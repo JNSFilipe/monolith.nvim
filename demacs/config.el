@@ -119,22 +119,39 @@
 
 ;; Jump through git hunks
 (after! git-gutter
-  (setq-default left-margin-width 1)
   (set-window-buffer nil (current-buffer))
-  (custom-set-variables
-   '(git-gutter:update-interval 1)
-   '(git-gutter:window-width 2)
-   '(git-gutter:modified-sign " ~ ")
-   '(git-gutter:added-sign " + ")
-   '(git-gutter:deleted-sign " - "))
-  (map! "ç" #'git-gutter:next-hunk)
-  (map! "Ç" #'git-gutter:previous-hunk))
+  (map! "º" #'git-gutter:next-hunk)
+  (map! "ª" #'git-gutter:previous-hunk))
 
-;; TODO: fix git-gutter signs, instead of the stupid fringe bar
+;; Use git-gutter signs, instead just colours
 (after! git-gutter-fringe
-  (fringe-mode '27))
+  (fringe-mode '13)
+  (fringe-helper-define 'git-gutter-fr:added nil
+    "...XX..."
+    "...XX..."
+    "...XX..."
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "...XX..."
+    "...XX..."
+    "...XX...")
+  (fringe-helper-define 'git-gutter-fr:deleted nil
+    "........"
+    "........"
+    "........"
+    "XXXXXXXX"
+    "XXXXXXXX"
+    "........"
+    "........"
+    "........")
+  (fringe-helper-define 'git-gutter-fr:modified nil
+    "........"
+    "........"
+    "..X....X"
+    ".XXX..XX"
+    "XX.XXXX."
+    "X...XX.."
+    "........"
+    "........"))
 
 ;; TODO: Shortcuts mimicking my vim config
-;; TODO: config treemacs - a for ading a file and C- <hjkl> to navigate in and out
-;; TODO: Make git-gutter show the signs
-;; TODO: Make git-gutter show the signs
