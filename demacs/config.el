@@ -113,40 +113,9 @@
 ;; Keybinds! TODO: put this in a new file
 (load-file "~/.config/doom/keybinds.el")
 
-;; Keep selection after indent
-(defun jf/evil-shift-right ()
-  (interactive)
-  (evil-shift-right evil-visual-beginning evil-visual-end)
-  (evil-normal-state)
-  (evil-visual-restore))
-;; Keep selection after unindent
-(defun jf/evil-shift-left ()
-  (interactive)
-  (evil-shift-left evil-visual-beginning evil-visual-end)
-  (evil-normal-state)
-  (evil-visual-restore))
-(after! evil
-  ;; Map tab key to indent region when in visual mode
-  (define-key evil-visual-state-map (kbd "<tab>") 'jf/evil-shift-right)
-  (define-key evil-visual-state-map (kbd "<backtab>") 'jf/evil-shift-left)
-  (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
-  (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
-  (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
-  (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
-  ;; Escape insert with jj and jk
-  (key-chord-mode 1)
-  (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
-  (key-chord-define evil-insert-state-map "jk" 'evil-normal-state))
-
-;; Bind Change project to C-Space
-(after! projectile
-  (map! "C-a" #'projectile-switch-project))
-
 ;; Jump through git hunks
 (after! git-gutter
-  (set-window-buffer nil (current-buffer))
-  (map! "º" #'git-gutter:next-hunk)
-  (map! "ª" #'git-gutter:previous-hunk))
+  (set-window-buffer nil (current-buffer)))
 
 ;; Use git-gutter signs, instead just colours
 (after! git-gutter-fringe
