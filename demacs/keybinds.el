@@ -154,6 +154,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
         :desc "All Buffers/Files" "." #'switch-to-buffer
         :desc "Search Buffer" "/" #'+default/search-buffer
         :desc "Search Project" "*" #'+default/search-project
+        :desc "Adjust Font" "'" #'text-scale-adjust
         :desc "Code Actions" "a" #'lsp-execute-code-action
         :desc "Dired" "o" #'mono/dired
         :desc "Files" "f" #'mono/find-file
