@@ -149,27 +149,24 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 
 ;; New shortcuts
 (when custom-shortcuts
-  (map! :leader ":" #'execute-extended-command :desc "M-x")
-  (map! :leader ";" #'eval-expression :desc "Eval")
-  (map! :leader "," #'doom/open-scratch-buffer :desc "Scratch Buffer")
-  (map! :leader "." #'switch-to-buffer :desc "All Buffers")
-  (map! :leader "/" #'+default/search-buffer :desc "Search Buffer")
-  (map! :leader "*" #'+default/search-project :desc "Search Project")
-  (map! :leader "a" #'lsp-execute-code-action-by-kind :desc "Code Actions")
-  (map! :leader "o" #'mono/dired :desc "Dired")
-  (map! :leader "f" #'mono/find-file :desc "Files")
-  (map! :leader "b" #'mono/list-buffers :desc "Buffers")
-  (map! :leader "t" #'+eshell/toggle :desc "EShell")
-  (map! :leader "c" #'comment-line :desc "Toggle Comment")
-  (map! :leader "d" #'consult-lsp-diagnostics :desc "Diagnostics")
-  (map! :leader "h" #'replace-string :desc "Replace")
-  (map! :leader "r" #'async-shell-command :desc "Run")
-  (map! :leader "m" #'+make/run :desc "Make")
-  (map! :leader "s" #'mono/auto-split-window :desc "Split Window")
-  (map! :leader "u" #'undo-tree-visualize :desc "Undo Tree")
-  ;; TODO: Replace is not working very well...
   (map! :leader
-        :n "y" #'consult-yank-pop
-        :v "y" #'consult-yank-replace :desc "Yanks"))
-
-;; TODO; descriptions not working yet
+        :desc "M-x" ":" #'execute-extended-command
+        :desc "Eval" ";" #'eval-expression
+        :desc "Scratch Buffer" "," #'doom/open-scratch-buffer
+        :desc "All Buffers/Files" "." #'switch-to-buffer
+        :desc "Search Buffer" "/" #'+default/search-buffer
+        :desc "Search Project" "*" #'+default/search-project
+        :desc "Code Actions" "a" #'lsp-execute-code-action
+        :desc "Dired" "o" #'mono/dired
+        :desc "Files" "f" #'mono/find-file
+        :desc "Buffers" "b" #'mono/list-buffers
+        :desc "EShell" "t" #'+eshell/toggle
+        :desc "Toggle Comment" "c" #'comment-line
+        :desc "Diagnostics" "d" #'consult-lsp-diagnostics
+        :desc "Replace" "h" #'replace-string
+        :desc "Run" "r" #'async-shell-command
+        :desc "Make" "m" #'+make/run
+        :desc "Split Window" "s" #'mono/auto-split-window
+        :desc "Undo Tree" "u" #'undo-tree-visualize
+        :desc "Yanks" :n "y" #'consult-yank-pop
+        :desc "Yanks" :v "y" #'consult-yank-replace))
