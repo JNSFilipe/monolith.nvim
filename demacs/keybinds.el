@@ -64,7 +64,7 @@
   (other-window 1)
   (projectile-find-file))
 
-(defun minibuffer-keyboard-quit ()
+(defun mono/minibuffer-quit ()
   "Abort recursive edit.
 In Delete Selection mode, if the mark is active, just deactivate it;
 then it takes a second \\[keyboard-quit] to abort the minibuffer."
@@ -75,77 +75,75 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
     (abort-recursive-edit)))
 
 ;; Bind Esc to abort minibuffers
-(define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-ns-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-completion-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-must-match-map [escape] 'minibuffer-keyboard-quit)
-(define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
+(map! :map minibuffer-local-map "<escape>" #'mono/minibuffer-quit)
+(map! :map minibuffer-local-ns-map "<escape>" #'mono/minibuffer-quit)
+(map! :map minibuffer-local-completion-map "<escape>" #'mono/minibuffer-quit)
+(map! :map minibuffer-local-must-match-map "<escape>" #'mono/minibuffer-quit)
+(map! :map minibuffer-local-isearch-map "<escape>" #'mono/minibuffer-quit)
 
-;; Bind Change project to C-Space
-(global-set-key (kbd "C-SPC") #'projectile-switch-project)
-(global-set-key (kbd "C-a") #'projectile-switch-open-project)
-
-;; Bind keys for font size adjustment
-(global-set-key (kbd "C-+") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
-(global-set-key (kbd "C-0") 'text-scale-set)
-
-;; Bind C-q to kill the current buffer
-(global-set-key (kbd "C-q") #'kill-this-buffer)
-
-;; Jump through git hunks
-(after! git-gutter
-  (map! "º" #'git-gutter:next-hunk)
-  (map! "ª" #'git-gutter:previous-hunk))
 
 ;; Keep selection after unindent
 (after! evil
   ;; Map tab key to indent region when in visual mode
-  (define-key evil-visual-state-map (kbd "<tab>") 'mono/evil-shift-right)
-  (define-key evil-visual-state-map (kbd "<backtab>") 'mono/evil-shift-left)
-  (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
-  (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
-  (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
-  (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
+  (map! :v "<tab>" #'mono/evil-shift-right
+        :v "<backtab>" #'mono/evil-shift-left
+        :n "C-h" #'evil-window-left     ;; TODO: This is not working in C files
+        :n "C-l" #'evil-window-right
+        :n "C-j" #'evil-window-down
+        :n "C-k" #'evil-window-up)
   ;; Escape insert with jj and jk
   (key-chord-mode 1)
   (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
   (key-chord-define evil-insert-state-map "jk" 'evil-normal-state))
 
+(map!
+ ;; Manage project opening/switching
+ "C-SPC" #'projectile-switch-project
+ "C-a" #'projectile-switch-open-project
+ ;; Kill current buffer
+ "C-q" #'kill-this-buffer)
+
+;; Jump through git hunks
+(after! git-gutter
+  (map! "º" #'git-gutter:next-hunk
+        "ª" #'git-gutter:previous-hunk))
+
+
 ;; Disable default shortcuts
 (when custom-shortcuts
-  (map! :leader "RET" nil)
-  (map! :leader "SPC" nil)
-  (map! :leader "TAB" nil)
-  (map! :leader "'" nil)
-  (map! :leader "*" nil)
-  (map! :leader "," nil)
-  (map! :leader "." nil)
-  (map! :leader "/" nil)
-  (map! :leader ":" nil)
-  (map! :leader ";" nil)
-  (map! :leader "<" nil)
-  (map! :leader "<" nil)
-  (map! :leader "`" nil)
-  (map! :leader "a" nil)
-  (map! :leader "b" nil)
-  (map! :leader "c" nil)
-  (map! :leader "f" nil)
-  ;; (map! :leader "g" nil)
-  (map! :leader "h" nil)
-  (map! :leader "i" nil)
-  (map! :leader "n" nil)
-  (map! :leader "o" nil)
-  (map! :leader "p" nil)
-  (map! :leader "r" nil)
-  (map! :leader "s" nil)
-  (map! :leader "t" nil)
-  (map! :leader "u" nil)
-  (map! :leader "w" nil)
-  (map! :leader "x" nil)
-  (map! :leader "X" nil)
-  (map! :leader "~" nil)
-  (map! :leader "q" nil))
+  (map! :leader
+        "RET" nil
+        "SPC" nil
+        "TAB" nil
+        "'" nil
+        "*" nil
+        "," nil
+        "." nil
+        "/" nil
+        ":" nil
+        ";" nil
+        "<" nil
+        "<" nil
+        "`" nil
+        "a" nil
+        "b" nil
+        "c" nil
+        "f" nil
+        "g" nil
+        "h" nil
+        "i" nil
+        "n" nil
+        "o" nil
+        "p" nil
+        "r" nil
+        "s" nil
+        "t" nil
+        "u" nil
+        "w" nil
+        "x" nil
+        "X" nil
+        "~" nil
+        "q" nil))
 
 ;; New shortcuts
 (when custom-shortcuts
