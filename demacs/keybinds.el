@@ -84,12 +84,17 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (map! :map minibuffer-local-must-match-map "<escape>" #'mono/minibuffer-quit)
 (map! :map minibuffer-local-isearch-map "<escape>" #'mono/minibuffer-quit)
 
+;; Config Copilot
+(after! copilot
+  (map! :i "C-l" #'copilot-accept-completion
+        :i "C-k" #'copilot-accept-completion-by-word))
+
 ;; Keep selection after unindent
 (after! evil
   ;; Map tab key to indent region when in visual mode
   (map! :v "<tab>" #'mono/evil-shift-right
         :v "<backtab>" #'mono/evil-shift-left
-        :n "C-h" #'evil-window-left     ;; TODO: This is not working in C files
+        :n "C-h" #'evil-window-left ;; TODO: This is not working in C files
         :n "C-l" #'evil-window-right
         :n "C-j" #'evil-window-down
         :n "C-k" #'evil-window-up)
@@ -98,18 +103,17 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
   (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
   (key-chord-define evil-insert-state-map "jk" 'evil-normal-state))
 
+;; Jump through git hunks
+(after! git-gutter
+  (map! "º" #'git-gutter:next-hunk
+        "ª" #'git-gutter:previous-hunk))
+
 (map!
  ;; Manage project opening/switching
  "C-SPC" #'projectile-switch-project
  "C-a" #'projectile-switch-open-project
  ;; Kill current buffer
  "C-q" #'kill-this-buffer)
-
-;; Jump through git hunks
-(after! git-gutter
-  (map! "º" #'git-gutter:next-hunk
-        "ª" #'git-gutter:previous-hunk))
-
 
 ;; Disable default shortcuts
 (when custom-shortcuts
@@ -125,13 +129,12 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
         ":" nil
         ";" nil
         "<" nil
-        "<" nil
         "`" nil
         "a" nil
         "b" nil
         "c" nil
         "f" nil
-        "g" nil
+        ;; "g" nil
         "h" nil
         "i" nil
         "n" nil

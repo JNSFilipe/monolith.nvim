@@ -63,6 +63,11 @@
      'face 'doom-dashboard-banner)))
 (setq +doom-dashboard-ascii-banner-fn #'splashscreen-banner)
 
+;; Config Copilot
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :config (setq copilot-idle-delay 0.4))
+
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type 'relative)
