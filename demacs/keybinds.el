@@ -2,6 +2,8 @@
 ;; Keybinds!
 (defvar custom-shortcuts t)
 
+(load-file "~/.config/doom/anchor.el")
+
 (defun mono/find-file ()
   (interactive)
   (if (projectile-project-p)
@@ -113,7 +115,11 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
  "C-SPC" #'projectile-switch-project
  "C-a" #'projectile-switch-open-project
  ;; Kill current buffer
- "C-q" #'kill-this-buffer)
+ "C-q" #'kill-this-buffer
+ ;; Anchors
+ "ç" #'anchor/next
+ "Ç" #'anchor/prev
+ :n "<tab>" #'anchor/last-jump)
 
 ;; Disable default shortcuts
 (when custom-shortcuts
@@ -173,4 +179,8 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
         :desc "Split Window" "s" #'mono/auto-split-window
         :desc "Undo Tree" "u" #'undo-tree-visualize
         :desc "Yanks" :n "y" #'consult-yank-pop
-        :desc "Yanks" :v "y" #'consult-yank-replace))
+        :desc "Yanks" :v "y" #'consult-yank-replace
+        :desc "Anchors" "ç" nil
+        :desc "Drop" "çç" #'anchor/drop
+        :desc "Search in Buffer" "çp" #'anchor/search-buffer
+        :desc "Navigate" "SPC" #'anchor/search-project))
