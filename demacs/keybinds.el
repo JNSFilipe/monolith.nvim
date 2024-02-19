@@ -74,13 +74,15 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
     (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
     (abort-recursive-edit)))
 
+;; Make which-key appear faster
+(setq which-key-idle-delay 0.5)
+
 ;; Bind Esc to abort minibuffers
 (map! :map minibuffer-local-map "<escape>" #'mono/minibuffer-quit)
 (map! :map minibuffer-local-ns-map "<escape>" #'mono/minibuffer-quit)
 (map! :map minibuffer-local-completion-map "<escape>" #'mono/minibuffer-quit)
 (map! :map minibuffer-local-must-match-map "<escape>" #'mono/minibuffer-quit)
 (map! :map minibuffer-local-isearch-map "<escape>" #'mono/minibuffer-quit)
-
 
 ;; Keep selection after unindent
 (after! evil
