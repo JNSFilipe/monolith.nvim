@@ -16,6 +16,36 @@
   (setq anchor/last-position (point))
   (backward-char 4)) ; Move the cursor before the anchor
 
+;; Check if there is a last buffer to visit in regestry
+(defun anchor/no-last-buffer ()
+  (interactive)
+  (if anchor/last-buffer
+      t
+    nil))
+
+;; Check if there are anchors in buffer
+(defun anchor/anchors-in-buffer ()
+  "Check if there are any anchors in the current buffer."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (if (search-forward "<++>" nil t)
+        (progn (message "Anchors found in buffer.") t)
+      (progn (message "No anchors found in buffer.") nil))))
+
+;; Check if there are anchors in project
+(defun anchor/anchors-in-project ()
+  "Check if there are any anchors in the current Projectile project."
+  (interactive)
+  (if (and (projectile-project-p)
+           (executable-find "rg"))
+      (let ((search-command (format "rg --files-with-matches '<\\+\\+>' %s" (shell-quote-argument (projectile-project-root)))))
+        (message search-command)
+        (if (string-empty-p (shell-command-to-string search-command))
+            (progn (message "No anchors found in project.") nil)
+          (progn (message "Anchors found in project.") t)))
+    (message "Projectile not available or not in a project.")))
+
 ;; Search anchor in buffer
 (defun anchor/search-buffer ()
   "Search and list all occurrences of the anchor <++> in the current buffer."
@@ -28,7 +58,7 @@
 
 ;; Search anchor in project
 (defun anchor/search-project ()
-  "Search for the anchor <++> across all files in the current Projectile project."
+  "Search for the anchor across all files in the current Projectile project."
   (interactive)
   (if (and (fboundp 'consult-ripgrep)
            (projectile-project-p)
