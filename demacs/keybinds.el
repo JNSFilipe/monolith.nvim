@@ -45,17 +45,6 @@
         (message "Width/Height Ratio: %f" ratio)
       ratio)))
 
-;; (defun mono/auto-split-window ()
-;;   (interactive)
-;;   ;; Prompt for file selection
-;;   (let ((file (read-file-name "Select a file: ")))
-;;     ;; Determine split direction based on window dimensions
-;;     (if (> (window-width) (window-height))
-;;         (split-window-horizontally)  ; Wider window, split horizontally
-;;       (split-window-vertically))    ; Taller window, split vertically
-;;     ;; Open the selected file in the new window
-;;     (other-window 1)
-;;     (find-file file)))
 (defun mono/auto-split-window ()
   (interactive)
   ;; Determine split direction based on window dimensions
@@ -114,6 +103,8 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
   ;; Map tab key to indent region when in visual mode
   (map! :v "<tab>" #'mono/evil-shift-right
         :v "<backtab>" #'mono/evil-shift-left
+        :n "j" "gj" ;; Enable easier navigation in wrapped lines
+        :n "k" "gk" ;; Enable easier navigation in wrapped lines
         :n "C-h" #'evil-window-left ;; TODO: This is not working in C files
         :n "C-l" #'evil-window-right
         :n "C-j" #'evil-window-down
