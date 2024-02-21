@@ -128,7 +128,10 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
  ;; Anchors
  "ç" #'anchor/next
  "Ç" #'anchor/prev
- :n "<tab>" #'mono/tab-navigate)
+ :n "<tab>" #'mono/tab-navigate
+ ;; Navigate buffers
+ :n "<" #'previous-buffer
+ :n ">" #'next-buffer)
 
 ;; Disable default shortcuts
 (when custom-shortcuts
