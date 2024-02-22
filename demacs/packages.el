@@ -9,6 +9,8 @@
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;; (package! some-package)
 
+;; Themes
+(package! modus-themes)
 ;; Set key-chord for jj as Esc
 (package! key-chord)
 ;; Icons stuff
