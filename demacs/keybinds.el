@@ -83,6 +83,13 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
       (call-interactively 'anchor/last-jump)
     (switch-to-buffer (other-buffer (current-buffer) 1))))
 
+(defun mono/run-make-or-compile ()
+  "Run `+make/run` if a Makefile exists, otherwise `compile`."
+  (interactive)
+  (if (file-exists-p (expand-file-name "Makefile" (doom-project-root)))
+      (+make/run)
+    (call-interactively 'compile)))
+
 ;; Make which-key appear faster
 (setq which-key-idle-delay 0.5)
 
@@ -187,7 +194,7 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
         :desc "Diagnostics" "d" #'consult-lsp-diagnostics
         :desc "Replace" "h" #'replace-string
         :desc "Run" "r" #'async-shell-command
-        :desc "Make" "m" #'+make/run
+        :desc "Make" "m" #'mono/run-make-or-compile
         :desc "Split Window" "s" #'mono/auto-split-window
         :desc "Undo Tree" "u" #'undo-tree-visualize
         :desc "Yanks" :n "y" #'consult-yank-pop
