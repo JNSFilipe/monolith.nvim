@@ -73,7 +73,39 @@
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
-(setq org-directory "~/org/")
+(setq org-notes-dir "~/Documents/GitHub/Rivendell"
+      org-directory org-notes-dir
+      org-roam-directory org-notes-dir
+      citar-notes-paths org-notes-dir
+      citar-notes-paths (concat org-notes-dir "/bib")
+      org-agenda-files (directory-files-recursively (concat org-notes-dir "/daily") "\\.org$"))
+(use-package! org-modern
+  :config
+  (setq
+   ;; Edit settings
+   org-auto-align-tags nil
+   org-tags-column 0
+   ;; org-catch-invisible-edits 'show-and-error ;; Deprecated
+   org-fold-catch-invisible-edits 'show-and-error
+   org-special-ctrl-a/e t
+   org-insert-heading-respect-content t
+
+   ;; Org styling, hide markup etc.
+   org-hide-emphasis-markers t
+   org-pretty-entities t
+   org-ellipsis " ++"
+
+   ;; Agenda styling
+   org-agenda-tags-column 0
+   org-agenda-block-separator ?─
+   org-agenda-time-grid
+   '((daily today require-timed)
+     (800 1000 1200 1400 1600 1800 2000)
+     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
+   org-agenda-current-time-string
+   "◀── now ─────────────────────────────────────────────────")
+  (with-eval-after-load 'org (global-org-modern-mode)))
+
 
 ;; Set Projectile path
 (setq projectile-project-search-path '("~/Documents/GitHub/" "~/.local/share/"))

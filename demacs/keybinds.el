@@ -195,4 +195,12 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
         :desc "Anchors" "ç" nil
         :desc "Drop" "çç" #'anchor/drop
         :desc "Search in Buffer" "çp" #'anchor/search-buffer
-        :desc "Navigate Files" "SPC" #'mono/navigate))
+        :desc "Navigate Files" "SPC" #'mono/navigate
+        :desc "Notes" "n" nil
+        :desc "Capture Note Daily" "nn" #'org-roam-dailies-capture-today
+        :desc "Capture Note" "nc" #'org-roam-capture
+        :desc "Org Agenda" "na" #'org-agenda
+        :desc "Roam Find Note" "nr" #'org-roam-node-find
+        :desc "Find in Agenda" "nf" #'consult-org-agenda
+        :desc "New Roam Note" "ni" #'org-roam-node-insert
+        :desc "Switch to Notes" "ns" (lambda () (interactive) (projectile-switch-project-by-name org-directory))))

@@ -17,6 +17,13 @@
 ;; Copilot
 (package! copilot
   :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el" "dist")))
+;; Make Org prettier
+(package! org-modern)
+;; Org-roam
+;; TODO: Roam UI, maybe?
+(package! org-roam
+  :recipe (:host github :repo "org-roam/org-roam"
+           :files (:defaults "extensions/*")))
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:
