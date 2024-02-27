@@ -1,6 +1,8 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; $DOOMDIR/packages.el
 
+(load-file "~/.config/doom/defs.el")
+
 ;; To install a package with Doom you must declare them here and run 'doom sync'
 ;; on the command line, then restart Emacs for the changes to take effect -- or
 ;; use 'M-x doom/reload'.
@@ -26,6 +28,10 @@
 (package! org-roam
   :recipe (:host github :repo "org-roam/org-roam"
            :files (:defaults "extensions/*")))
+;; EXWM, if enabled in defs.el
+(when enable-exwm
+  (package! exwm)
+  (package! desktop-environment))
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:

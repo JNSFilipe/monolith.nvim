@@ -1,7 +1,4 @@
-
-;; Keybinds!
-(defvar custom-shortcuts t)
-
+(load-file "~/.config/doom/defs.el")
 (load-file "~/.config/doom/anchor.el")
 
 (defun mono/find-file ()
@@ -72,7 +69,6 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
            (anchor/anchors-in-project))
       (call-interactively 'anchor/search-project)
     (call-interactively 'mono/find-file)))
-
 
 (defun mono/tab-navigate ()
   "Navigate to anchors in the project if they exist, otherwise use mono/find-file."

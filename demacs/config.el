@@ -2,6 +2,7 @@
 
 ;; Place your private configuration here! Remember, you do not need to run 'doom
 ;; sync' after modifying this file!
+(load-file "~/.config/doom/defs.el")
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets. It is optional.
@@ -35,9 +36,9 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-;; (setq doom-theme 'doom-tokyo-night)
+(setq doom-theme 'doom-tokyo-night)
 ;; (setq doom-theme 'doom-ayu-dark)
-(load-theme 'modus-vivendi :no-confirm)
+;; (load-theme 'modus-vivendi :no-confirm)
 (defun splashscreen-banner ()
   (let* ((banner '("   ⣴⣶⣤⡤⠦⣤⣀⣤⠆     ⣈⣭⣿⣶⣿⣦⣼⣆          "
                    "    ⠉⠻⢿⣿⠿⣿⣿⣶⣦⠤⠄⡠⢾⣿⣿⡿⠋⠉⠉⠻⣿⣿⡛⣦       "
@@ -147,7 +148,11 @@
 ;; Setup dashboard
 ;; (setq fancy-splash-image (concat doom-private-dir "splash.png"))
 
-;; Keybinds! TODO: put this in a new file
+;; EXWM stuff
+(when enable-exwm
+  (load-file "~/.config/doom/wm.el"))
+
+;; Keybinds!
 (load-file "~/.config/doom/keybinds.el")
 
 ;; Jump through git hunks
