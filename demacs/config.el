@@ -73,41 +73,29 @@
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type 'relative)
 
-;; If you use `org' and don't want your org files in the default location below,
-;; change `org-directory'. It must be set before org loads!
-(setq org-notes-dir "~/Documents/GitHub/Rivendell"
-      org-directory org-notes-dir
-      org-roam-directory org-notes-dir
-      citar-notes-paths org-notes-dir
-      citar-notes-paths (concat org-notes-dir "/bib")
-      org-agenda-files (directory-files-recursively (concat org-notes-dir "/daily") "\\.org$"))
-(use-package! org-modern
+;; Configure obsidian notes
+(use-package! obsidian
+  :ensure t
+  :demand t
   :config
-  (setq
-   ;; Edit settings
-   org-auto-align-tags nil
-   org-tags-column 0
-   ;; org-catch-invisible-edits 'show-and-error ;; Deprecated
-   org-fold-catch-invisible-edits 'show-and-error
-   org-special-ctrl-a/e t
-   org-insert-heading-respect-content t
-
-   ;; Org styling, hide markup etc.
-   org-hide-emphasis-markers t
-   org-pretty-entities t
-   org-ellipsis " ++"
-
-   ;; Agenda styling
-   org-agenda-tags-column 0
-   org-agenda-block-separator ?─
-   org-agenda-time-grid
-   '((daily today require-timed)
-     (800 1000 1200 1400 1600 1800 2000)
-     " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄")
-   org-agenda-current-time-string
-   "◀── now ─────────────────────────────────────────────────")
-  (with-eval-after-load 'org (global-org-modern-mode)))
-
+  (obsidian-specify-path obsidian-notes-dir)
+  (global-obsidian-mode t)
+  :custom
+  ;; This directory will be used for `obsidian-capture' if set.
+  (obsidian-inbox-directory "inbox")
+  ;; Create missing files in inbox? - when clicking on a wiki link
+  ;; t: in inbox, nil: next to the file with the link
+  ;; default: t
+  (obsidian-wiki-link-create-file-in-inbox t)
+  ;; The directory for daily notes (file name is YYYY-MM-DD.md)
+  (obsidian-daily-notes-directory "daily")
+  :bind (:map obsidian-mode-map)
+  ;; Replace C-c C-o with Obsidian.el's implementation. It's ok to use another key binding.
+  ("C-c C-o" . obsidian-follow-link-at-point)
+  ;; Jump to backlinks
+  ("C-c C-b" . obsidian-backlink-jump)
+  ;; If you prefer you can use `obsidian-insert-link'
+  ("C-c C-l" . obsidian-insert-wikilink))
 
 ;; Set Projectile path
 (setq projectile-project-search-path '("~/Documents/GitHub/" "~/.local/share/"))

@@ -13,3 +13,6 @@
 
 ;; Enable EXWM stuff
 (defvar enable-exwm (mono/exwm-enable-if-possible t))
+
+;; Variable where path to Obsidian Notes folder is stored
+(setq obsidian-notes-dir "~/Documents/GitHub/Ecthelion")

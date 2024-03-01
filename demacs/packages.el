@@ -21,13 +21,8 @@
 ;; Copilot
 (package! copilot
   :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el" "dist")))
-;; Make Org prettier
-(package! org-modern)
-;; Org-roam
-;; TODO: Roam UI, maybe?
-(package! org-roam
-  :recipe (:host github :repo "org-roam/org-roam"
-           :files (:defaults "extensions/*")))
+;; Obsidian notes
+(package! obsidian)
 ;; EXWM, if enabled in defs.el
 (when enable-exwm
   (package! exwm)
