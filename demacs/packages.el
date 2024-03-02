@@ -24,7 +24,7 @@
 ;; Obsidian notes
 (package! obsidian)
 ;; EXWM, if enabled in defs.el
-(when enable-exwm
+(when install-exwm
   (package! exwm)
   (package! desktop-environment))
 

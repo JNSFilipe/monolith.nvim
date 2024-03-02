@@ -136,12 +136,12 @@
 ;; Setup dashboard
 ;; (setq fancy-splash-image (concat doom-private-dir "splash.png"))
 
+;; Keybinds!
+(load-file "~/.config/doom/keybinds.el")
+
 ;; EXWM stuff
 (when enable-exwm
   (load-file "~/.config/doom/wm.el"))
-
-;; Keybinds!
-(load-file "~/.config/doom/keybinds.el")
 
 ;; Jump through git hunks
 (after! git-gutter

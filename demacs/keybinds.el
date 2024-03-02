@@ -203,4 +203,5 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
         :desc "Capture Note Daily" "nn" #'obsidian-daily-note
         :desc "Capture Note" "nc" #'obsidian-capture
         :desc "Find in Notes" "nf" #'obsidian-jump
+        ;; TODO: make shortcut to find TODOs in notes
         :desc "Switch to Notes" "ns" (lambda () (interactive) (projectile-switch-project-by-name obsidian-notes-dir))))

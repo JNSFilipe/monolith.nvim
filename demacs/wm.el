@@ -100,23 +100,37 @@
   ;; Ctrl+Q will enable the next key to be sent directly
   (define-key exwm-mode-map [?\M-\s] 'exwm-input-send-next-key)
 
-  ;; Set up global key bindings.  These always work, no matter the input state!
-  ;; Keep in mind that changing this list after EXWM initializes has no effect.
-  (setq exwm-input-global-keys
-        `(
-          ;; Move between windows
-          ([C-h] . windmove-left)
-          ([C-l] . windmove-right)
-          ([C-k] . windmove-up)
-          ([C-j] . windmove-down)
 
-          ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
+  (setq exwm-input-global-keys
+        `((, (kbd "C-h") . windmove-left)
+          (, (kbd "C-l") . windmove-right)
+          (, (kbd "C-k") . windmove-up)
+          (, (kbd "C-j") . windmove-down)
           ,@(mapcar (lambda (i)
-                      `(,(kbd (format "s-%d" i)) .
+                      `(,(kbd (format "M-%d" i)) .
                         (lambda ()
                           (interactive)
                           (exwm-workspace-switch-create ,i))))
                     (number-sequence 0 9))))
+
+
+  ;; Set up global key bindings.  These always work, no matter the input state!
+  ;; Keep in mind that changing this list after EXWM initializes has no effect.
+  ;; (setq exwm-input-global-keys
+  ;;       `(
+  ;;         ;; Move between windows
+  ;;         ([C-h] . windmove-left)
+  ;;         ([C-l] . windmove-right)
+  ;;         ([C-k] . windmove-up)
+  ;;         ([C-j] . windmove-down)
+
+  ;;         ;; 's-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
+  ;;         ,@(mapcar (lambda (i)
+  ;;                     `(,(kbd (format "s-%d" i)) .
+  ;;                       (lambda ()
+  ;;                         (interactive)
+  ;;                         (exwm-workspace-switch-create ,i))))
+  ;;                   (number-sequence 0 9))))
   (exwm-enable)
 
   (use-package desktop-environment
