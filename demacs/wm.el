@@ -90,9 +90,6 @@
           ?\C-q
           ?\C-h
           ?\M-x
-          ?\M-d
-          ?\M-q
-          ?\M-f
           ?\M-&
           ?\M-:
           ?\C-\ )) ;; Ctrl+Space
@@ -101,21 +98,38 @@
   (define-key exwm-mode-map [?\M-\s] 'exwm-input-send-next-key)
 
 
+  ;; Set up global key bindings.  These always work, no matter the input state!
+  ;; Keep in mind that changing this list after EXWM initializes has no effect.
   (setq exwm-input-global-keys
         `((, (kbd "C-h") . windmove-left)
           (, (kbd "C-l") . windmove-right)
           (, (kbd "C-k") . windmove-up)
           (, (kbd "C-j") . windmove-down)
+          ;; Shortcuts
+          (, (kbd "M-d") . mono/launcher)
+          (, (kbd "M-q") . mono/kill-buffer-and-window)
+          (, (kbd "M-f") . mono/delete-other-windows)
+
+          ;; 'M-N': Switch to certain workspace with Super (Win) plus a number key (0 - 9)
           ,@(mapcar (lambda (i)
                       `(,(kbd (format "M-%d" i)) .
                         (lambda ()
                           (interactive)
                           (exwm-workspace-switch-create ,i))))
-                    (number-sequence 0 9))))
+                    (number-sequence 0 9))
+
+          ;; 'M-s-N': Move window to, and switch to, a certain workspace.
+          ,@(cl-mapcar (lambda (c n)
+                         `(,(kbd (format "M-s-%c" c)) .
+                           (lambda ()
+                             (interactive)
+                             (exwm-workspace-move-window ,n)
+                             (exwm-workspace-switch ,n))))
+                       '(?\) ?! ?@ ?# ?$ ?% ?^ ?& ?* ?\()
+                       ;; '(?\= ?! ?\" ?# ?¤ ?% ?& ?/ ?\( ?\))
+                       (number-sequence 0 9))))
 
 
-  ;; Set up global key bindings.  These always work, no matter the input state!
-  ;; Keep in mind that changing this list after EXWM initializes has no effect.
   ;; (setq exwm-input-global-keys
   ;;       `(
   ;;         ;; Move between windows
