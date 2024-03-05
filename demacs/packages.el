@@ -23,10 +23,6 @@
   :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el" "dist")))
 ;; Obsidian notes
 (package! obsidian)
-;; EXWM, if enabled in defs.el
-(when install-exwm
-  (package! exwm)
-  (package! desktop-environment))
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:

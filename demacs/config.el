@@ -139,10 +139,6 @@
 ;; Keybinds!
 (load-file "~/.config/doom/keybinds.el")
 
-;; EXWM stuff
-(when enable-exwm
-  (load-file "~/.config/doom/wm.el"))
-
 ;; Jump through git hunks
 (after! git-gutter
   (set-window-buffer nil (current-buffer)))
