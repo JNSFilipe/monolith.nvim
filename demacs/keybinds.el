@@ -86,6 +86,58 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
       (+make/run)
     (call-interactively 'compile)))
 
+(defun mono/dired-open ()
+  "In Dired, open the file or directory under the cursor.
+Opens directories in Emacs. Opens files with Emacs if possible, otherwise uses xdg-open."
+  (interactive)
+  (let ((file (dired-get-file-for-visit)))
+    (if (file-directory-p file)
+        (dired-find-file)
+      (if (file-executable-p file)
+          (start-process "" nil "xdg-open" file)
+        (find-file file)))))
+
+(defun mono/dired-open-split ()
+  "Open the current item in Dired in a new right split.
+If it's a directory, open in Dired. If it's a file Emacs can open, open it in Emacs.
+Otherwise, open it using xdg-open."
+  (interactive)
+  (let ((file (dired-get-file-for-visit)))
+    (if (file-directory-p file)
+        (progn
+          (split-window-right)
+          (other-window 1)
+          (dired file))
+      (if (file-exists-p file)
+          (progn
+            (split-window-right)
+            (other-window 1)
+            (if (file-readable-p file)
+                (find-file file)
+              (start-process "" nil "xdg-open" file)))
+        (message "File does not exist")))))
+
+
+
+(defun mono/dired-create-path (name)
+  "Create a file or directory based on the input NAME.
+If NAME ends with a '/', it creates a directory, otherwise a file."
+  (interactive "sEnter file or directory name: ")
+  (let ((dir (if (string-suffix-p "/" name)
+                 name
+               (file-name-directory name))))
+    (when dir
+      (make-directory dir t))
+    (unless (string-suffix-p "/" name)
+      (write-region "" nil name))))
+
+(defun mono/close-dired ()
+  "Kill the current dired buffer and close its window."
+  (interactive)
+  (when (eq major-mode 'dired-mode)
+    (kill-this-buffer)
+    (delete-window)))
+
 ;; Make which-key appear faster
 (setq which-key-idle-delay 0.5)
 
@@ -116,6 +168,40 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
   (key-chord-mode 1)
   (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
   (key-chord-define evil-insert-state-map "jk" 'evil-normal-state))
+
+;; Config Dired
+(after! dired
+  (map! :map dired-mode-map
+        :n "M-RET" #'dired-display-file
+        :n "h" #'dired-up-directory
+        :n "H" #'mono/close-dired
+        :n "l" #'mono/dired-open
+        :n "L" #'mono/dired-open-split
+        :n "m" #'dired-mark
+        :n "t" #'dired-toggle-marks
+        :n "u" #'dired-unmark
+        :n "s" #'dired-do-search           ; Search marked files
+        :n "a" #'mono/dired-create-path
+        :n "C" #'dired-do-copy
+        :n "D" #'dired-do-delete
+        :n "J" #'dired-goto-file
+        :n "M" #'dired-do-chmod
+        :n "O" #'dired-do-chown
+        :n "P" #'dired-do-print
+        :n "R" #'dired-do-rename
+        :n "T" #'dired-do-touch
+        :n "Y" #'dired-copy-filenamecopy-filename-as-kill ; copies filename to kill ring.
+        :n "Z" #'dired-do-compress
+        :n "+" #'dired-create-directory
+        :n "-" #'dired-do-kill-lines
+        :n "% l" #'dired-downcase
+        :n "% m" #'dired-mark-files-regexp
+        :n "% u" #'dired-upcase
+        :n "* %" #'dired-mark-files-regexp
+        :n "* ." #'dired-mark-extension
+        :n "* /" #'dired-mark-directories
+        :n "; d" #'epa-dired-do-decrypt
+        :n "; e" #'epa-dired-do-encrypt))
 
 ;; Jump through git hunks
 (after! git-gutter
