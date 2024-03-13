@@ -21,8 +21,8 @@
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
 ;;
-(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 13 :weight 'semi-bold)
-      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 13))
+(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 14 :weight 'semi-bold)
+      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 14))
 
 ;; Set default tab size as two spaces
 (setq-default tab-width 2)
