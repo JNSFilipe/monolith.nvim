@@ -1,6 +1,9 @@
 (load-file "~/.config/doom/defs.el")
 (load-file "~/.config/doom/anchor.el")
 
+(defvar dired-copy-paste-func nil)
+(defvar dired-copy-paste-stored-file-list nil)
+
 (defun mono/find-file ()
   (interactive)
   (if (projectile-project-p)
@@ -117,8 +120,6 @@ Otherwise, open it using xdg-open."
               (start-process "" nil "xdg-open" file)))
         (message "File does not exist")))))
 
-
-
 (defun mono/dired-create-path (name)
   "Create a file or directory based on the input NAME.
 If NAME ends with a '/', it creates a directory, otherwise a file."
@@ -137,6 +138,41 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
   (when (eq major-mode 'dired-mode)
     (kill-this-buffer)
     (delete-window)))
+
+(defun mono/add_slashes_to_dirs (fns)
+  "Add slashes to the end of files that are directories."
+  (mapcar (lambda (fn)
+            (if (file-directory-p fn)
+                (concat fn "/"
+                        fn)))
+          fns))
+
+(defun mono/dired-do-paste ()
+  "In dired-mode, paste cut/copied file/dir(s) into current directory."
+  (interactive)
+  (let ((stored-file-list nil))
+    (dolist (stored-file dired-copy-paste-stored-file-list)
+      (condition-case nil
+          (progn
+            (funcall dired-copy-paste-func stored-file (dired-current-directory) 1)
+            (push stored-file stored-file-list))))
+    ;; (error nil)
+
+    (if (eq dired-copy-paste-func 'rename-file)
+        (setq dired-copy-paste-stored-file-list nil
+              dired-copy-paste-func nil))
+    (revert-buffer)
+    (message
+     (format "%d file/dir(s) pasted into current directory." (length stored-file-list)))))
+
+(defun mono/dired-toggle-mark ()
+  "Toggle the mark on the current file and stay on the same line."
+  (interactive)
+  (save-excursion
+    (beginning-of-line)
+    (if (looking-at dired-re-mark)
+        (dired-unmark 1)
+      (dired-mark 1))))
 
 ;; Make which-key appear faster
 (setq which-key-idle-delay 0.5)
@@ -177,12 +213,17 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
         :n "H" #'mono/close-dired
         :n "l" #'mono/dired-open
         :n "L" #'mono/dired-open-split
-        :n "m" #'dired-mark
+        :n "m" #'mono/dired-toggle-mark
         :n "t" #'dired-toggle-marks
-        :n "u" #'dired-unmark
-        :n "s" #'dired-do-search           ; Search marked files
+        :n "f" #'dired-do-search           ; Search marked files
         :n "a" #'mono/dired-create-path
-        :n "C" #'dired-do-copy
+        :n "y" #'mono/dired-do-yank
+        :n "p" #'mono/dired-do-paste
+        :n "c" #'diredp-do-command-in-marked
+        :n "." #'dired-mark-files-regexp
+        :n "s" #'dired-mark-extension
+        :n "G" #'diredp-do-grep-recursive
+        :n "Y" #'dired-do-copy
         :n "D" #'dired-do-delete
         :n "J" #'dired-goto-file
         :n "M" #'dired-do-chmod
@@ -190,7 +231,7 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
         :n "P" #'dired-do-print
         :n "R" #'dired-do-rename
         :n "T" #'dired-do-touch
-        :n "Y" #'dired-copy-filenamecopy-filename-as-kill ; copies filename to kill ring.
+        :n "C" #'dired-copy-filenamecopy-filename-as-kill ; copies filename to kill ring.
         :n "Z" #'dired-do-compress
         :n "+" #'dired-create-directory
         :n "-" #'dired-do-kill-lines

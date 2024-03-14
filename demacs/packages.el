@@ -18,6 +18,8 @@
 ;; Icons stuff
 (package! all-the-icons)
 (package! nerd-icons)
+;; Dired pluggins
+(package! dired+)
 ;; Copilot
 (package! copilot
   :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el" "dist")))
