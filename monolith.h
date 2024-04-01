@@ -17,6 +17,9 @@
 #include <unistd.h>
 #endif
 
+#define MONO_WGT_BOLD "\e[1m"
+#define MONO_WGT_RGLR "\e[m"
+
 #define MONO_COLR_YLW "\033[0;33m"
 #define MONO_COLR_RED "\033[0;31m"
 #define MONO_COLR_GRN "\033[0;32m"
@@ -414,20 +417,27 @@ void mono_log(Mono_Log_Level level, const char *fmt, ...) {
   switch (level) {
   case MONO_INFO:
     fprintf(stderr, MONO_COLR_GRN);
+    fprintf(stderr, MONO_WGT_BOLD);
     fprintf(stderr, "[INFO] ");
     fprintf(stderr, MONO_COLR_RST);
+    fprintf(stderr, MONO_WGT_BOLD);
     break;
   case MONO_WARNING:
     fprintf(stderr, MONO_COLR_YLW);
+    fprintf(stderr, MONO_WGT_BOLD);
     fprintf(stderr, "[WARNING] ");
     fprintf(stderr, MONO_COLR_RST);
+    fprintf(stderr, MONO_WGT_BOLD);
     break;
   case MONO_ERROR:
     fprintf(stderr, MONO_COLR_RED);
+    fprintf(stderr, MONO_WGT_BOLD);
     fprintf(stderr, "[ERROR] ");
     fprintf(stderr, MONO_COLR_RST);
+    fprintf(stderr, MONO_WGT_BOLD);
     break;
   default:
+    fprintf(stderr, MONO_WGT_RGLR);
     MONO_ASSERT(0 && "unreachable");
   }
 
@@ -435,6 +445,7 @@ void mono_log(Mono_Log_Level level, const char *fmt, ...) {
   va_start(args, fmt);
   vfprintf(stderr, fmt, args);
   va_end(args);
+  fprintf(stderr, MONO_WGT_RGLR);
   fprintf(stderr, "\n");
 }
 
