@@ -71,8 +71,8 @@ int main() {
   MONO_CMD(buffer);
 
   mono_log(MONO_INFO, "[DEMACS] INSTALLING DOOM");
-  snprintf(buffer, sizeof(buffer), "%s/bin/doom install",
-           MONO_RESOLVE_ENV_VARS(DEMACS_CONFIG_DATA));
+  snprintf(buffer, sizeof(buffer), "%s/bin/doom install --force",
+           MONO_RESOLVE_ENV_VARS(DEMACS_CONFIG_DATA)); // force for unattended
   mono_log(MONO_INFO, buffer);
   MONO_CMD(buffer);
 #endif
