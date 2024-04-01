@@ -17,6 +17,12 @@
 #include <unistd.h>
 #endif
 
+#define MONO_COLR_YLW "\033[0;33m"
+#define MONO_COLR_RED "\033[0;31m"
+#define MONO_COLR_GRN "\033[0;32m"
+#define MONO_COLR_BLU "\033[0;34m"
+#define MONO_COLR_RST "\033[0m"
+
 #define MONO_ASSERT assert
 #define MONO_REALLOC realloc
 #define MONO_FREE free
@@ -407,13 +413,19 @@ int delete_file_or_dir(const char *path) {
 void mono_log(Mono_Log_Level level, const char *fmt, ...) {
   switch (level) {
   case MONO_INFO:
+    fprintf(stderr, MONO_COLR_GRN);
     fprintf(stderr, "[INFO] ");
+    fprintf(stderr, MONO_COLR_RST);
     break;
   case MONO_WARNING:
+    fprintf(stderr, MONO_COLR_YLW);
     fprintf(stderr, "[WARNING] ");
+    fprintf(stderr, MONO_COLR_RST);
     break;
   case MONO_ERROR:
+    fprintf(stderr, MONO_COLR_RED);
     fprintf(stderr, "[ERROR] ");
+    fprintf(stderr, MONO_COLR_RST);
     break;
   default:
     MONO_ASSERT(0 && "unreachable");
