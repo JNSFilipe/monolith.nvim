@@ -60,6 +60,16 @@ require('lazy').setup({
   -- Detect tabstop and shiftwidth automatically
   'tpope/vim-sleuth',
 
+  -- Pluggin for installing luarocks automatically
+  {
+    "vhyrro/luarocks.nvim",
+    priority = 1000, -- Very high priority is required, luarocks.nvim should run as the first plugin in your config.
+    -- config = true,
+    opts = {
+        rocks = { "magick" }, -- specifies a list of rocks to install
+      },
+  },
+
   -- NOTE: This is where your plugins related to LSP can be installed.
   --  The configuration is done below. Search for lspconfig to find it below.
   {
@@ -220,14 +230,6 @@ require('lazy').setup({
 
       return opts
     end,
-  },
-
-  -- Trouble (lists error, warinings, etc)
-  {
-    "folke/trouble.nvim",
-    config = function()
-      require("trouble").setup()
-    end
   },
 
   -- Undo tree
@@ -429,6 +431,29 @@ require('lazy').setup({
   },
 
   {
+    'stevearc/overseer.nvim',
+    dependencies = { 'stevearc/dressing.nvim', 'rcarriga/nvim-notify' },
+    config = function()
+      require("overseer").setup()
+    end
+  },
+
+  {
+    "X3eRo0/dired.nvim",
+    dependencies = { "MunifTanjim/nui.nvim" },
+    config = function()
+      -- TODO: Add keyybinds for opening current folder in other window
+      -- TODO: make modifiable
+      require("dired").setup({
+          keybinds = {
+            dired_enter = "l",
+            dired_back = "h"
+          }
+            })
+    end
+  },
+
+  {
     -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
     main = 'ibl',
@@ -459,6 +484,15 @@ require('lazy').setup({
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
+  -- Image viewer
+  { '3rd/image.nvim',
+    config = function()
+      require('image').setup({
+         backend = 'kitty',
+                            })
+    end
+  },
+
   -- Fuzzy Finder (files, lsp, etc)
   {
     'nvim-telescope/telescope.nvim',
@@ -482,18 +516,17 @@ require('lazy').setup({
     opts = function()
       local actions = require "telescope.actions"
       return {
+        layout_strategy = "vertical",
+        border = true,
         defaults = {
           git_worktrees = vim.g.git_worktrees,
-          -- prompt_prefix = get_icon("Selected", 1),
-          -- selection_caret = get_icon("Selected", 1),
           path_display = { "truncate" },
           sorting_strategy = "ascending",
           layout_config = {
-            horizontal = { prompt_position = "top", preview_width = 0.55 },
-            vertical = { mirror = false },
-            width = 0.87,
-            height = 0.80,
-            preview_cutoff = 120,
+            anchor = "S",
+            prompt_position = "top",
+            width = {padding = 0},
+            height = 0.3,
           },
           mappings = {
             i = {
@@ -517,14 +550,6 @@ require('lazy').setup({
     end
   },
 
-  -- OCaml
-  {
-    "tjdevries/ocaml.nvim",
-    setup = function()
-      require('ocaml').setup()
-    end
-  },
-
   {
     -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
@@ -536,178 +561,6 @@ require('lazy').setup({
 
   -- Show header of current function on top
   { "nvim-treesitter/nvim-treesitter-context" },
-
-  {
-    "nvim-neo-tree/neo-tree.nvim",
-    branch = "main", -- HACK: force neo-tree to checkout `main` for initial v3 migration since default branch has changed
-    dependencies = { "MunifTanjim/nui.nvim" },
-    cmd = "Neotree",
-    init = function() vim.g.neo_tree_remove_legacy_commands = true end,
-    opts = function()
-      -- local get_icon = utils.get_icon
-      return {
-        auto_clean_after_session_restore = true,
-        close_if_last_window = true,
-        sources = { "filesystem", "buffers", "git_status" },
-        source_selector = {
-          winbar = true,
-          content_layout = "center",
-          -- sources = {
-          --   { source = "filesystem", display_name = get_icon("FolderClosed", 1, true) .. "File" },
-          --   { source = "buffers", display_name = get_icon("DefaultFile", 1, true) .. "Bufs" },
-          --   { source = "git_status", display_name = get_icon("Git", 1, true) .. "Git" },
-          --   { source = "diagnostics", display_name = get_icon("Diagnostic", 1, true) .. "Diagnostic" },
-          -- },
-        },
-        default_component_configs = {
-          indent = { padding = 0 },
-          -- icon = {
-          --   folder_closed = get_icon "FolderClosed",
-          --   folder_open = get_icon "FolderOpen",
-          --   folder_empty = get_icon "FolderEmpty",
-          --   folder_empty_open = get_icon "FolderEmpty",
-          --   default = get_icon "DefaultFile",
-          -- },
-          -- modified = { symbol = get_icon "FileModified" },
-          -- git_status = {
-          --   symbols = {
-          --     added = get_icon "GitAdd",
-          --     deleted = get_icon "GitDelete",
-          --     modified = get_icon "GitChange",
-          --     renamed = get_icon "GitRenamed",
-          --     untracked = get_icon "GitUntracked",
-          --     ignored = get_icon "GitIgnored",
-          --     unstaged = get_icon "GitUnstaged",
-          --     staged = get_icon "GitStaged",
-          --     conflict = get_icon "GitConflict",
-          --   },
-          -- },
-        },
-        commands = {
-          system_open = function(state)
-            vim.ui.open(state.tree:get_node():get_id())
-          end,
-          parent_or_close = function(state)
-            local node = state.tree:get_node()
-            if (node.type == "directory" or node:has_children()) and node:is_expanded() then
-              state.commands.toggle_node(state)
-            else
-              require("neo-tree.ui.renderer").focus_node(state, node:get_parent_id())
-            end
-          end,
-          child_or_open = function(state)
-            local node = state.tree:get_node()
-            if node.type == "directory" or node:has_children() then
-              if not node:is_expanded() then -- if unexpanded, expand
-                state.commands.toggle_node(state)
-              else                           -- if expanded and has children, seleect the next child
-                require("neo-tree.ui.renderer").focus_node(state, node:get_child_ids()[1])
-              end
-            else -- if not a directory just open it
-              state.commands.open(state)
-            end
-          end,
-          copy_selector = function(state)
-            local node = state.tree:get_node()
-            local filepath = node:get_id()
-            local filename = node.name
-            local modify = vim.fn.fnamemodify
-
-            local vals = {
-              ["BASENAME"] = modify(filename, ":r"),
-              ["EXTENSION"] = modify(filename, ":e"),
-              ["FILENAME"] = filename,
-              ["PATH (CWD)"] = modify(filepath, ":."),
-              ["PATH (HOME)"] = modify(filepath, ":~"),
-              ["PATH"] = filepath,
-              ["URI"] = vim.uri_from_fname(filepath),
-            }
-
-            local options = vim.tbl_filter(function(val) return vals[val] ~= "" end, vim.tbl_keys(vals))
-            if vim.tbl_isempty(options) then
-              -- utils.notify("No values to copy", vim.log.levels.WARN)
-              return
-            end
-            table.sort(options)
-            vim.ui.select(options, {
-              prompt = "Choose to copy to clipboard:",
-              format_item = function(item) return ("%s: %s"):format(item, vals[item]) end,
-            }, function(choice)
-              local result = vals[choice]
-              if result then
-                -- utils.notify(("Copied: `%s`"):format(result))
-                vim.fn.setreg("+", result)
-              end
-            end)
-          end,
-          find_in_dir = function(state)
-            local node = state.tree:get_node()
-            local path = node:get_id()
-            require("telescope.builtin").find_files {
-              cwd = node.type == "directory" and path or vim.fn.fnamemodify(path, ":h"),
-            }
-          end,
-        },
-        window = {
-          width = 30,
-          mappings = {
-            ["<space>"] = false, -- disable space until we figure out which-key disabling
-            ["[b"] = "prev_source",
-            ["]b"] = "next_source",
-            F = "find_in_dir",
-            O = "system_open",
-            Y = "copy_selector",
-            h = "parent_or_close",
-            l = "child_or_open",
-            o = "open",
-          },
-          fuzzy_finder_mappings = { -- define keymaps for filter popup window in fuzzy_finder_mode
-            ["<C-j>"] = "move_cursor_down",
-            ["<C-k>"] = "move_cursor_up",
-          },
-        },
-        filesystem = {
-          follow_current_file = { enabled = true },
-          hijack_netrw_behavior = "open_current",
-          use_libuv_file_watcher = true,
-        },
-        event_handlers = {
-          {
-            event = "neo_tree_buffer_enter",
-            handler = function(_) vim.opt_local.signcolumn = "auto" end,
-          },
-        },
-      }
-    end,
-  },
-
-  -- Conjure for REPL
-  {
-    'PaterJason/cmp-conjure',
-    config = function()
-      local cmp = require "cmp"
-      local config = cmp.get_config()
-      table.insert(config.sources, {
-        name = "buffer",
-        option = {
-          sources = {
-            { name = "conjure" },
-          },
-        },
-      })
-      cmp.setup(config)
-    end,
-  },
-
-  {
-    'Olical/conjure',
-
-    ft = { "scheme", "fennel", "lua", "python", "rust", "hy", "scheme", "guile", "common-lisp" }, -- etc
-    init = function()
-      -- Set configuration options here
-      -- vim.g["conjure#debug"] = true
-    end,
-  },
 
   -- Format on save
   {
@@ -779,10 +632,6 @@ require('lazy').setup({
       lvim.builtin.treesitter.matchup.enable = true
     end,
   },
-
-  -- <++>
-  -- { 'JNSFilipe/anchor.nvim' },
-  { dir = '~/Documents/GitHub/anchor.nvim' },
 
   -- NOTE: Next Step on Your Neovim Journey: Add/Configure additional "plugins" for kickstart
   --       These are some example plugins that I've included in the kickstart repository.
@@ -928,42 +777,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 -- Enable telescope fzf native, if installed
 pcall(require('telescope').load_extension, 'fzf')
 
--- Telescope live_grep in git root
--- Function to find the git root directory based on the current buffer's path
-local function find_git_root()
-  -- Use the current buffer's path as the starting point for the git search
-  local current_file = vim.api.nvim_buf_get_name(0)
-  local current_dir
-  local cwd = vim.fn.getcwd()
-  -- If the buffer is not associated with a file, return nil
-  if current_file == '' then
-    current_dir = cwd
-  else
-    -- Extract the directory from the current file's path
-    current_dir = vim.fn.fnamemodify(current_file, ':h')
-  end
-
-  -- Find the Git root directory from the current file's path
-  local git_root = vim.fn.systemlist('git -C ' .. vim.fn.escape(current_dir, ' ') .. ' rev-parse --show-toplevel')[1]
-  if vim.v.shell_error ~= 0 then
-    print 'Not a git repository. Searching on current working directory'
-    return cwd
-  end
-  return git_root
-end
-
--- Custom live_grep function to search in git root
-local function live_grep_git_root()
-  local git_root = find_git_root()
-  if git_root then
-    require('telescope.builtin').live_grep {
-      search_dirs = { git_root },
-    }
-  end
-end
-
-vim.api.nvim_create_user_command('LiveGrepGitRoot', live_grep_git_root, {})
-
 -- [[ Configure Treesitter ]]
 -- See `:help nvim-treesitter`
 -- Defer Treesitter setup after first render to improve startup time of 'nvim {filename}'
@@ -1050,23 +863,16 @@ local on_attach = function(_, bufnr)
     vim.keymap.set('n', keys, func, { buffer = bufnr, desc = desc })
   end
 
-  nmap('<leader>cr', vim.lsp.buf.rename, 'Rename')
-  nmap('<leader>ca', vim.lsp.buf.code_action, 'Code action')
+  nmap('<leader>h', vim.lsp.buf.rename, 'Rename')
+  nmap('<leader>aa', vim.lsp.buf.code_action, 'Code action')
 
   nmap('gd', require('telescope.builtin').lsp_definitions, 'Goto definition')
-  nmap('<leader>cd', require('telescope.builtin').lsp_definitions, 'Goto definition')
   nmap('gr', require('telescope.builtin').lsp_references, 'Goto references')
   nmap('gI', require('telescope.builtin').lsp_implementations, 'Goto implementation')
-  nmap('<leader>ci', require('telescope.builtin').lsp_implementations, 'Goto implementation')
-  nmap('<leader>fD', require('telescope.builtin').lsp_type_definitions, 'Find definition')
-  nmap('<leader>cd', require('telescope.builtin').lsp_document_symbols, 'Document symbols')
-  nmap('<leader>cw', require('telescope.builtin').lsp_dynamic_workspace_symbols, 'workspace symbols')
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  nmap('<leader>ck', vim.lsp.buf.hover, 'Hover documentation')
   nmap('<C-k>', vim.lsp.buf.signature_help, 'Signature Documentation') -- FIX: Doesn't it colide with the move window shortcuts?
-  nmap('<leader>cK', vim.lsp.buf.signature_help, 'Signature documentation')
 
   -- Lesser used LSP functionality
   nmap('gD', vim.lsp.buf.declaration, 'Goto declaration')
@@ -1087,15 +893,14 @@ require('which-key').register {
   ['<leader>g'] = { name = ' Git', _ = 'which_key_ignore' },
   ['<leader>gh'] = { name = 'Hunk', _ = 'which_key_ignore' },
   ['<leader>gt'] = { name = 'Toggle', _ = 'which_key_ignore' },
-  -- ['<leader>r'] = { name = '[R]ename', _ = 'which_key_ignore' }, -- TODO: Remove this from menu!
-  ['<leader>u'] = { name = '󱓍 UndoTree', _ = 'which_key_ignore' },
-  ['<leader>f'] = { name = ' Find', _ = 'which_key_ignore' },
-  ['<leader>c'] = { name = ' Code', _ = 'which_key_ignore' },
-  ['<leader>e'] = { name = '󰘧 Evaluate', _ = 'which_key_ignore' },
-  ['<leader>l'] = { name = ' Eval Buffer', _ = 'which_key_ignore' },
-  ['<leader>d'] = { name = '󱍼 Diagnostics', _ = 'which_key_ignore' },
-  ['<leader>a'] = { name = ' Anchor', _ = 'which_key_ignore' },
-  ['<leader>t'] = { name = ' Tmux', _ = 'which_key_ignore' },
+  -- ['<leader>u'] = { name = '󱓍 UndoTree', _ = 'which_key_ignore' },
+  -- ['<leader>f'] = { name = ' Find', _ = 'which_key_ignore' },
+  -- ['<leader>c'] = { name = ' Code', _ = 'which_key_ignore' },
+  -- ['<leader>e'] = { name = '󰘧 Evaluate', _ = 'which_key_ignore' },
+  -- ['<leader>l'] = { name = ' Eval Buffer', _ = 'which_key_ignore' },
+  -- ['<leader>d'] = { name = '󱍼 Diagnostics', _ = 'which_key_ignore' },
+  -- ['<leader>a'] = { name = ' Anchor', _ = 'which_key_ignore' },
+  -- ['<leader>t'] = { name = ' Tmux', _ = 'which_key_ignore' },
 }
 -- register which-key VISUAL mode
 -- required for visual <leader>hs (hunk stage) to work
@@ -1104,6 +909,9 @@ require('which-key').register({
   ['<leader>c'] = { name = ' Code', _ = 'which_key_ignore' },
   ['<leader>h'] = { 'Git [H]unk' },
 }, { mode = 'v' })
+
+
+vim.keymap.set('n', '<leader>m', '<cmd>OverseerRun<cr>', { desc = 'Make' })
 
 
 ---- [[ Keymaps ]] ----
@@ -1149,141 +957,111 @@ vim.keymap.set('n', 'ª', require('gitsigns').prev_hunk, { desc = 'Jump to previ
 vim.keymap.set('n', '<leader>gg', "<cmd>Telescope git_signs<cr>", { desc = 'List git hunks in buffer' })
 
 -- UndoTree
-vim.keymap.set('n', '<leader>uu', vim.cmd.UndotreeToggle, { desc = 'Toggle' })
-vim.keymap.set('n', '<leader>uw', vim.cmd.UndotreePresistUndo, { desc = 'Write undo to file' })
+vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle, { desc = 'Undo' })
 
 -- Telescope
 -- See `:help telescope.builtin`
-vim.keymap.set('n', '<leader>ff', require('telescope.builtin').find_files, { desc = 'Find files' })
-vim.keymap.set('n', '<leader>fF', require('telescope.builtin').live_grep, { desc = 'Find in files' })
-vim.keymap.set('n', '<leader>fr', require('telescope.builtin').oldfiles, { desc = 'Find recently opened files' })
-vim.keymap.set('n', '<leader>fb', require('telescope.builtin').buffers, { desc = 'Find buffers' })
-vim.keymap.set('n', '<leader>f/',
+vim.keymap.set('n', '<leader>f', require('telescope.builtin').find_files, { desc = 'Files' })
+vim.keymap.set('n', '<leader>*', require('telescope.builtin').live_grep, { desc = 'Search Project' })
+vim.keymap.set('n', '<leader>b', require('telescope.builtin').buffers, { desc = 'Buffers' })
+vim.keymap.set('n', '<leader>/',
   function()
     -- You can pass additional configuration to telescope to change theme, layout, etc.
     require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
       winblend = 10,
       previewer = false,
     })
-  end, { desc = 'Fuzzy search in buffer' })
-local find_in_open_buffers = function()
-  require('telescope.builtin').live_grep {
-    grep_open_files = true,
-    prompt_title = 'Live Grep in Open Files',
-  }
-end
-vim.keymap.set('n', '<leader>fo', find_in_open_buffers, { desc = 'Find in open buffers' })
-vim.keymap.set('n', '<leader>/', find_in_open_buffers, { desc = 'Find in open buffers' })
-vim.keymap.set('n', '<leader>fs', require('telescope.builtin').grep_string, { desc = 'Find string' })
-vim.keymap.set('n', '<leader>fg', require('telescope.builtin').git_files, { desc = 'Find in git project' })
-vim.keymap.set('n', '<leader>fh', require('telescope.builtin').help_tags, { desc = 'Find in help' })
-vim.keymap.set('n', '<leader>fw', function()
+  end, { desc = 'Search Buffer' })
+vim.keymap.set('n', '<leader>w', function()
   local word = vim.fn.expand("<cword>")
   require('telescope.builtin').grep_string({ search = word })
-end, { desc = 'Find word under cursor' })
-vim.keymap.set('n', '<leader>fW', function()
-  local word = vim.fn.expand("<cWORD>")
-  require('telescope.builtin').grep_string({ search = word })
-end, { desc = 'Find WORD under cursor' })
-vim.keymap.set('n', '<leader>fd', require('telescope.builtin').diagnostics, { desc = 'Find diagnostics' })
-vim.keymap.set('n', '<leader>fR', require('telescope.builtin').resume, { desc = 'Find resume' })
-vim.keymap.set('n', '<leader>ft', '<cmd>TodoTelescope keywords=TODO,FIX,WARNING,NOTE,HACK,PERF<cr>',
-  { desc = 'Find TODOs, etc' })
-vim.keymap.set('n', '<leader>x', require('telescope.builtin').commands, { desc = 'M-x' })
+end, { desc = 'Find Word' })
+vim.keymap.set('n', '<leader>d', require('telescope.builtin').diagnostics, { desc = 'Diagnostics' })
+-- vim.keymap.set('n', '<leader>fR', require('telescope.builtin').resume, { desc = 'Find resume' })
+-- vim.keymap.set('n', '<leader>ft', '<cmd>TodoTelescope keywords=TODO,FIX,WARNING,NOTE,HACK,PERF<cr>',
+--   { desc = 'Find TODOs, etc' })
+vim.keymap.set('n', '<leader>:', require('telescope.builtin').commands, { desc = 'M-x' })
 vim.keymap.set('n', '<leader>;', ":lua ", { desc = 'Eval' })
 
 -- Code
-vim.keymap.set('v', '<leader>cc', '<esc><cmd>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<cr>',
-  { desc = 'Toggle comment selection' })
+vim.keymap.set('v', '<leader>c', '<esc><cmd>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<cr>',
+  { desc = 'Toggle Comment' })
 vim.keymap.set('n', '<leader>cc',
   function() require("Comment.api").toggle.linewise.count(vim.v.count > 0 and vim.v.count or 1) end,
-  { desc = 'Toggle comment line' })
-vim.keymap.set('n', '<leader>cf', vim.diagnostic.open_float, { desc = 'Open floating diagnostic message' })
-vim.keymap.set('n', '<leader>cq', vim.diagnostic.setloclist, { desc = 'Open diagnostics list' })
-
--- Conjure
-vim.g['conjure#mapping#eval_motion'] = 'eE'
-
--- NeoTree
-vim.keymap.set('n', '<leader>o', '<cmd>Neotree toggle<cr>', { desc = 'Toggle File Tree' })
+  { desc = 'Toggle Comment' })
 
 -- NeoClip
 -- In linux, the system clipboar is the + register, but in windows it is * TODO: Fix accordingly
-vim.keymap.set('n', '<leader>y', '<cmd>Telescope neoclip plus<cr>', { desc = 'Yank history' })
+vim.keymap.set('n', '<leader>y', '<cmd>Telescope neoclip plus<cr>', { desc = 'Yanks' })
+
+-- Dired
+vim.keymap.set('n', '<leader>o', '<cmd>Dired<cr>', { desc = 'Dired' })
+
+-- Split
+vim.keymap.set('n', '<leader>s',
+               function ()
+                 -- Get the current window width and height
+                 local win_width = vim.api.nvim_win_get_width(0)
+                 local win_height = vim.api.nvim_win_get_height(0)
+
+                 -- Determine whether to split vertically or horizontally
+                 if win_width > win_height then
+                   vim.cmd('vsplit')
+                 else
+                   vim.cmd('split')
+                 end
+                 -- Open Telescope file picker in the new split
+                 require('telescope.builtin').find_files()
+               end, { desc = 'Split Window' })
 
 -- <++> Anchor
-vim.keymap.set('n', '<leader>aa', require('anchor').dropAnchor, { desc = 'Drop Anchor' })
-vim.keymap.set('n', '<leader>aA', require('anchor').addToHistoryNoAnchor, { desc = 'Add to hist. w/o anchor' })
-vim.keymap.set('n', '<leader>ah', require('anchor').hoistAllAnchors, { desc = 'Hoist all anchors' })
-vim.keymap.set('n', '<leader>af', require('anchor').telescopeAnchorsInProject, { desc = 'Show anchors in project' })
-vim.keymap.set('n', '<leader>ar', require('anchor').jumpToRecentAnchor, { desc = 'Toggle between recent anchors' })
-vim.keymap.set('n', '<leader>aj', require('anchor').jumpToNextAnchor, { desc = 'Next anchor in buffer' })
-vim.keymap.set('n', '<leader>ak', require('anchor').jumpToPrevAnchor, { desc = 'Previous anchor in buffer' })
-vim.keymap.set('n', '<Tab>', require('anchor').jumpToRecentAnchor, { desc = 'Toggle between recent anchors' })
-vim.keymap.set('n', 'ç', require('anchor').jumpToNextAnchor, { desc = 'Next anchor in buffer' })
-vim.keymap.set('n', 'Ç', require('anchor').jumpToPrevAnchor, { desc = 'Previous anchor in buffer' })
-vim.keymap.set('n', '<leader><leader>', function()
-  local results = {}
-  local Job = require('plenary.job')
-  Job:new({
-    command = "rg",
-    args = { "<\\+\\+>", "./" },
-    on_stdout = function(_, line)
-      table.insert(results, line)
-    end,
-  }):sync() -- Wait for the job to finish
-  if #results == 0 then
-    require('telescope.builtin').find_files()
-  else
-    require('anchor').telescopeAnchorsInProject()
-  end
-end, { desc = 'List Anchors' })
-vim.keymap.set('n', '+', function()
-  vim.cmd("vsplit")
-  require('anchor').jumpToNextAnchor()
-  require('anchor').addToHistoryNoAnchor()
-end, { desc = 'Jump no next anchor in a new split' })
-
--- Trouble/Diagnostic
-vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = 'Go to previous diagnostic message' })
-vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next diagnostic message' })
-vim.keymap.set('n', '<leader>dd', require('trouble').toggle, { desc = 'Toggle trouble' })
-vim.keymap.set('n', '<leader>dn', function() require('trouble').next({ skip_groups = true, jump = true }) end,
-  { desc = 'Next trouble' })
-vim.keymap.set('n', '<leader>dp', function() require('trouble').previous({ skip_groups = true, jump = true }) end,
-  { desc = 'Previous trouble' })
-vim.keymap.set('n', '<leader>df', require('telescope.builtin').diagnostics, { desc = 'Find diagnostics' })
+-- vim.keymap.set('n', '<leader>aa', require('anchor').dropAnchor, { desc = 'Drop Anchor' })
+-- vim.keymap.set('n', '<leader>aA', require('anchor').addToHistoryNoAnchor, { desc = 'Add to hist. w/o anchor' })
+-- vim.keymap.set('n', '<leader>ah', require('anchor').hoistAllAnchors, { desc = 'Hoist all anchors' })
+-- vim.keymap.set('n', '<leader>af', require('anchor').telescopeAnchorsInProject, { desc = 'Show anchors in project' })
+-- vim.keymap.set('n', '<leader>ar', require('anchor').jumpToRecentAnchor, { desc = 'Toggle between recent anchors' })
+-- vim.keymap.set('n', '<leader>aj', require('anchor').jumpToNextAnchor, { desc = 'Next anchor in buffer' })
+-- vim.keymap.set('n', '<leader>ak', require('anchor').jumpToPrevAnchor, { desc = 'Previous anchor in buffer' })
+-- vim.keymap.set('n', '<Tab>', require('anchor').jumpToRecentAnchor, { desc = 'Toggle between recent anchors' })
+-- vim.keymap.set('n', 'ç', require('anchor').jumpToNextAnchor, { desc = 'Next anchor in buffer' })
+-- vim.keymap.set('n', 'Ç', require('anchor').jumpToPrevAnchor, { desc = 'Previous anchor in buffer' })
+-- vim.keymap.set('n', '<leader><leader>', function()
+--   local results = {}
+--   local Job = require('plenary.job')
+--   Job:new({
+--     command = "rg",
+--     args = { "<\\+\\+>", "./" },
+--     on_stdout = function(_, line)
+--       table.insert(results, line)
+--     end,
+--   }):sync() -- Wait for the job to finish
+--   if #results == 0 then
+--     require('telescope.builtin').find_files()
+--   else
+--     require('anchor').telescopeAnchorsInProject()
+--   end
+-- end, { desc = 'List Anchors' })
+-- vim.keymap.set('n', '+', function()
+--   vim.cmd("vsplit")
+--   require('anchor').jumpToNextAnchor()
+--   require('anchor').addToHistoryNoAnchor()
+-- end, { desc = 'Jump no next anchor in a new split' })
 
 -- <++> Tmux
 vim.keymap.set('n', '<C-h>', require("tmux").move_left, { noremap = true })
 vim.keymap.set('n', '<C-j>', require("tmux").move_down, { noremap = true })
 vim.keymap.set('n', '<C-k>', require("tmux").move_up, { noremap = true })
 vim.keymap.set('n', '<C-l>', require("tmux").move_right, { noremap = true })
-vim.keymap.set('n', '<leader>tt', require("tmux").list_and_select_tmux_terminals, { desc = "Tmux panes in session" })
-vim.keymap.set('n', '<leader>tr',
+-- vim.keymap.set('n', '<leader>tt', require("tmux").list_and_select_tmux_terminals, { desc = "Tmux panes in session" })
+vim.keymap.set('n', '<leader>t',
   function() require("tmux").create_or_move_tmux_pane({ split_direction = "h", focus = true }) end,
-  { desc = "New pane on the right" })
-vim.keymap.set('n', '<leader>tb',
-  function() require("tmux").create_or_move_tmux_pane({ split_direction = "v", focus = true }) end,
-  { desc = "New pane on the bottom" })
-vim.keymap.set('n', '<leader>th',
-  function() require("tmux").create_or_move_tmux_pane({ split_direction = "h", pane_name = "htop", command = "htop" }) end,
-  { desc = "Pane with htop" })
-
--- <++> REPL
-vim.keymap.set('n', '<leader>es', require("repl").start_repl, { desc = "Start REPL" })
-vim.keymap.set('v', '<leader>eE', require("repl").send_to_tmux_repl, { desc = "Eval selection" })
-vim.keymap.set('v', '<leader>ee', function() require("repl").send_to_tmux_repl(require("repl").capture_selection) end,
-  { desc = "Eval selection" })
-vim.keymap.set('n', '<leader>el', function() require("repl").send_to_tmux_repl(require("repl").capture_line) end,
-  { desc = "Eval line" })
-vim.keymap.set('n', '<leader>ef', function() require("repl").send_to_tmux_repl(require("repl").capture_function) end,
-  { desc = "Eval function" })
-vim.keymap.set('n', '<leader>ee',
-  function() require("repl").send_to_tmux_repl(require("repl").capture_outermost_expression) end,
-  { desc = "Eval outermost" })
-vim.keymap.set('n', '<leader>eb', function() require("repl").send_to_tmux_repl(require("repl").capture_buffer) end,
-  { desc = "Eval buffer" })
+  { desc = "Terminal" })
+-- vim.keymap.set('n', '<leader>tb',
+--   function() require("tmux").create_or_move_tmux_pane({ split_direction = "v", focus = true }) end,
+--   { desc = "New pane on the bottom" })
+-- vim.keymap.set('n', '<leader>th',
+--   function() require("tmux").create_or_move_tmux_pane({ split_direction = "h", pane_name = "htop", command = "htop" }) end,
+--   { desc = "Pane with htop" })
 
 ---- [[ Mason/LSP ]] ----
 
