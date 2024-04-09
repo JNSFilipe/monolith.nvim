@@ -66,8 +66,8 @@ require('lazy').setup({
     priority = 1000, -- Very high priority is required, luarocks.nvim should run as the first plugin in your config.
     -- config = true,
     opts = {
-        rocks = { "magick" }, -- specifies a list of rocks to install
-      },
+      rocks = { "magick" }, -- specifies a list of rocks to install
+    },
   },
 
   -- NOTE: This is where your plugins related to LSP can be installed.
@@ -445,11 +445,11 @@ require('lazy').setup({
       -- TODO: Add keyybinds for opening current folder in other window
       -- TODO: make modifiable
       require("dired").setup({
-          keybinds = {
-            dired_enter = "l",
-            dired_back = "h"
-          }
-            })
+        keybinds = {
+          dired_enter = "l",
+          dired_back = "h"
+        }
+      })
     end
   },
 
@@ -485,11 +485,12 @@ require('lazy').setup({
   { 'numToStr/Comment.nvim', opts = {} },
 
   -- Image viewer
-  { '3rd/image.nvim',
+  {
+    '3rd/image.nvim',
     config = function()
       require('image').setup({
-         backend = 'kitty',
-                            })
+        backend = 'kitty',
+      })
     end
   },
 
@@ -525,7 +526,7 @@ require('lazy').setup({
           layout_config = {
             anchor = "S",
             prompt_position = "top",
-            width = {padding = 0},
+            width = { padding = 0 },
             height = 0.3,
           },
           mappings = {
@@ -574,7 +575,6 @@ require('lazy').setup({
           bash = { 'shellcheck', 'shfmt' },
           go = { 'gomodifytags', 'gofumpt', 'iferr', 'impl', 'goimports' },
           markdown = { 'prettierd' },
-          ocaml = { 'ocamlformat' },
           -- Use the "*" filetype to run formatters on all filetypes.
           ["*"] = { "codespell" },
           -- Use the "_" filetype to run formatters on filetypes that don't
@@ -783,7 +783,7 @@ pcall(require('telescope').load_extension, 'fzf')
 vim.defer_fn(function()
   require('nvim-treesitter.configs').setup {
     -- Add languages to be installed here that you want installed for treesitter
-    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash', 'latex', 'cmake', 'ninja', 'fennel', 'arduino', 'bibtex', 'markdown', 'markdown_inline', 'commonlisp', 'cuda', 'json', 'toml', 'diff', 'git_config', 'git_rebase', 'gitattributes', 'gitcommit', 'gitignore', 'scheme', 'ssh_config', 'ocaml' },
+    ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'bash', 'latex', 'cmake', 'ninja', 'fennel', 'arduino', 'bibtex', 'markdown', 'markdown_inline', 'commonlisp', 'cuda', 'json', 'toml', 'diff', 'git_config', 'git_rebase', 'gitattributes', 'gitcommit', 'gitignore', 'scheme', 'ssh_config' },
 
     -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
     auto_install = false,
@@ -999,20 +999,20 @@ vim.keymap.set('n', '<leader>o', '<cmd>Dired<cr>', { desc = 'Dired' })
 
 -- Split
 vim.keymap.set('n', '<leader>s',
-               function ()
-                 -- Get the current window width and height
-                 local win_width = vim.api.nvim_win_get_width(0)
-                 local win_height = vim.api.nvim_win_get_height(0)
+  function()
+    -- Get the current window width and height
+    local win_width = vim.api.nvim_win_get_width(0)
+    local win_height = vim.api.nvim_win_get_height(0)
 
-                 -- Determine whether to split vertically or horizontally
-                 if win_width > win_height then
-                   vim.cmd('vsplit')
-                 else
-                   vim.cmd('split')
-                 end
-                 -- Open Telescope file picker in the new split
-                 require('telescope.builtin').find_files()
-               end, { desc = 'Split Window' })
+    -- Determine whether to split vertically or horizontally
+    if win_width > win_height then
+      vim.cmd('vsplit')
+    else
+      vim.cmd('split')
+    end
+    -- Open Telescope file picker in the new split
+    require('telescope.builtin').find_files()
+  end, { desc = 'Split Window' })
 
 -- <++> Anchor
 -- vim.keymap.set('n', '<leader>aa', require('anchor').dropAnchor, { desc = 'Drop Anchor' })
