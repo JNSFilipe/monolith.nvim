@@ -370,67 +370,6 @@ require('lazy').setup({
   },
 
   {
-    "goolord/alpha-nvim",
-    dependencies = { 'nvim-tree/nvim-web-devicons' },
-    opts = function()
-      local dashboard = require("alpha.themes.dashboard")
-      -- customize the dashboard header
-      dashboard.section.header.val = {
-        "   ⣴⣶⣤⡤⠦⣤⣀⣤⠆     ⣈⣭⣿⣶⣿⣦⣼⣆          ",
-        "    ⠉⠻⢿⣿⠿⣿⣿⣶⣦⠤⠄⡠⢾⣿⣿⡿⠋⠉⠉⠻⣿⣿⡛⣦       ",
-        "          ⠈⢿⣿⣟⠦ ⣾⣿⣿⣷    ⠻⠿⢿⣿⣧⣄     ",
-        "           ⣸⣿⣿⢧ ⢻⠻⣿⣿⣷⣄⣀⠄⠢⣀⡀⠈⠙⠿⠄    ",
-        "          ⢠⣿⣿⣿⠈    ⣻⣿⣿⣿⣿⣿⣿⣿⣛⣳⣤⣀⣀   ",
-        "   ⢠⣧⣶⣥⡤⢄ ⣸⣿⣿⠘  ⢀⣴⣿⣿⡿⠛⣿⣿⣧⠈⢿⠿⠟⠛⠻⠿⠄  ",
-        "  ⣰⣿⣿⠛⠻⣿⣿⡦⢹⣿⣷   ⢊⣿⣿⡏  ⢸⣿⣿⡇ ⢀⣠⣄⣾⠄   ",
-        " ⣠⣿⠿⠛ ⢀⣿⣿⣷⠘⢿⣿⣦⡀ ⢸⢿⣿⣿⣄ ⣸⣿⣿⡇⣪⣿⡿⠿⣿⣷⡄  ",
-        " ⠙⠃   ⣼⣿⡟  ⠈⠻⣿⣿⣦⣌⡇⠻⣿⣿⣷⣿⣿⣿ ⣿⣿⡇ ⠛⠻⢷⣄ ",
-        "      ⢻⣿⣿⣄   ⠈⠻⣿⣿⣿⣷⣿⣿⣿⣿⣿⡟ ⠫⢿⣿⡆     ",
-        "       ⠻⣿⣿⣿⣿⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⢀⣀⣤⣾⡿⠃     ",
-        "                                   ",
-        " -<  N    E    O    V    I    M  >-",
-      }
-      dashboard.section.header.opts.hl = "DashboardHeader"
-      dashboard.section.footer.opts.hl = "DashboardFooter"
-
-      dashboard.section.buttons.val = {
-        dashboard.button("SPC o", "  File Explorer"),
-        dashboard.button("SPC ff", "  Find File"),
-        dashboard.button("SPC fF", "  Find in Files"),
-        dashboard.button("SPC ft", "  Find TODOs"),
-        dashboard.button("u", "  Update plugins", '<cmd>Lazy sync<cr>'),
-        dashboard.button("q", "󰗼  Quit", "<cmd>qa<cr>")
-      }
-
-      dashboard.config.layout = {
-        { type = "padding", val = vim.fn.max { 2, vim.fn.floor(vim.fn.winheight(0) * 0.2) } },
-        dashboard.section.header,
-        { type = "padding", val = 5 },
-        dashboard.section.buttons,
-        { type = "padding", val = 3 },
-        dashboard.section.footer,
-      }
-      dashboard.config.opts.noautocmd = true
-      return dashboard
-    end,
-    config = function(_, opts)
-      require("alpha").setup(opts.config)
-
-      vim.api.nvim_create_autocmd("User", {
-        pattern = "LazyVimStarted",
-        desc = "Add Alpha dashboard footer",
-        once = true,
-        callback = function()
-          local stats = require("lazy").stats()
-          local ms = math.floor(stats.startuptime * 100 + 0.5) / 100
-          opts.section.footer.val = { "NeoVim loaded " .. stats.count .. " plugins  in " .. ms .. "ms" }
-          pcall(vim.cmd.AlphaRedraw)
-        end,
-      })
-    end
-  },
-
-  {
     'stevearc/overseer.nvim',
     dependencies = { 'stevearc/dressing.nvim', 'rcarriga/nvim-notify' },
     config = function()
@@ -1188,3 +1127,15 @@ mason_lspconfig.setup_handlers {
     }
   end,
 }
+
+-- Auto-open Telescope file picker when Neovim starts with no files
+vim.api.nvim_create_autocmd("VimEnter", {
+    pattern = "*",
+    callback = function()
+        if #vim.api.nvim_list_bufs() == 1 and vim.fn.bufname() == "" and vim.fn.argc() == 0 then
+            vim.defer_fn(function()
+                require('telescope.builtin').find_files()
+            end, 0)
+        end
+    end
+})
