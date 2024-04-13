@@ -12,7 +12,6 @@
 ;; (package! some-package)
 
 ;; Themes
-(package! modus-themes)
 ;; Set key-chord for jj as Esc
 (package! key-chord)
 ;; Icons stuff
