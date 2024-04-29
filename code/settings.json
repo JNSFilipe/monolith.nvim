@@ -1,4 +1,6 @@
 {
+    "window.menuBarVisibility": "toggle",
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'monospace', monospace",
     "editor.cursorBlinking": "solid",
     "editor.lineNumbers": "relative",
 
@@ -6,6 +8,37 @@
     "security.workspace.trust.untrustedFiles": "open",
     "remote.SSH.remotePlatform": {
         "10.20.96.209": "Loki"
+    },
+    "vim.easymotion": true,
+    "vim.useSystemClipboard": true,
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            "before": [
+                "<space>"
+            ],
+            "commands": [
+                "vspacecode.space"
+            ]
+        },
+        {
+            "before": [
+                ","
+            ],
+            "commands": [
+                "vspacecode.space",
+                {
+                    "command": "whichkey.triggerKey",
+                    "args": "m"{
+    "window.menuBarVisibility": "toggle",
+    "editor.fontFamily": "'JetBrainsMono Nerd Font', 'monospace', monospace",
+    // Vim easymotion is required for Jump menu - <SPC> j
+    "editor.cursorBlinking": "solid",
+    "editor.lineNumbers": "relative",
+
+    "git.autofetch": true,
+    "security.workspace.trust.untrustedFiles": "open",
+    "remote.SSH.remotePlatform": {
+        "10.20.96.209": "linux",
     },
     "vim.easymotion": true,
     "vim.useSystemClipboard": true,
@@ -91,4 +124,126 @@
             ]
         },
     ],
+    "vspacecode.bindings": [
+        {
+            "key": "/",
+            "name": "Search Buffer",
+            "type": "command",
+            "command": "fuzzySearch.activeTextEditorWithCurrentSelection"
+        },
+        {
+            "key": "*",
+            "name": "Search Project",
+            "type": "command",
+            "command": "workbench.action.findInFiles"
+        },
+        {
+            "key": ":",
+            "name": "M-x",
+            "type": "command",
+            "command": "workbench.action.showCommands"
+        },
+        {
+            "key": "f",
+            "name": "Files",
+            "type": "command",
+            "command": "file-browser.open"
+        },
+        {
+            "key": "b",
+            "name": "Buffers",
+            "type": "command",
+            "command": "workbench.action.showAllEditorsByMostRecentlyUsed"
+        },
+        {
+            "key": "c",
+            "name": "Toggle Comment",
+            "type": "command",
+            "command": "editor.action.commentLine"
+        },
+        {
+            "key": "h",
+            "name": "Replace",
+            "type": "command",
+            "command": "workbench.action.replaceInFiles"
+        }
+    ],
+
+    "editor.inlineSuggest.suppressSuggestions": true,
+    "cmake.configureOnOpen": true,
+    "workbench.colorTheme": "Tokyo Night",
+    // Hide tabs
+    // "workbench.editor.showTabs": "none",
+    // "window.customTitleBarVisibility": "never",
+
+    "projectManager.sortList": "Recent",
+    "projectManager.projectsLocation": "~/Documents/GitHub",
+    "projectManager.git.baseFolders": ["~/Documents/GitHub"],
+}
+                }
+            ]
+        }
+    ],
+    "vim.insertModeKeyBindingsNonRecursive": [
+        {
+            "before": ["j", "j"],
+            "after": ["<esc>"]
+        }
+    ],
+    "vim.visualModeKeyBindingsNonRecursive": [
+        {
+            "before": [
+                "<space>"
+            ],
+            "commands": [
+                "vspacecode.space"
+            ]
+        },
+        {
+            "before": [
+                ","
+            ],
+            "commands": [
+                "vspacecode.space",
+                {
+                    "command": "whichkey.triggerKey",
+                    "args": "m"
+                }
+            ]
+        },
+        {
+            "before": [
+                ">"
+            ],
+            "commands": [
+                "editor.action.indentLines"
+            ]
+        },
+        {
+            "before": [
+                "tab"
+            ],
+            "commands": [
+                "editor.action.indentLines"
+            ]
+        },
+        {
+            "before": [
+                "<"
+            ],
+            "commands": [
+                "editor.action.outdentLines"
+            ]
+        },
+        {
+            "before": [
+                "shift+tab"
+            ],
+            "commands": [
+                "editor.action.outdentLines"
+            ]
+        },
+    ],
+    "cmake.configureOnOpen": true,
+    "workbench.colorTheme": "Tokyo Night"
 }
