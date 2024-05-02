@@ -132,14 +132,14 @@
         :desc "M-x" ":" #'execute-extended-command
         :desc "Eval" ";" #'eval-expression
         :desc "Scratch Buffer" "," #'doom/open-scratch-buffer
-        :desc "All Buffers/Files" "." #'switch-to-buffer
-        :desc "Search Buffer" "/" #'+default/search-buffer
+        :desc "IBuffer" "." #'ibuffer
+        :desc "Search Buffer" "w" #'+default/search-buffer
         :desc "Search Project" "*" #'+default/search-project
         :desc "Adjust Font" "'" #'text-scale-adjust
         :desc "Code Actions" "a" #'lsp-execute-code-action
         :desc "Dired" "o" #'mono/dired
         :desc "Files" "f" #'mono/find-file
-        :desc "Buffers" "b" #'mono/list-buffers
+        :desc "Buffers" "b" #'consult-buffer
         :desc "EShell" "t" #'+eshell/toggle
         :desc "Toggle Comment" "c" #'comment-line
         :desc "Diagnostics" "d" #'consult-lsp-diagnostics
