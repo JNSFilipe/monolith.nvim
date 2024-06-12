@@ -24,6 +24,9 @@
 (setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 14 :weight 'semi-bold)
       doom-variable-pitch-font (font-spec :family "Fira Sans" :size 14))
 
+;; Set terminal name for TRAMP agent (useful to disable fancy features when using TRAMP, cause this is going to be the value of $TERM)
+(setq tramp-terminal-type "tramp")
+
 ;; Set default tab size as two spaces
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
