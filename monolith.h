@@ -294,7 +294,7 @@ int create_full_path(const char *path) {
 #else
 int mv_file_or_dir(const char *input, const char *output) {
   char cmd[MAX_OUT_SZ];
-  snprintf(cmd, sizeof(cmd), "mv %s %s", input, output);
+  snprintf(cmd, sizeof(cmd), "mv -f %s %s", input, output);
 
   MONO_CMD(cmd);
 
