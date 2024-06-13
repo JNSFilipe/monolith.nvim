@@ -946,7 +946,7 @@ vim.keymap.set('n', '<leader>;', ":lua ", { desc = 'Eval' })
 -- Code
 vim.keymap.set('v', '<leader>c', '<esc><cmd>lua require("Comment.api").toggle.linewise(vim.fn.visualmode())<cr>',
   { desc = 'Toggle Comment' })
-vim.keymap.set('n', '<leader>cc',
+vim.keymap.set('n', '<leader>c',
   function() require("Comment.api").toggle.linewise.count(vim.v.count > 0 and vim.v.count or 1) end,
   { desc = 'Toggle Comment' })
 
