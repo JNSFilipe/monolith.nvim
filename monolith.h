@@ -86,6 +86,17 @@ char *run_cmd(char *input) {
 #define MONO_CMD(input) run_cmd(input)
 
 /**
+ * MONO_SYS Macro
+ *
+ * Runs commands in the interactive shell, using system function
+ *
+ * Returns:
+ *   system() error code
+ *
+ */
+#define MONO_SYS(input) system(input)
+
+/**
  * MONO_RESOLVE_ENV_VARS Macro
  *
  * Resolves env vars, by running 'echo <comand>' and getting the result
