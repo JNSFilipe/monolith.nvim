@@ -441,6 +441,7 @@ require('lazy').setup({
     branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
+      'nvim-telescope/telescope-project.nvim',
       -- Fuzzy Finder Algorithm which requires local dependencies to be built.
       -- Only load if `make` is available. Make sure you have the system
       -- requirements installed.
@@ -457,6 +458,7 @@ require('lazy').setup({
     cmd = "Telescope",
     opts = function()
       local actions = require "telescope.actions"
+      local project_actions = require "telescope._extensions.project.actions"
       return {
         layout_strategy = "vertical",
         border = true,
@@ -480,6 +482,20 @@ require('lazy').setup({
             n = { q = actions.close },
           },
         },
+        extensions = {
+          project = {
+            base_dirs = {
+              '~/Documents/GitHub',
+            },
+            hidden_files = true, -- default: false
+            order_by = "recent",
+            search_by = "title",
+            on_project_selected = function(prompt_bufnr)
+              -- Do anything you want in here. For example:
+              project_actions.change_working_directory(prompt_bufnr, false)
+            end
+          }
+        }
       }
     end,
   },
@@ -899,6 +915,9 @@ vim.keymap.set('n', '<leader>gg', "<cmd>Telescope git_signs<cr>", { desc = 'List
 
 -- UndoTree
 vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle, { desc = 'Undo' })
+
+-- Project management
+vim.keymap.set('n', '<C-Space>', require('telescope').extensions.project.project, { desc = 'Project' })
 
 -- Telescope
 -- See `:help telescope.builtin`
