@@ -425,15 +425,15 @@ require('lazy').setup({
   -- "gc" to comment visual regions/lines
   { 'numToStr/Comment.nvim', opts = {} },
 
-  -- Image viewer
-  {
-    '3rd/image.nvim',
-    config = function()
-      require('image').setup({
-        backend = 'kitty',
-      })
-    end
-  },
+  -- -- Image viewer
+  -- {
+  --   '3rd/image.nvim',
+  --   config = function()
+  --     require('image').setup({
+  --       backend = 'kitty',
+  --     })
+  --   end
+  -- },
 
   -- Fuzzy Finder (files, lsp, etc)
   {
@@ -929,12 +929,11 @@ vim.keymap.set('n', '<leader>/',
     -- You can pass additional configuration to telescope to change theme, layout, etc.
     require('telescope.builtin').current_buffer_fuzzy_find(require('telescope.themes').get_dropdown {
       winblend = 10,
-      previewer = false,
+      previewer = true,
     })
   end, { desc = 'Search Buffer' })
 vim.keymap.set('n', '<leader>w', function()
-  local word = vim.fn.expand("<cword>")
-  require('telescope.builtin').grep_string({ search = word })
+  require("telescope.builtin").current_buffer_fuzzy_find { default_text = vim.fn.expand("<cword>") }
 end, { desc = 'Find Word' })
 vim.keymap.set('n', '<leader>d', require('telescope.builtin').diagnostics, { desc = 'Diagnostics' })
 -- vim.keymap.set('n', '<leader>fR', require('telescope.builtin').resume, { desc = 'Find resume' })
