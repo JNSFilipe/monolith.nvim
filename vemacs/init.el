@@ -106,10 +106,24 @@
   :config
   (setq doom-modeline-height 15))
 
+;; Projectile.el stuff
+(use-package projectile
+  :ensure t
+  :init (projectile-mode +1)
+  :config
+  (setq projectile-project-search-path '("~/Documents/GitHub/"))
+  (setq projectile-sort-order 'access-time)
+  :bind
+  ("C-SPC" . projectile-switch-project))
+;; ;; TODO: this might not be needed
+;; (use-package perspective
+;;   :init
+;;   (persp-mode))
+
 ;; A startup screen extracted from Spacemacs
 (use-package dashboard
   :config
-  (setq dashboard-projects-backend 'project-el
+  (setq dashboard-projects-backend 'projectile
         dashboard-banner-logo-title nil
         dashboard-startup-banner 'logo
         dashboard-center-content t
@@ -137,9 +151,6 @@
 (with-eval-after-load 'flymake
   (define-key flymake-mode-map (kbd "C-c n") #'flymake-goto-next-error)
   (define-key flymake-mode-map (kbd "C-c p") #'flymake-goto-prev-error))
-
-(require 'project)
-(mapc #'project-remember-projects-under '("~/Documents/GitHub/" "~/.local/share/"))
 
 ;; EditorConfig support
 (use-package editorconfig
