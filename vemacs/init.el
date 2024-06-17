@@ -39,10 +39,10 @@
 (setq use-package-always-ensure t)
 
 (dolist (mode
-         '(menu-bar-mode         ;; Disable the menu bar
-           tool-bar-mode         ;; Disable the tool bar
-           scroll-bar-mode       ;; Disable the scroll bars
-           blink-cursor-mode))   ;; Disable the blinking cursor
+         '(menu-bar-mode       ;; Disable the menu bar
+           tool-bar-mode       ;; Disable the tool bar
+           scroll-bar-mode     ;; Disable the scroll bars
+           blink-cursor-mode)) ;; Disable the blinking cursor
   (funcall mode -1))
 
 ;; Disable splash screen
@@ -69,7 +69,7 @@
 
 ;; Fonts
 (when (member "JetBrains Mono" (font-family-list))
-  (set-face-attribute 'default nil :font "JetBrains Mono-12"))
+  (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font-12"))
 ;; Use a variable pitch, keeping fixed pitch where it's sensible
 (use-package mixed-pitch ;; For auto detecting when to use variable pitch
   :defer t
@@ -129,8 +129,8 @@
         dashboard-center-content t
         dashboard-set-footer nil
         dashboard-page-separator "\n\n\n"
-        dashboard-items '((projects . 15)
-                          (recents  . 15)
+        dashboard-items '((projects . 5)
+                          (recents  . 5)
                           (bookmarks . 5)))
   (dashboard-setup-startup-hook))
 
@@ -183,8 +183,15 @@
 (use-package meow
   :ensure t
   :demand t
+  :bind
+  ("∇" . meow-keypad)
   :config
   (defun meow-setup ()
+    ;; Define CapsLock as a Nabla and use it as a modifier (https://www.emacswiki.org/emacs/CapsKey#toc5)
+    ;; (define-key key-translation-map [8711] 'event-apply-hyper-modifier)
+    ;; Use nabla (aka CapsLock) as leader (https://www.emacswiki.org/emacs/CapsKey#toc5)
+    ;; (meow-leader-define-key [8711])
+    (meow-leader-define-key "RET")
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
     (meow-motion-overwrite-define-key
      '("j" . meow-next)
@@ -492,6 +499,12 @@
   ;; mode.  Vertico commands are hidden in normal buffers. This setting is
   ;; useful beyond Vertico.
   (setq read-extended-command-predicate #'command-completion-default-include-p))
+
+;; PDF Tools
+(use-package pdf-tools
+  :ensure t
+  :config
+  (pdf-tools-install))
 
 ;; Keybinds
 
