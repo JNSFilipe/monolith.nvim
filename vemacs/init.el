@@ -7,37 +7,137 @@
 ;; Created: junho 11, 2024
 ;; Modified: junho 11, 2024
 ;; Version: 0.0.1
-;; Keywords: abbrev bib c calendar comm convenience data docs emulations extensions faces files frames games hardware help hypermedia i18n internal languages lisp local maint mail matching mouse multimedia news outlines processes terminals tex tools unix vc wp
-;; Homepage: https://github.com/jfilipe/init
-;; Package-Requires: ((emacs "24.3"))
+;; Package-Requires: ((emacs "29.1"))
 ;;
 ;; This file is not part of GNU Emacs.
 ;;
-;;; Commentary:
-;;
-;;  Description
-;;
-;;; Code:
+;;; Sources/Inspiration:
+;; https://blog.sumtypeofway.com/posts/emacs-config.html
 
-;; Emacs configuration -*- lexical-binding: t -*-
+;; Some functionality uses this to identify you, e.g. GPG configuration, email
+;; clients, file templates and snippets. It is optional.
+(setq user-full-name "JNSFilipe"
+      user-mail-address "jose.filipe@ieee.org")
 
-;; Save the contents of this file under ~/.emacs.d/init.el
-;; Do not forget to use Emacs' built-in help system:
-;; Use C-h C-h to get an overview of all help commands.  All you
-;; need to know about Emacs (what commands exist, what functions do,
-;; what variables specify), the help system can provide.
+;; Setting it to 100mb seems to strike a nice balance between GC pauses and performance.
+(setq gc-cons-threshold (* 100 1024 1024))
 
-;; Add the NonGNU ELPA package archive
-(require 'package)
-(add-to-list 'package-archives  '("nongnu" . "https://elpa.nongnu.org/nongnu/"))
-(add-to-list 'package-archives  '("MELPA"  . "https://melpa.org/packages/"))
-(unless package-archive-contents  (package-refresh-contents))
+;; #############################################################################
+;; Bootstrap elpaca
+;; #############################################################################
+(defvar elpaca-installer-version 0.7)
+(defvar elpaca-directory (expand-file-name "elpaca/" user-emacs-directory))
+(defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
+(defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
+(defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
+                       :ref nil :depth 1
+                       :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                       :build (:not elpaca--activate-package)))
+(let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
+       (build (expand-file-name "elpaca/" elpaca-builds-directory))
+       (order (cdr elpaca-order))
+       (default-directory repo))
+  (add-to-list 'load-path (if (file-exists-p build) build repo))
+  (unless (file-exists-p repo)
+    (make-directory repo t)
+    (when (< emacs-major-version 28) (require 'subr-x))
+    (condition-case-unless-debug err
+        (if-let ((buffer (pop-to-buffer-same-window "*elpaca-bootstrap*"))
+                 ((zerop (apply #'call-process `("git" nil ,buffer t "clone"
+                                                 ,@(when-let ((depth (plist-get order :depth)))
+                                                     (list (format "--depth=%d" depth) "--no-single-branch"))
+                                                 ,(plist-get order :repo) ,repo))))
+                 ((zerop (call-process "git" nil buffer t "checkout"
+                                       (or (plist-get order :ref) "--"))))
+                 (emacs (concat invocation-directory invocation-name))
+                 ((zerop (call-process emacs nil buffer nil "-Q" "-L" "." "--batch"
+                                       "--eval" "(byte-recompile-directory \".\" 0 'force)")))
+                 ((require 'elpaca))
+                 ((elpaca-generate-autoloads "elpaca" repo)))
+            (progn (message "%s" (buffer-string)) (kill-buffer buffer))
+          (error "%s" (with-current-buffer buffer (buffer-string))))
+      ((error) (warn "%s" err) (delete-directory repo 'recursive))))
+  (unless (require 'elpaca-autoloads nil t)
+    (require 'elpaca)
+    (elpaca-generate-autoloads "elpaca" repo)
+    (load "./elpaca-autoloads")))
+(add-hook 'after-init-hook #'elpaca-process-queues)
+(elpaca `(,@elpaca-order))
 
-;; Install and require use-package
-;; THIS ONLY WORKS IN EMACS 29
-(require 'use-package)
+;; Install use-package support
+(elpaca elpaca-use-package
+        ;; Enable use-package :ensure support for Elpaca.
+        (elpaca-use-package-mode))
 (setq use-package-always-ensure t)
 
+;; #############################################################################
+;; Helper functions
+;; #############################################################################
+(defun vemacs/marker-is-point-p (marker)
+  "Test if MARKER is current point"
+  (and (eq (marker-buffer marker) (current-buffer))
+       (= (marker-position marker) (point))))
+
+(defun vemacs/push-mark-maybe ()
+  "Push mark onto `global-mark-ring' if mark head or tail is not current location"
+  (if (not global-mark-ring) (error "global-mark-ring empty")
+    (unless (or (vemacs/marker-is-point-p (car global-mark-ring))
+                (vemacs/marker-is-point-p (car (reverse global-mark-ring))))
+      (push-mark))))
+
+(defun vemacs/backward-global-mark ()
+  "Use `pop-global-mark', pushing current point if not on ring."
+  (interactive)
+  (vemacs/push-mark-maybe)
+  (when (vemacs/marker-is-point-p (car global-mark-ring))
+    (call-interactively 'pop-global-mark))
+  (call-interactively 'pop-global-mark))
+
+(defun vemacs/forward-global-mark ()
+  "Hack `pop-global-mark' to go in reverse, pushing current point if not on ring."
+  (interactive)
+  (vemacs/push-mark-maybe)
+  (setq global-mark-ring (nreverse global-mark-ring))
+  (when (vemacs/marker-is-point-p (car global-mark-ring))
+    (call-interactively 'pop-global-mark))
+  (call-interactively 'pop-global-mark)
+  (setq global-mark-ring (nreverse global-mark-ring)))
+
+(defun vemacs/find-file ()
+  (interactive)
+  (if (projectile-project-p)
+      (call-interactively 'projectile-find-file)
+    (call-interactively 'find-file)))
+
+(defun vemacs/dired ()
+  (interactive)
+  (if (projectile-project-p)
+      (dired (projectile-project-root))
+    (dired "~/")))
+
+(defun vemacs/xy-window-pixel-ratio ()
+  "Return the ratio of the window's width to its height in pixels."
+  (interactive)
+  (let* ((edges (window-pixel-edges))
+         (width (- (nth 2 edges) (nth 0 edges)))
+         (height (- (nth 3 edges) (nth 1 edges)))
+         (ratio (/ (float width) height)))
+    (if (called-interactively-p 'interactive)
+        (message "Width/Height Ratio: %f" ratio)
+      ratio)))
+
+(defun vemacs/auto-split-window ()
+  "Split the current window along its biggest dimension and run `projectile-find-file`."
+  (interactive)
+  (if (> (vemacs/xy-window-pixel-ratio) 1.0)
+      (split-window-horizontally)       ; Wider window, split horizontally
+    (split-window-vertically))          ; Taller window, split vertically
+  (other-window 1)
+  (projectile-find-file))
+
+;; #############################################################################
+
+;; UI elements setup
 (dolist (mode
          '(menu-bar-mode       ;; Disable the menu bar
            tool-bar-mode       ;; Disable the tool bar
@@ -45,8 +145,46 @@
            blink-cursor-mode)) ;; Disable the blinking cursor
   (funcall mode -1))
 
-;; Disable splash screen
-(setq inhibit-startup-screen t)
+(setq
+ ;; No need to see GNU agitprop.
+ inhibit-startup-screen t
+ ;; No need to remind me what a scratch buffer is.
+ initial-scratch-message nil
+ ;; Double-spaces after periods is morally wrong.
+ sentence-end-double-space nil
+ ;; Save existing clipboard text into the kill ring before replacing it.
+ save-interprogram-paste-before-kill t
+ ;; Prompts should go in the minibuffer, not in a GUI.
+ use-dialog-box nil
+ ;; Fix undo in commands affecting the mark.
+ mark-even-if-inactive nil
+ ;; accept 'y' or 'n' instead of yes/no
+ ;; the documentation advises against setting this variable
+ ;; the documentation can get bent imo
+ use-short-answers t
+ ;; eke out a little more scrolling performance
+ fast-but-imprecise-scrolling t
+ ;; prefer newer elisp files
+ load-prefer-newer t
+ ;; if native-comp is having trouble, there's not very much I can do
+ native-comp-async-report-warnings-errors 'silent
+ ;; unicode ellipses are better
+ truncate-string-ellipsis "…"
+ ;; Define Scrool step
+ scroll-step 1
+ ;; Smooth scrolling
+ scroll-conservatively 10000)
+
+;; Never mix tabs and spaces. Never use tabs, period.
+;; We need the setq-default here because this becomes
+;; a buffer-local variable when set.
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 2)
+(setq indent-line-function 'insert-tab)
+
+;; Set encoding preferences
+(set-charset-priority 'unicode)
+(prefer-coding-system 'utf-8-unix)
 
 ;; For navigating wrapped lines
 (global-visual-line-mode t)
@@ -58,25 +196,8 @@
 ;; Automatically pair parentheses
 (electric-pair-mode t)
 
-;; Use 2 spaces only for indentation
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 2)
-(setq indent-line-function 'insert-tab)
-
-;; Smooth scrolling - That is, scroll only one line
-(setq scroll-step            1
-      scroll-conservatively  10000)
-
 ;; Fonts
-(when (member "JetBrains Mono" (font-family-list))
-  (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font-12"))
-;; Use a variable pitch, keeping fixed pitch where it's sensible
-(use-package mixed-pitch ;; For auto detecting when to use variable pitch
-  :defer t
-  :hook (text-mode . mixed-pitch-mode)
-  :config
-  (when (member "Source Serif Pro" (font-family-list))
-    (set-face-attribute 'variable-pitch nil :family "Source Serif Pro")))
+(set-face-attribute 'default nil :font "JetBrainsMono Nerd Font-11")
 ;; Pretty simbols
 (setq-default prettify-symbols-alist '(("lambda" . ?λ)
                                        ("delta" . ?Δ)
@@ -90,7 +211,6 @@
 
 ;; Doom Themes
 (use-package doom-themes
-  :ensure t
   :config
   ;; Load the desired theme
   (load-theme 'doom-tokyo-night t)  ; Replace 'doom-one with your preferred theme
@@ -101,14 +221,23 @@
 
 ;; Doom Modeline
 (use-package doom-modeline
-  :ensure t
   :init (doom-modeline-mode 1)
   :config
   (setq doom-modeline-height 15))
 
+;; Dims non-active windows
+(use-package dimmer
+  :custom (dimmer-fraction 0.3)
+  :config (dimmer-mode))
+
+;; Needed for other stuff
+(use-package eldoc
+  :config
+  (provide 'upgraded-eldoc))
+(use-package jsonrpc)
+
 ;; Projectile.el stuff
 (use-package projectile
-  :ensure t
   :init (projectile-mode +1)
   :config
   (setq projectile-project-search-path '("~/Documents/GitHub/"))
@@ -129,20 +258,45 @@
         dashboard-center-content t
         dashboard-set-footer nil
         dashboard-page-separator "\n\n\n"
-        dashboard-items '((projects . 5)
-                          (recents  . 5)
-                          (bookmarks . 5)))
+        dashboard-items '((projects . 10)
+                          (recents  . 10)))
   (dashboard-setup-startup-hook))
+
+;; Treesitter
+(use-package tree-sitter
+  :hook ((python-mode . tree-sitter-hl-mode)
+         (rust-mode . tree-sitter-hl-mode)
+         (sh-mode . tree-sitter-hl-mode)
+         (c-mode . tree-sitter-hl-mode)
+         (cpp-mode . tree-sitter-hl-mode)
+         (go-mode . tree-sitter-hl-mode)
+         (zig-mode . tree-sitter-hl-mode)
+         (haskel-mode . tree-sitter-hl-mode)
+         (ocaml-mode . tree-sitter-hl-mode)
+         (latex-mode . tree-sitter-hl-mode)))
+(use-package tree-sitter-langs)
 
 ;; Eglot - LSP Support
 (use-package eglot
-  :ensure t
-  :hook (prog-mode . eglot-ensure)
-  :init (defalias 'start-lsp-server #'eglot))
+  :init (defalias 'start-lsp-server #'eglot)
+  :hook ((go-mode . eglot-ensure)
+         (haskell-mode . eglot-ensure)
+         (rust-mode . eglot-ensure)
+         (python-mode . eglot-ensure)
+         (sh-mode . eglot-ensure)
+         (c-mode . eglot-ensure)
+         (cpp-mode . eglot-ensure)
+         (zig-mode . eglot-ensure)
+         (haskel-mode . eglot-ensure)
+         (ocaml-mode . eglot-ensure)
+         (latex-mode . eglot-ensure))
+  (prog-mode . eglot-ensure)
+  :custom
+  (eglot-autoshutdown t))
+(use-package consult-eglot)
 
 ;; Flymake - Inline static analysis
 (use-package flymake
-  :ensure t
   :hook (prog-mode . flymake-mode)
   :config
   (setq help-at-pt-display-when-idle t))
@@ -154,7 +308,6 @@
 
 ;; EditorConfig support
 (use-package editorconfig
-  :ensure t
   :config (editorconfig-mode t))
 
 ;; Miscellaneous options
@@ -169,7 +322,6 @@
 (save-place-mode t)
 (savehist-mode t)
 (recentf-mode t)
-(defalias 'yes-or-no #'y-or-n-p)
 
 ;; Sotre emacs generated files in a centralised location
 (setq backup-directory-alist '(("." . "~/.emacs_saves")))
@@ -181,17 +333,18 @@
 
 ;; MEOW
 (use-package meow
-  :ensure t
   :demand t
   :bind
-  ("∇" . meow-keypad)
+  ;; Define CapsLock as a Nabla and use it as a modifier (https://www.emacswiki.org/emacs/CapsKey#toc5)
+  ;; Use nabla (aka CapsLock) as leader (https://www.emacswiki.org/emacs/CapsKey#toc5)
+  ;; ("∇" . meow-keypad)
   :config
   (defun meow-setup ()
-    ;; Define CapsLock as a Nabla and use it as a modifier (https://www.emacswiki.org/emacs/CapsKey#toc5)
-    ;; (define-key key-translation-map [8711] 'event-apply-hyper-modifier)
-    ;; Use nabla (aka CapsLock) as leader (https://www.emacswiki.org/emacs/CapsKey#toc5)
-    ;; (meow-leader-define-key [8711])
-    (meow-leader-define-key "RET")
+    ;; Enable modeline indicator
+    (meow-setup-indicator)
+    ;; Define prefixes that are baypassed to keypad mode
+    (setq meow-keypad-start-keys '((?x . ?x)))
+    ;; Define the layout
     (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
     (meow-motion-overwrite-define-key
      '("j" . meow-next)
@@ -201,19 +354,26 @@
      ;; SPC j/k will run the original command in MOTION state.
      '("j" . "H-j")
      '("k" . "H-k")
-     ;; Use SPC (0-9) for digit arguments.
-     '("1" . meow-digit-argument)
-     '("2" . meow-digit-argument)
-     '("3" . meow-digit-argument)
-     '("4" . meow-digit-argument)
-     '("5" . meow-digit-argument)
-     '("6" . meow-digit-argument)
-     '("7" . meow-digit-argument)
-     '("8" . meow-digit-argument)
-     '("9" . meow-digit-argument)
-     '("0" . meow-digit-argument)
-     '("/" . meow-keypad-describe-key)
-     '("?" . meow-cheatsheet))
+     '("?" . meow-cheatsheet)
+     '(":" . execute-extended-command)
+     '(";" . eval-expression)
+     '("." . ibuffer)
+     '("," . scratch-buffer)
+     '("*" . project-search)
+     '("'" . text-scale-adjust)
+     '("b" . consult-buffer)
+     '("c" . comment-line)
+     '("w" . meow-visit)
+     '("a" . lsp-execute-code-action)
+     '("o" . vemacs/dired)
+     '("f" . vemacs/find-file)
+     '("h" . replace-string)
+     '("d" . consult-flymake)
+     ;; '("t" . toggle-terminal)
+     '("r" . async-shell-command)
+     '("m" . compile)
+     ;; '("u" . undo-tee-visualize)
+     '("s" . vemacs/auto-split-window))
     (meow-normal-define-key
      '("0" . meow-expand-0)
      '("9" . meow-expand-9)
@@ -275,15 +435,19 @@
      '("Y" . meow-sync-grab)
      '("z" . meow-pop-selection)
      '("'" . repeat)
-     '("<tab>" . repeat)
-     '("<escape>" . ignore)))
-
+     '("<tab>" . vemacs/backward-global-mark)
+     '("<backtab>" . vemacs/forward-global-mark)
+     '("<escape>" . ignore)
+     '("C-h" . windmove-left)
+     '("C-l" . windmove-right)
+     '("C-k" . windmove-up)
+     '("C-j" . windmove-down)
+     '("C-q" . delete-window)))
   (meow-setup)
   (meow-global-mode 1))
 
 ;; Enable vertico
 (use-package vertico
-  :ensure t
   :bind (:map vertico-map
          ("C-j" . vertico-next)
          ("C-k" . vertico-previous)
@@ -297,13 +461,13 @@
 
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
 (use-package savehist
+  :elpaca nil
   :init
   (savehist-mode))
 
 ;; Marginalia, whateve it is...
 (use-package marginalia
   :after vertico
-  :ensure t
   :custom
   (marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
   :init
@@ -431,14 +595,12 @@
 
 ;; Orderless
 (use-package orderless
-  :ensure t
   :custom
   (completion-styles '(orderless basic))
   (completion-category-overrides '((file (styles basic partial-completion)))))
 
 ;; Embark
 (use-package embark
-  :ensure t
 
   :bind
   (("C-." . embark-act)         ;; pick some comfortable binding
@@ -469,12 +631,27 @@
 
 ;; Embark-consult
 (use-package embark-consult
-  :ensure t ; only need to install it, embark loads it after consult if found
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
+;; Autocompletion
+(use-package corfu
+  :init
+  (global-corfu-mode)
+  :config
+  ;; Enable auto completion and configure quitting
+  (setq corfu-auto t
+        corfu-quit-no-match 'separator)) ;; or t)
+
+;; Which-key
+(use-package which-key
+  :config
+  (which-key-setup-side-window-bottom)
+  (which-key-mode))
+
 ;; A few more useful configurations...
 (use-package emacs
+  :elpaca nil
   :init
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
@@ -502,7 +679,6 @@
 
 ;; PDF Tools
 (use-package pdf-tools
-  :ensure t
   :config
   (pdf-tools-install))
 
