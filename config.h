@@ -12,13 +12,17 @@
 #define DEMACS_CONFIG_PATH "$XDG_CONFIG_HOME/doom"
 #define DEMACS_CONFIG_DATA "$XDG_CONFIG_HOME/emacs"
 #define DEMACS_CONFIG_CACHE "$HOME/.emacs_saves"
+#define DEMACS_REPO "https://github.com/doomemacs/doomemacs"
 // Vanilla EMACS
 #define VEMACS_CONFIG_PATH "$HOME/.emacs.d"
 #endif
 
-#define NEOVIM
+// EDITORS
+// #define NEOVIM
 #define DEMACS
 // #define VEMACS
+
+// OPTIONS
 #define FORCE_INSTALL
 #define SYNC
 

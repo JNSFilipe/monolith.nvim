@@ -140,7 +140,7 @@
 ;; Basic Emacs setup
 (use-package emacs
   ;; https://github.com/progfolio/elpaca?tab=readme-ov-file#quick-start / https://www.reddit.com/r/emacs/comments/1bgurp5/how_to_turn_off_elpacausepackagecompact_warning/
-  :ensure nil  
+  :ensure nil
   :init
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
@@ -172,45 +172,45 @@
     (funcall mode -1))
 
   (setq
-    ;; Support opening new minibuffers from inside existing minibuffers.
-    enable-recursive-minibuffers t
-    ;; No need to see GNU agitprop.
-    inhibit-startup-screen t
-    ;; No need to remind me what a scratch buffer is.
-    initial-scratch-message nil
-    ;; Double-spaces after periods is morally wrong.
-    sentence-end-double-space nil
-    ;; Save existing clipboard text into the kill ring before replacing it.
-    save-interprogram-paste-before-kill t
-    ;; Prompts should go in the minibuffer, not in a GUI.
-    use-dialog-box nil
-    ;; Fix undo in commands affecting the mark.
-    mark-even-if-inactive nil
-    ;; accept 'y' or 'n' instead of yes/no
-    ;; the documentation advises against setting this variable
-    ;; the documentation can get bent imo
-    use-short-answers t
-    ;; Confir kill emacs
-    confirm-kill-emacs #'yes-or-no-p
-    ;; eke out a little more scrolling performance
-    fast-but-imprecise-scrolling t
-    ;; prefer newer elisp files
-    load-prefer-newer t
-    ;; if native-comp is having trouble, there's not very much I can do
-    native-comp-async-report-warnings-errors 'silent
-    ;; unicode ellipses are better
-    truncate-string-ellipsis "…"
-    ;; Define Scrool step
-    scroll-step 1
-    ;; Smooth scrolling
-    scroll-conservatively 10000
-    ;; Resize at pixel resolution
-    window-resize-pixelwise t
-    frame-resize-pixelwise t
-    ;; Store emacs generated files in a centralised location
-    backup-directory-alist '(("." . "~/.emacs_saves"))
-    ;; Store automatic customization options elsewhere
-    custom-file (locate-user-emacs-file "custom.el"))
+   ;; Support opening new minibuffers from inside existing minibuffers.
+   enable-recursive-minibuffers t
+   ;; No need to see GNU agitprop.
+   inhibit-startup-screen t
+   ;; No need to remind me what a scratch buffer is.
+   initial-scratch-message nil
+   ;; Double-spaces after periods is morally wrong.
+   sentence-end-double-space nil
+   ;; Save existing clipboard text into the kill ring before replacing it.
+   save-interprogram-paste-before-kill t
+   ;; Prompts should go in the minibuffer, not in a GUI.
+   use-dialog-box nil
+   ;; Fix undo in commands affecting the mark.
+   mark-even-if-inactive nil
+   ;; accept 'y' or 'n' instead of yes/no
+   ;; the documentation advises against setting this variable
+   ;; the documentation can get bent imo
+   use-short-answers t
+   ;; Confir kill emacs
+   confirm-kill-emacs #'yes-or-no-p
+   ;; eke out a little more scrolling performance
+   fast-but-imprecise-scrolling t
+   ;; prefer newer elisp files
+   load-prefer-newer t
+   ;; if native-comp is having trouble, there's not very much I can do
+   native-comp-async-report-warnings-errors 'silent
+   ;; unicode ellipses are better
+   truncate-string-ellipsis "…"
+   ;; Define Scrool step
+   scroll-step 1
+   ;; Smooth scrolling
+   scroll-conservatively 10000
+   ;; Resize at pixel resolution
+   window-resize-pixelwise t
+   frame-resize-pixelwise t
+   ;; Store emacs generated files in a centralised location
+   backup-directory-alist '(("." . "~/.emacs_saves"))
+   ;; Store automatic customization options elsewhere
+   custom-file (locate-user-emacs-file "custom.el"))
 
   ;; Never mix tabs and spaces. Never use tabs, period.
   ;; We need the setq-default here because this becomes
@@ -260,15 +260,18 @@
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
 (use-package savehist
   ;; https://www.reddit.com/r/emacs/comments/1bgurp5/how_to_turn_off_elpacausepackagecompact_warning/
-  :ensure nil 
+  :ensure nil
   :init
   (savehist-mode))
 
-;; Needed for other stuff
-;(use-package eldoc)
-;  :config
-;  (provide 'upgraded-eldoc))
-;(use-package jsonrpc)
+;; Without this, flymake whines about installed version of eldoc being too low
+(use-package jsonrpc)
+(use-package eldoc :defer t)
+;; (use-package eldoc
+;;   ;; https://www.reddit.com/r/emacs/comments/1bgurp5/how_to_turn_off_elpacausepackagecompact_warning/
+;;   ;; :ensure nil
+;;   :config
+;;   (provide 'upgraded-eldoc))
 
 ;; Install icons
 (use-package all-the-icons :if (display-graphic-p))
@@ -321,6 +324,12 @@
                           (recents  . 10)))
   (dashboard-setup-startup-hook))
 
+;; Flymake - Inline static analysis
+(use-package flymake
+  :hook (prog-mode . flymake-mode)
+  :config
+  (setq help-at-pt-display-when-idle t))
+
 ;; Treesitter
 (use-package tree-sitter
   :hook ((python-mode . tree-sitter-hl-mode)
@@ -353,12 +362,6 @@
   :custom
   (eglot-autoshutdown t))
 (use-package consult-eglot)
-
-;; Flymake - Inline static analysis
-(use-package flymake
-  :hook (prog-mode . flymake-mode)
-  :config
-  (setq help-at-pt-display-when-idle t))
 
 ;; EditorConfig support
 (use-package editorconfig
@@ -420,12 +423,12 @@
      '("1" . meow-expand-1)
      '("-" . negative-argument)
      '(";" . meow-reverse)
-     '("," . meow-inner-of-thing)
-     '("." . meow-bounds-of-thing)
-     '("[" . meow-beginning-of-thing)
-     '("]" . meow-end-of-thing)
+     '("I" . meow-inner-of-thing) ;; '("," . meow-inner-of-thing)
+     '("A" . meow-bounds-of-thing) ;; '("." . meow-bounds-of-thing)
+     '("," . meow-beginning-of-thing) ;; '("[" . meow-beginning-of-thing)
+     '("." . meow-end-of-thing) ;; '("]" . meow-end-of-thing)
      '("a" . meow-append)
-     '("A" . meow-open-below)
+     '("o" . meow-open-below) ;; '("A" . meow-open-below)
      '("b" . meow-back-word)
      '("B" . meow-back-symbol)
      '("c" . meow-change)
@@ -439,7 +442,7 @@
      '("h" . meow-left)
      '("H" . meow-left-expand)
      '("i" . meow-insert)
-     '("I" . meow-open-above)
+     '("O" . meow-open-above) ;; '("I" . meow-open-above)
      '("j" . meow-next)
      '("J" . meow-next-expand)
      '("k" . meow-prev)
@@ -448,14 +451,15 @@
      '("L" . meow-right-expand)
      '("m" . meow-join)
      '("n" . meow-search)
-     '("o" . meow-block)
-     '("O" . meow-to-block)
+     '("C-b" . meow-block) ;; '("o" . meow-block)
+     '("C-B" . meow-to-block) ;; '("O" . meow-to-block)
      '("p" . meow-yank)
+     '("C-p" . meow-yank-pop) ;; This presents a paste menu
      '("q" . meow-quit)
      '("Q" . meow-goto-line)
      '("r" . meow-replace)
      '("R" . meow-swap-grab)
-     '("s" . meow-kill)
+     ;; '("s" . meow-kill)
      '("t" . meow-till)
      '("u" . meow-undo)
      '("U" . meow-undo-in-selection)
@@ -463,7 +467,7 @@
      '("w" . meow-mark-word)
      '("W" . meow-mark-symbol)
      '("x" . meow-line)
-     '("X" . meow-goto-line)
+     '(":" . meow-goto-line) ;; '("X" . meow-goto-line)
      '("y" . meow-save)
      '("Y" . meow-sync-grab)
      '("z" . meow-pop-selection)
