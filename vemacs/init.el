@@ -137,73 +137,138 @@
 
 ;; #############################################################################
 
-;; UI elements setup
-(dolist (mode
-         '(menu-bar-mode       ;; Disable the menu bar
-           tool-bar-mode       ;; Disable the tool bar
-           scroll-bar-mode     ;; Disable the scroll bars
-           blink-cursor-mode)) ;; Disable the blinking cursor
-  (funcall mode -1))
+;; Basic Emacs setup
+(use-package emacs
+  ;; https://github.com/progfolio/elpaca?tab=readme-ov-file#quick-start / https://www.reddit.com/r/emacs/comments/1bgurp5/how_to_turn_off_elpacausepackagecompact_warning/
+  :ensure nil  
+  :init
+  ;; Add prompt indicator to `completing-read-multiple'.
+  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
+  (defun crm-indicator (args)
+    (cons (format "[CRM%s] %s"
+                  (replace-regexp-in-string
+                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                   crm-separator)
+                  (car args))
+          (cdr args)))
+  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
-(setq
- ;; No need to see GNU agitprop.
- inhibit-startup-screen t
- ;; No need to remind me what a scratch buffer is.
- initial-scratch-message nil
- ;; Double-spaces after periods is morally wrong.
- sentence-end-double-space nil
- ;; Save existing clipboard text into the kill ring before replacing it.
- save-interprogram-paste-before-kill t
- ;; Prompts should go in the minibuffer, not in a GUI.
- use-dialog-box nil
- ;; Fix undo in commands affecting the mark.
- mark-even-if-inactive nil
- ;; accept 'y' or 'n' instead of yes/no
- ;; the documentation advises against setting this variable
- ;; the documentation can get bent imo
- use-short-answers t
- ;; eke out a little more scrolling performance
- fast-but-imprecise-scrolling t
- ;; prefer newer elisp files
- load-prefer-newer t
- ;; if native-comp is having trouble, there's not very much I can do
- native-comp-async-report-warnings-errors 'silent
- ;; unicode ellipses are better
- truncate-string-ellipsis "…"
- ;; Define Scrool step
- scroll-step 1
- ;; Smooth scrolling
- scroll-conservatively 10000)
+  ;; Do not allow the cursor in the minibuffer prompt
+  (setq minibuffer-prompt-properties
+        '(read-only t cursor-intangible t face minibuffer-prompt))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
 
-;; Never mix tabs and spaces. Never use tabs, period.
-;; We need the setq-default here because this becomes
-;; a buffer-local variable when set.
-(setq-default indent-tabs-mode nil)
-(setq-default tab-width 2)
-(setq indent-line-function 'insert-tab)
+  ;; Emacs 28 and newer: Hide commands in M-x which do not work in the current
+  ;; mode.  Vertico commands are hidden in normal buffers. This setting is
+  ;; useful beyond Vertico.
+  (setq read-extended-command-predicate #'command-completion-default-include-p)
 
-;; Set encoding preferences
-(set-charset-priority 'unicode)
-(prefer-coding-system 'utf-8-unix)
+  ;; UI elements setup
+  (dolist (mode
+           '(menu-bar-mode       ;; Disable the menu bar
+             tool-bar-mode       ;; Disable the tool bar
+             scroll-bar-mode     ;; Disable the scroll bars
+             blink-cursor-mode)) ;; Disable the blinking cursor
+    (funcall mode -1))
 
-;; For navigating wrapped lines
-(global-visual-line-mode t)
+  (setq
+    ;; Support opening new minibuffers from inside existing minibuffers.
+    enable-recursive-minibuffers t
+    ;; No need to see GNU agitprop.
+    inhibit-startup-screen t
+    ;; No need to remind me what a scratch buffer is.
+    initial-scratch-message nil
+    ;; Double-spaces after periods is morally wrong.
+    sentence-end-double-space nil
+    ;; Save existing clipboard text into the kill ring before replacing it.
+    save-interprogram-paste-before-kill t
+    ;; Prompts should go in the minibuffer, not in a GUI.
+    use-dialog-box nil
+    ;; Fix undo in commands affecting the mark.
+    mark-even-if-inactive nil
+    ;; accept 'y' or 'n' instead of yes/no
+    ;; the documentation advises against setting this variable
+    ;; the documentation can get bent imo
+    use-short-answers t
+    ;; Confir kill emacs
+    confirm-kill-emacs #'yes-or-no-p
+    ;; eke out a little more scrolling performance
+    fast-but-imprecise-scrolling t
+    ;; prefer newer elisp files
+    load-prefer-newer t
+    ;; if native-comp is having trouble, there's not very much I can do
+    native-comp-async-report-warnings-errors 'silent
+    ;; unicode ellipses are better
+    truncate-string-ellipsis "…"
+    ;; Define Scrool step
+    scroll-step 1
+    ;; Smooth scrolling
+    scroll-conservatively 10000
+    ;; Resize at pixel resolution
+    window-resize-pixelwise t
+    frame-resize-pixelwise t
+    ;; Store emacs generated files in a centralised location
+    backup-directory-alist '(("." . "~/.emacs_saves"))
+    ;; Store automatic customization options elsewhere
+    custom-file (locate-user-emacs-file "custom.el"))
 
-;; Enable and use relative line numbering
-(global-display-line-numbers-mode 1)
-(setq display-line-numbers 'relative)
+  ;; Never mix tabs and spaces. Never use tabs, period.
+  ;; We need the setq-default here because this becomes
+  ;; a buffer-local variable when set.
+  (setq-default indent-tabs-mode nil)
+  (setq-default tab-width 2)
+  (setq indent-line-function 'insert-tab)
 
-;; Automatically pair parentheses
-(electric-pair-mode t)
+  ;; Set encoding preferences
+  (set-charset-priority 'unicode)
+  (prefer-coding-system 'utf-8-unix)
 
-;; Fonts
-(set-face-attribute 'default nil :font "JetBrainsMono Nerd Font-11")
-;; Pretty simbols
-(setq-default prettify-symbols-alist '(("lambda" . ?λ)
-                                       ("delta" . ?Δ)
-                                       ("gamma" . ?Γ)
-                                       ("phi" . ?φ)
-                                       ("psi" . ?ψ)))
+  ;; For navigating wrapped lines
+  (global-visual-line-mode t)
+
+  ;; Enable and use relative line numbering
+  (global-display-line-numbers-mode 1)
+  (setq display-line-numbers 'relative)
+
+  ;; Automatically pair parentheses
+  (electric-pair-mode t)
+
+  ;; Fonts
+  (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font-11")
+  ;; Pretty simbols
+  (setq-default prettify-symbols-alist '(("lambda" . ?λ)
+                                         ("delta" . ?Δ)
+                                         ("gamma" . ?Γ)
+                                         ("phi" . ?φ)
+                                         ("psi" . ?ψ)))
+
+  ;; Miscellaneous options -- Stolen from somwhere, don't know where nor what it does...
+  (setq-default major-mode
+                (lambda ()
+                  (unless buffer-file-name
+                    (let ((buffer-file-name (buffer-name)))
+                      (set-auto-mode)))))
+  (save-place-mode t)
+  (savehist-mode t)
+  (recentf-mode t)
+
+  ;; Load custom.el if it exists...
+  (when (file-exists-p custom-file)
+    (load custom-file)))
+
+;; TODO: Test if I need this if there is the (savhist-mode t) sexp in use-package emacs... My guess is I do not...
+;; Persist history over Emacs restarts. Vertico sorts by history position.
+(use-package savehist
+  ;; https://www.reddit.com/r/emacs/comments/1bgurp5/how_to_turn_off_elpacausepackagecompact_warning/
+  :ensure nil 
+  :init
+  (savehist-mode))
+
+;; Needed for other stuff
+;(use-package eldoc)
+;  :config
+;  (provide 'upgraded-eldoc))
+;(use-package jsonrpc)
 
 ;; Install icons
 (use-package all-the-icons :if (display-graphic-p))
@@ -229,12 +294,6 @@
 (use-package dimmer
   :custom (dimmer-fraction 0.3)
   :config (dimmer-mode))
-
-;; Needed for other stuff
-(use-package eldoc
-  :config
-  (provide 'upgraded-eldoc))
-(use-package jsonrpc)
 
 ;; Projectile.el stuff
 (use-package projectile
@@ -301,35 +360,9 @@
   :config
   (setq help-at-pt-display-when-idle t))
 
-;; Message navigation bindings
-(with-eval-after-load 'flymake
-  (define-key flymake-mode-map (kbd "C-c n") #'flymake-goto-next-error)
-  (define-key flymake-mode-map (kbd "C-c p") #'flymake-goto-prev-error))
-
 ;; EditorConfig support
 (use-package editorconfig
   :config (editorconfig-mode t))
-
-;; Miscellaneous options
-(setq-default major-mode
-              (lambda ()
-                (unless buffer-file-name
-                  (let ((buffer-file-name (buffer-name)))
-                    (set-auto-mode)))))
-(setq confirm-kill-emacs #'yes-or-no-p)
-(setq window-resize-pixelwise t)
-(setq frame-resize-pixelwise t)
-(save-place-mode t)
-(savehist-mode t)
-(recentf-mode t)
-
-;; Sotre emacs generated files in a centralised location
-(setq backup-directory-alist '(("." . "~/.emacs_saves")))
-
-;; Store automatic customization options elsewhere
-(setq custom-file (locate-user-emacs-file "custom.el"))
-(when (file-exists-p custom-file)
-  (load custom-file))
 
 ;; MEOW
 (use-package meow
@@ -458,12 +491,6 @@
   (vertico-cycle t)
   :init
   (vertico-mode))
-
-;; Persist history over Emacs restarts. Vertico sorts by history position.
-(use-package savehist
-  :elpaca nil
-  :init
-  (savehist-mode))
 
 ;; Marginalia, whateve it is...
 (use-package marginalia
@@ -649,40 +676,11 @@
   (which-key-setup-side-window-bottom)
   (which-key-mode))
 
-;; A few more useful configurations...
-(use-package emacs
-  :elpaca nil
-  :init
-  ;; Add prompt indicator to `completing-read-multiple'.
-  ;; We display [CRM<separator>], e.g., [CRM,] if the separator is a comma.
-  (defun crm-indicator (args)
-    (cons (format "[CRM%s] %s"
-                  (replace-regexp-in-string
-                   "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                   crm-separator)
-                  (car args))
-          (cdr args)))
-  (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-  ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
-
-  ;; Support opening new minibuffers from inside existing minibuffers.
-  (setq enable-recursive-minibuffers t)
-
-  ;; Emacs 28 and newer: Hide commands in M-x which do not work in the current
-  ;; mode.  Vertico commands are hidden in normal buffers. This setting is
-  ;; useful beyond Vertico.
-  (setq read-extended-command-predicate #'command-completion-default-include-p))
-
 ;; PDF Tools
 (use-package pdf-tools
   :config
   (pdf-tools-install))
 
-;; Keybinds
 
 (provide 'init)
 ;;; init.el ends here
