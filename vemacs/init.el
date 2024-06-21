@@ -135,6 +135,19 @@
   (other-window 1)
   (projectile-find-file))
 
+(defun vemacs/indent-region (num-spaces)
+  "Indent or unindent the selected region by NUM-SPACES."
+  (if (region-active-p)
+      (let ((start (region-beginning))
+            (end (region-end)))
+        (save-excursion
+          (goto-char start)
+          (while (< (point) end)
+            (indent-rigidly (point) (min (1+ end) (line-end-position)) num-spaces)
+            (forward-line)))
+        (setq deactivate-mark nil))
+    (if (< num-spaces 0) (vemacs/forward-global-mark) (vemacs/backward-global-mark))))
+
 ;; #############################################################################
 
 ;; Basic Emacs setup
@@ -266,7 +279,9 @@
 
 ;; Without this, flymake whines about installed version of eldoc being too low
 (use-package jsonrpc)
-(use-package eldoc :defer t)
+(use-package eldoc
+  :defer t
+  :hook (vertigo-mode . turn-on-eldoc-mode))
 ;; (use-package eldoc
 ;;   ;; https://www.reddit.com/r/emacs/comments/1bgurp5/how_to_turn_off_elpacausepackagecompact_warning/
 ;;   ;; :ensure nil
@@ -399,7 +414,7 @@
      '("'" . text-scale-adjust)
      '("b" . consult-buffer)
      '("c" . comment-line)
-     '("w" . meow-visit)
+     '("w" . save-buffer)
      '("a" . lsp-execute-code-action)
      '("o" . vemacs/dired)
      '("f" . vemacs/find-file)
@@ -432,8 +447,8 @@
      '("b" . meow-back-word)
      '("B" . meow-back-symbol)
      '("c" . meow-change)
-     '("d" . meow-delete)
-     '("D" . meow-backward-delete)
+     '("x" . meow-delete) ;; '("d" . meow-delete)
+     '("X" . meow-backward-delete) ;; '("D" . meow-backward-delete)
      '("e" . meow-next-word)
      '("E" . meow-next-symbol)
      '("f" . meow-find)
@@ -451,30 +466,31 @@
      '("L" . meow-right-expand)
      '("m" . meow-join)
      '("n" . meow-search)
-     '("C-b" . meow-block) ;; '("o" . meow-block)
-     '("C-B" . meow-to-block) ;; '("O" . meow-to-block)
+     '("Q" . meow-block) ;; '("o" . meow-block)
+     ;; '("C-B" . meow-to-block) ;; '("O" . meow-to-block)
      '("p" . meow-yank)
-     '("C-p" . meow-yank-pop) ;; This presents a paste menu
+     '("P" . meow-yank-pop) ;; This presents a paste menu
      '("q" . meow-quit)
-     '("Q" . meow-goto-line)
+     ;; '("Q" . meow-goto-line)
      '("r" . meow-replace)
      '("R" . meow-swap-grab)
-     ;; '("s" . meow-kill)
+     '("d" . meow-kill)
      '("t" . meow-till)
      '("u" . meow-undo)
      '("U" . meow-undo-in-selection)
      '("v" . meow-visit)
      '("w" . meow-mark-word)
      '("W" . meow-mark-symbol)
-     '("x" . meow-line)
+     '("V" . meow-line) ;; '("x" . meow-line)
      '(":" . meow-goto-line) ;; '("X" . meow-goto-line)
      '("y" . meow-save)
      '("Y" . meow-sync-grab)
      '("z" . meow-pop-selection)
      '("'" . repeat)
-     '("<tab>" . vemacs/backward-global-mark)
-     '("<backtab>" . vemacs/forward-global-mark)
-     '("<escape>" . ignore)
+     '("<tab>" .  (lambda () (interactive) (vemacs/indent-region 2)))
+     '("<backtab>" .  (lambda () (interactive) (vemacs/indent-region -2)))
+     '("<escape>" . meow-cancel-selection) ;; '("<escape>" . ignore)
+     '("∇" . consult-global-mark)
      '("C-h" . windmove-left)
      '("C-l" . windmove-right)
      '("C-k" . windmove-up)
@@ -482,6 +498,17 @@
      '("C-q" . delete-window)))
   (meow-setup)
   (meow-global-mode 1))
+
+;; Key-chord, to deal with sequances of keys, like jj to escape insert mode
+(use-package key-chord
+  :config
+  (key-chord-mode 1)
+  ;; Insert mode
+  (key-chord-define meow-insert-state-keymap "jj" 'meow-insert-exit)
+  ;; Normal mode
+  ;; (key-chord-define meow-normal-state-keymap "gd" '(lambda () (interactive) (save-mark-and-excursion (dumb-jump-go))))
+  (key-chord-define meow-normal-state-keymap "gd" 'xref-find-definitions)
+  (key-chord-define meow-normal-state-keymap "gD" 'dumb-jump-quick-look))
 
 ;; Enable vertico
 (use-package vertico
@@ -669,10 +696,14 @@
 (use-package corfu
   :init
   (global-corfu-mode)
+  :hook (corfu-mode . corfu-popupinfo-mode)
   :config
   ;; Enable auto completion and configure quitting
   (setq corfu-auto t
-        corfu-quit-no-match 'separator)) ;; or t)
+        corfu-quit-no-match 'separator)
+  :bind (:map corfu-map
+              ("C-j" . corfu-next)
+              ("C-k" . corfu-previous)))
 
 ;; Which-key
 (use-package which-key
