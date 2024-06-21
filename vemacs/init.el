@@ -22,6 +22,14 @@
 ;; Setting it to 100mb seems to strike a nice balance between GC pauses and performance.
 (setq gc-cons-threshold (* 100 1024 1024))
 
+;; TODO:
+;; - [ ] Add terminal (probably eat)
+;; - [ ] Add git-dif-hl and search hunks (probably eat)
+;; - [ ] Add way to search documentation
+;; - [ ] Add copilot
+;; - [ ] Solve warning at the beginning
+;; - [ ] FIND A KEY TO BIND meow-block TO!!!
+
 ;; #############################################################################
 ;; Bootstrap elpaca
 ;; #############################################################################
