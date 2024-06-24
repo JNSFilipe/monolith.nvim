@@ -23,6 +23,7 @@
 (setq gc-cons-threshold (* 100 1024 1024))
 
 ;; TODO:
+;; - [ ] Add auto-formatting
 ;; - [ ] Add way to search documentation
 ;; - [ ] Add copilot
 ;; - [ ] Solve warning at the beginning
@@ -273,7 +274,10 @@
 
   ;; Load custom.el if it exists...
   (when (file-exists-p custom-file)
-    (load custom-file)))
+    (load custom-file))
+
+  ;; Share system/emacs clipboard
+  (setq x-select-enable-clipboard t))
 
 ;; TODO: Test if I need this if there is the (savhist-mode t) sexp in use-package emacs... My guess is I do not...
 ;; Persist history over Emacs restarts. Vertico sorts by history position.
@@ -415,6 +419,7 @@
   ;; Use nabla (aka CapsLock) as leader (https://www.emacswiki.org/emacs/CapsKey#toc5)
   ;; ("∇" . meow-keypad)
   :config
+  (setq meow-use-clipboard t) ;; 
   (defun meow-setup ()
     ;; Enable modeline indicator
     (meow-setup-indicator)
