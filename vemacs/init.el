@@ -155,6 +155,18 @@
         (setq deactivate-mark nil))
     (if (< num-spaces 0) (vemacs/forward-global-mark) (vemacs/backward-global-mark))))
 
+(defun vemacs/meow-append ()
+  (interactive)
+  (unless (region-active-p) (forward-char 1))  ; 这里
+  (if meow--temp-normal
+      (progn
+        (message "Quit temporary normal mode")
+        (meow--switch-state 'motion))
+    (meow--direction-forward)
+    (when (bound-and-true-p delete-selection-mode)
+      (meow--cancel-selection))
+    (meow--switch-state 'insert)))
+
 ;; #############################################################################
 
 ;; Basic Emacs setup
@@ -469,11 +481,12 @@
      '("1" . meow-expand-1)
      '("-" . negative-argument)
      '(";" . meow-reverse)
+     '("/" . meow-visit)
      '("I" . meow-inner-of-thing) ;; '("," . meow-inner-of-thing)
      '("A" . meow-bounds-of-thing) ;; '("." . meow-bounds-of-thing)
      '("," . meow-beginning-of-thing) ;; '("[" . meow-beginning-of-thing)
      '("." . meow-end-of-thing) ;; '("]" . meow-end-of-thing)
-     '("a" . meow-append)
+     '("a" . vemacs/meow-append)
      '("o" . meow-open-below) ;; '("A" . meow-open-below)
      '("b" . meow-back-word)
      '("B" . meow-back-symbol)
