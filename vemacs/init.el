@@ -24,7 +24,6 @@
 
 ;; TODO:
 ;; - [ ] Add terminal (probably eat)
-;; - [ ] Add git-dif-hl and search hunks (probably eat)
 ;; - [ ] Add way to search documentation
 ;; - [ ] Add copilot
 ;; - [ ] Solve warning at the beginning
@@ -386,6 +385,22 @@
   (eglot-autoshutdown t))
 (use-package consult-eglot)
 
+;; Magit
+(use-package magit
+  :bind (("C-x g" . magit-status)
+         ("C-x C-g" . magit-status)))
+
+;; Git signs
+;; https://ianyepan.github.io/posts/emacs-git-gutter/
+(use-package git-gutter
+  :hook (prog-mode . git-gutter-mode)
+  :config
+  (custom-set-variables
+   '(git-gutter:modified-sign "~")
+   '(git-gutter:added-sign "+")
+   '(git-gutter:deleted-sign "-"))
+  (setq git-gutter:update-interval 0.2))
+
 ;; EditorConfig support
 (use-package editorconfig
   :config (editorconfig-mode t))
@@ -495,6 +510,8 @@
      '("Y" . meow-sync-grab)
      '("z" . meow-pop-selection)
      '("'" . repeat)
+     '("ç" . git-gutter:next-hunk)
+     '("Ç" . git-gutter:previous-hunk)
      '("<tab>" .  (lambda () (interactive) (vemacs/indent-region 2)))
      '("<backtab>" .  (lambda () (interactive) (vemacs/indent-region -2)))
      '("<escape>" . meow-cancel-selection) ;; '("<escape>" . ignore)
@@ -723,7 +740,6 @@
 (use-package pdf-tools
   :config
   (pdf-tools-install))
-
 
 (provide 'init)
 ;;; init.el ends here
