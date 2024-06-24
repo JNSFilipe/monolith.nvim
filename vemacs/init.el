@@ -23,7 +23,6 @@
 (setq gc-cons-threshold (* 100 1024 1024))
 
 ;; TODO:
-;; - [ ] Add terminal (probably eat)
 ;; - [ ] Add way to search documentation
 ;; - [ ] Add copilot
 ;; - [ ] Solve warning at the beginning
@@ -405,6 +404,9 @@
 (use-package editorconfig
   :config (editorconfig-mode t))
 
+;; EAT - Terminal emulation
+(use-package eat)
+
 ;; MEOW
 (use-package meow
   :demand t
@@ -443,7 +445,8 @@
      '("f" . vemacs/find-file)
      '("h" . replace-string)
      '("d" . consult-flymake)
-     ;; '("t" . toggle-terminal)
+     '("t" . eat)
+     '("T" . eat-project)
      '("r" . async-shell-command)
      '("m" . compile)
      ;; '("u" . undo-tee-visualize)
