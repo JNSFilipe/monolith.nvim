@@ -23,7 +23,6 @@
 (setq gc-cons-threshold (* 100 1024 1024))
 
 ;; TODO:
-;; - [ ] Add auto-formatting
 ;; - [ ] Add way to search documentation
 ;; - [ ] Add copilot
 ;; - [ ] Solve warning at the beginning
@@ -37,9 +36,9 @@
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                       :ref nil :depth 1
-                       :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                       :build (:not elpaca--activate-package)))
+                              :ref nil :depth 1
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
 (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
        (build (expand-file-name "elpaca/" elpaca-builds-directory))
        (order (cdr elpaca-order))
@@ -73,8 +72,8 @@
 
 ;; Install use-package support
 (elpaca elpaca-use-package
-        ;; Enable use-package :ensure support for Elpaca.
-        (elpaca-use-package-mode))
+  ;; Enable use-package :ensure support for Elpaca.
+  (elpaca-use-package-mode))
 (setq use-package-always-ensure t)
 
 ;; #############################################################################
@@ -156,8 +155,9 @@
     (if (< num-spaces 0) (vemacs/forward-global-mark) (vemacs/backward-global-mark))))
 
 (defun vemacs/meow-append ()
+  ;; https://github.com/meow-edit/meow/issues/43
   (interactive)
-  (unless (region-active-p) (forward-char 1))  ; 这里
+  (unless (region-active-p) (forward-char 1))
   (if meow--temp-normal
       (progn
         (message "Quit temporary normal mode")
@@ -399,6 +399,17 @@
   :custom
   (eglot-autoshutdown t))
 (use-package consult-eglot)
+
+;; Auto-formatting
+(use-package format-all
+  :commands format-all-mode
+  :hook (prog-mode . format-all-mode)
+  :config
+  (setq-default format-all-formatters
+                '(("C"     (astyle "--mode=c"))
+                  ("Shell" (shfmt "-i" "4" "-ci"))))
+  ;; To format on save
+  (format-all-mode t))
 
 ;; Magit
 (use-package magit
