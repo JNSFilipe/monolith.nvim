@@ -167,6 +167,42 @@
       (meow--cancel-selection))
     (meow--switch-state 'insert)))
 
+(defun vemacs/meow-left ()
+  (interactive)
+  (if (region-active-p)
+      (meow-left-expand)
+    (meow-left)))
+
+(defun vemacs/meow-next ()
+  (interactive)
+  (if (region-active-p)
+      (meow-next-expand 1)
+    (meow-next 1)))
+
+(defun vemacs/meow-prev ()
+  (interactive)
+  (if (region-active-p)
+      (meow-prev-expand 1)
+    (meow-prev 1)))
+
+(defun vemacs/meow-right ()
+  (interactive)
+  (if (region-active-p)
+      (meow-right-expand)
+    (meow-right)))
+
+(defun vemacs/meow-grab-or-go-to-bottom ()
+  (interactive)
+  (if (region-active-p)
+      (meow-grab)
+    (meow-end-of-thing 'buffer)))
+
+(defun vemacs/meow-kill-or-line ()
+  (interactive)
+  (if (region-active-p)
+      (meow-kill)
+    (meow-line 1)))
+
 ;; #############################################################################
 
 ;; Basic Emacs setup
@@ -509,15 +545,15 @@
      '("f" . meow-find)
      '("g" . meow-cancel-selection)
      '("G" . meow-grab)
-     '("h" . meow-left)
+     '("h" . vemacs/meow-left)
      '("H" . meow-left-expand)
      '("i" . meow-insert)
      '("O" . meow-open-above) ;; '("I" . meow-open-above)
-     '("j" . meow-next)
+     '("j" . vemacs/meow-next)
      '("J" . meow-next-expand)
-     '("k" . meow-prev)
+     '("k" . vemacs/meow-prev)
      '("K" . meow-prev-expand)
-     '("l" . meow-right)
+     '("l" . vemacs/meow-right)
      '("L" . meow-right-expand)
      '("m" . meow-join)
      '("n" . meow-search)
@@ -529,7 +565,7 @@
      ;; '("Q" . meow-goto-line)
      '("r" . meow-replace)
      '("R" . meow-swap-grab)
-     '("d" . meow-kill)
+     '("d" . vemacs/meow-kill-or-line)
      '("t" . meow-till)
      '("u" . meow-undo)
      '("U" . meow-undo-in-selection)
@@ -570,11 +606,11 @@
 ;; Enable vertico
 (use-package vertico
   :bind (:map vertico-map
-         ("C-j" . vertico-next)
-         ("C-k" . vertico-previous)
-         ("C-f" . vertico-exit)
-         :map minibuffer-local-map
-         ("M-h" . backward-kill-word))
+              ("C-j" . vertico-next)
+              ("C-k" . vertico-previous)
+              ("C-f" . vertico-exit)
+              :map minibuffer-local-map
+              ("M-h" . backward-kill-word))
   :custom
   (vertico-cycle t)
   :init
