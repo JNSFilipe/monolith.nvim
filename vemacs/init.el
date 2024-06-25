@@ -25,7 +25,7 @@
 ;; TODO:
 ;; - [ ] Add way to search documentation
 ;; - [ ] Add copilot
-;; - [ ] Solve warning at the beginning
+;; - [x] Solve warning at the beginning -- DISABLED WARINING AT BEGINGI, NOT EXACTLY SOLVED
 ;; - [ ] FIND A KEY TO BIND meow-block TO!!!
 
 ;; #############################################################################
@@ -324,6 +324,9 @@
   (when (file-exists-p custom-file)
     (load custom-file))
 
+  ;; DISABLE WARNINGS AT INITIALIZATION, REMOVE FOR DEBUG, IT IS A LAZY WORKAROUND!!!
+  (setq warning-minimum-level :emergency)
+
   ;; Share system/emacs clipboard
   (setq x-select-enable-clipboard t))
 
@@ -478,7 +481,7 @@
   ;; Use nabla (aka CapsLock) as leader (https://www.emacswiki.org/emacs/CapsKey#toc5)
   ;; ("∇" . meow-keypad)
   :config
-  (setq meow-use-clipboard t) ;; 
+  (setq meow-use-clipboard t) ;;
   (defun meow-setup ()
     ;; Enable modeline indicator
     (meow-setup-indicator)
