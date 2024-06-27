@@ -333,14 +333,6 @@
   ;; Share system/emacs clipboard
   (setq x-select-enable-clipboard t))
 
-;; TODO: Test if I need this if there is the (savhist-mode t) sexp in use-package emacs... My guess is I do not...
-;; Persist history over Emacs restarts. Vertico sorts by history position.
-(use-package savehist
-  ;; https://www.reddit.com/r/emacs/comments/1bgurp5/how_to_turn_off_elpacausepackagecompact_warning/
-  :ensure nil
-  :init
-  (savehist-mode))
-
 ;; Without this, flymake whines about installed version of eldoc being too low
 (use-package jsonrpc)
 (use-package eldoc
