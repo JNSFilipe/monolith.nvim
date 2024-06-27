@@ -472,6 +472,9 @@
   ;; To format on save
   (format-all-mode t))
 
+;; Rainbow Delimiters
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
 ;; Magit
 (use-package magit
   :bind (("C-x g" . magit-status)
@@ -631,11 +634,11 @@
 ;; Enable vertico
 (use-package vertico
   :bind (:map vertico-map
-              ("C-j" . vertico-next)
-              ("C-k" . vertico-previous)
-              ("C-f" . vertico-exit)
-              :map minibuffer-local-map
-              ("M-h" . backward-kill-word))
+         ("C-j" . vertico-next)
+         ("C-k" . vertico-previous)
+         ("C-f" . vertico-exit)
+         :map minibuffer-local-map
+         ("M-h" . backward-kill-word))
   :custom
   (vertico-cycle t)
   :init
