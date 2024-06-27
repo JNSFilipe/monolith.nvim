@@ -305,7 +305,7 @@
   (electric-pair-mode t)
 
   ;; Fonts
-  (set-face-attribute 'default nil :font "JetBrainsMono Nerd Font-11")
+  (set-face-attribute 'default nil :font "Cascadia Code-12")
   ;; Pretty simbols
   (setq-default prettify-symbols-alist '(("lambda" . ?λ)
                                          ("delta" . ?Δ)
