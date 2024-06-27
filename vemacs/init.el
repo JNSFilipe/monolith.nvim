@@ -475,6 +475,11 @@
 ;; Rainbow Delimiters
 (use-package rainbow-delimiters
   :hook (prog-mode . rainbow-delimiters-mode))
+
+;; Aggressive Indent, seems useful but on probationn for now
+(use-package aggressive-indent
+  :hook (prog-mode . aggressive-indent-mode))
+
 ;; Magit
 (use-package magit
   :bind (("C-x g" . magit-status)
