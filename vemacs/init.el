@@ -36,9 +36,9 @@
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                              :ref nil :depth 1
-                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                              :build (:not elpaca--activate-package)))
+                       :ref nil :depth 1
+                       :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                       :build (:not elpaca--activate-package)))
 (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
        (build (expand-file-name "elpaca/" elpaca-builds-directory))
        (order (cdr elpaca-order))
@@ -72,8 +72,8 @@
 
 ;; Install use-package support
 (elpaca elpaca-use-package
-  ;; Enable use-package :ensure support for Elpaca.
-  (elpaca-use-package-mode))
+        ;; Enable use-package :ensure support for Elpaca.
+        (elpaca-use-package-mode))
 (setq use-package-always-ensure t)
 
 ;; #############################################################################
@@ -294,8 +294,11 @@
   ;; For navigating wrapped lines
   (global-visual-line-mode t)
 
+  ;; Higlight line with cursor
+  (hl-line-mode t)
+
   ;; Enable and use relative line numbering
-  (global-display-line-numbers-mode 1)
+  (global-display-line-numbers-mode t)
   (setq display-line-numbers 'relative)
 
   ;; Automatically pair parentheses
