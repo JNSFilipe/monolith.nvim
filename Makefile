@@ -6,7 +6,7 @@
 
 monolith:
 	mkdir -p build
-	gcc -std=c99 -Wall monolith.c -o build/monolith
+	gcc -std=c99 -Wall -lcurl monolith.c -o build/monolith
 	./build/monolith
 
 # end
