@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <curl/curl.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -52,6 +53,18 @@ typedef enum {
  */
 #define MONO_PRINT_SEP                                                         \
   fprintf(stderr, "------------------------------------\n");
+// MACROS
+
+/**
+ * MONO_ARRAY_NUMEL Macro
+ *
+ * Returns the number of elements of a static C vector
+ *
+ * Returns:
+ *   The number of elements of the array (int)
+ *
+ */
+#define MONO_ARRAY_NUMEL(arr) (int)(sizeof(arr) / sizeof(arr[0]))
 
 /**
  * MONO_CMD Macro
@@ -459,5 +472,92 @@ void mono_log(Mono_Log_Level level, const char *fmt, ...) {
   fprintf(stderr, MONO_WGT_RGLR);
   fprintf(stderr, "\n");
 }
+
+/**
+ * mono_download_file Function
+ *
+ * Downloads a file from a specified URL using libcurl and saves it locally.
+ * Uses callback function to write downloaded data to a file.
+ *
+ * Parameters:
+ *   - url (const char*): The URL from which to download the file.
+ *   - output_filename (const char*): The filename to save the downloaded file
+ * locally.
+ *
+ * Returns:
+ *   - int: Returns 0 on success, non-zero on failure.
+ *
+ * Usage:
+ *   int result =
+ * download_file("https://download.jetbrains.com/fonts/JetBrainsMono-2.304.zip",
+ * "JetBrainsMono-2.304.zip"); if (result == 0) { printf("File downloaded
+ * successfully.\n"); } else { fprintf(stderr, "Failed to download file.\n");
+ *   }
+ *
+ * Notes:
+ *   - Uses libcurl for handling HTTP requests and downloading files.
+ *   - Requires proper initialization of libcurl environment and linking with
+ * libcurl library.
+ *   - The file is saved to the current working directory with the specified
+ * filename.
+ *   - Error handling is basic; it's recommended to enhance error checks as per
+ * specific application requirements.
+ *   - Ensure proper file permissions and network connectivity for successful
+ * operation.
+ */
+
+// Callback function to write downloaded data to a file
+static size_t mono_write_data(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+  return fwrite(ptr, size, nmemb, stream);
+}
+
+// Function to download a file from a URL using libcurl
+int mono_download_file(const char *url, const char *output_filename) {
+  CURL *curl;
+  FILE *fp;
+  CURLcode res;
+    
+  // Initialize libcurl
+  curl = curl_easy_init();
+  if (curl) {
+    // Open file for writing
+    fp = fopen(output_filename, "wb");
+    if (fp == NULL) {
+      fprintf(stderr, "Error opening file %s\n", output_filename);
+      curl_easy_cleanup(curl);
+      return 1;
+    }
+        
+    // Set URL to download
+    curl_easy_setopt(curl, CURLOPT_URL, url);
+        
+    // Set callback function to write data
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, mono_write_data);
+        
+    // Set file to write to
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, fp);
+        
+    // Perform the request
+    res = curl_easy_perform(curl);
+        
+    // Check for errors
+    if (res != CURLE_OK) {
+      fprintf(stderr, "curl_easy_perform() failed: %s\n", curl_easy_strerror(res));
+      fclose(fp);
+      curl_easy_cleanup(curl);
+      return 1;
+    }
+        
+    // Clean up
+    fclose(fp);
+    curl_easy_cleanup(curl);
+  } else {
+    fprintf(stderr, "Error initializing curl.\n");
+    return 1;
+  }
+    
+  return 0;
+}
+
 
 #endif // UTILS_H_
