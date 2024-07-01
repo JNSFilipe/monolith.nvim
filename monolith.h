@@ -559,5 +559,68 @@ int mono_download_file(const char *url, const char *output_filename) {
   return 0;
 }
 
+/**
+ * mono_create_desktop_file Function
+ *
+ * Creates a minimal .desktop file with specified parameters for a desktop
+ * application launcher.
+ *
+ * Parameters:
+ *   - f (const char*): The filename (including path) of the .desktop file to
+ *     create.
+ *   - name (const char*): The name of the application to display in the launcher.
+ *   - exec (const char*): The command to execute when the application is launched.
+ *   - comment (const char*): A brief description or comment about the application.
+ *   - icon (const char*): The path to the icon file to display for the application.
+ *
+ * Returns:
+ *   - int: Returns 0 on success, non-zero on failure.
+ *
+ * Usage:
+ *   int result = mono_create_desktop_file("myapp.desktop", "My Application",
+ *                                         "/path/to/my/application",
+ *                                         "A brief description of my application",
+ *                                         "/path/to/my/icon.png");
+ *   if (result == 0) {
+ *       printf(".desktop file created successfully.\n");
+ *   } else {
+ *       fprintf(stderr, "Failed to create .desktop file.\n");
+ *   }
+ *
+ * Notes:
+ *   - The function creates a .desktop file conforming to the Desktop Entry
+ *     Specification (https://specifications.freedesktop.org/desktop-entry-spec/latest/).
+ *   - The `exec` parameter should be the full path to the executable or command
+ *     to run the application.
+ *   - The `icon` parameter specifies the path to an image file (typically a PNG
+ *     or SVG) to use as the application's icon.
+ *   - Ensure proper file permissions and directory write permissions for
+ *     successful creation of the .desktop file.
+ *   - Error handling is basic; it's recommended to enhance error checks as per
+ *     specific application requirements.
+ */
+int mono_create_desktop_file(const char *f, const char *name, const char *exec, const char *comment, const char *icon) {
+  FILE *fp;
+  fp = fopen(f, "w");
+  if (fp == NULL) {
+    perror("Error creating .desktop file");
+    mono_log(MONO_ERROR, "Error creating .desktop file");
+    return 1; // Return an error code indicating failure
+  }
+
+  fprintf(fp, "[Desktop Entry]\n");
+  fprintf(fp, "Version=1.0\n");
+  fprintf(fp, "Name=%s\n", name);
+  fprintf(fp, "Comment=%s\n", comment);
+  fprintf(fp, "Exec=%s\n", exec);
+  fprintf(fp, "Icon=%s\n", icon);
+  fprintf(fp, "Terminal=false\n");
+  fprintf(fp, "Type=Application\n");
+
+  fclose(fp);
+
+  return 0; // Return 0 to indicate success
+}
+
 
 #endif // UTILS_H_

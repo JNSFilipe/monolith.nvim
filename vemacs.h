@@ -3,23 +3,21 @@
 
 #include "config.h"
 #include "monolith.h"
+#include <stdio.h>
 
 int deploy_vemacs() {
 
   char buffer[MAX_OUT_SZ];
   char buffer2[MAX_OUT_SZ];
+  char vemacs_cmd[MAX_OUT_SZ];
+
+  snprintf(vemacs_cmd, sizeof(vemacs_cmd), "emacs --init-directory %s",
+           MONO_RESOLVE_ENV_VARS(VEMACS_CONFIG_PATH));
+    
 
   mono_log(MONO_INFO, "[VEMACS] STARTING DEPLOYMENT");
-  mono_log(MONO_INFO, "[VEMACS] DELETING (mv /tmp) " DEMACS_CONFIG_PATH);
-  MONO_DEL(MONO_RESOLVE_ENV_VARS(DEMACS_CONFIG_PATH));
+  mono_log(MONO_INFO, "[VEMACS] DELETING (mv /tmp) " VEMACS_CONFIG_PATH);
   MONO_DEL(MONO_RESOLVE_ENV_VARS(VEMACS_CONFIG_PATH));
-
-#ifdef FORCE_INSTALL
-  mono_log(MONO_INFO, "[VEMACS] DELETING " DEMACS_CONFIG_DATA);
-  MONO_DEL(MONO_RESOLVE_ENV_VARS(DEMACS_CONFIG_DATA));
-  mono_log(MONO_INFO, "[VEMACS] DELETING " DEMACS_CONFIG_CACHE);
-  MONO_DEL(MONO_RESOLVE_ENV_VARS(DEMACS_CONFIG_CACHE));
-#endif
 
   mono_log(MONO_INFO, "[VEMACS] CREATE CONFIG FOLDER:");
   mono_log(MONO_INFO, MONO_RESOLVE_ENV_VARS(VEMACS_CONFIG_PATH));
@@ -40,6 +38,17 @@ int deploy_vemacs() {
   MONO_SYS(buffer);
 #endif
 
+  snprintf(buffer, sizeof(buffer),
+           "%s/.local/share/applications/vemacs.desktop",
+           MONO_RESOLVE_ENV_VARS("$HOME"));
+  err = snprintf(buffer2, sizeof(buffer2), "%s %%F", vemacs_cmd);
+  if (err != 0) 
+    mono_log(MONO_ERROR, "Unnable to populate buffer2 variable");
+  mono_log(MONO_INFO, "[VEMACS] CREATING .desktop FILE ");
+  mono_log(MONO_INFO, buffer);
+  mono_create_desktop_file(buffer, "vemacs", buffer2,
+                           "Monolith Vanilla Emacs Config",
+                           "");
   return 0;
 }
 

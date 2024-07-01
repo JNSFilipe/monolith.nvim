@@ -7,15 +7,7 @@
 
 int main() {
 
-#if defined(DEMACS) && defined(VEMACS)
-  mono_log(MONO_ERROR, "DEMACS and VEMACS cannot be enabled at the same time, "
-                       "choose one emacs config");
-  return -1;
-#endif
-
-  MONO_PRINT_SEP;
-
-// Inform about enabled flags
+  // Inform about enabled flags
 #ifdef NEOVIM
   mono_log(MONO_WARNING, "NEOVIM ENABLED");
 #endif
