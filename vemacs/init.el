@@ -36,9 +36,9 @@
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                       :ref nil :depth 1
-                       :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                       :build (:not elpaca--activate-package)))
+                              :ref nil :depth 1
+                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                              :build (:not elpaca--activate-package)))
 (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
        (build (expand-file-name "elpaca/" elpaca-builds-directory))
        (order (cdr elpaca-order))
@@ -72,43 +72,13 @@
 
 ;; Install use-package support
 (elpaca elpaca-use-package
-        ;; Enable use-package :ensure support for Elpaca.
-        (elpaca-use-package-mode))
+  ;; Enable use-package :ensure support for Elpaca.
+  (elpaca-use-package-mode))
 (setq use-package-always-ensure t)
 
 ;; #############################################################################
 ;; Helper functions
 ;; #############################################################################
-(defun vemacs/marker-is-point-p (marker)
-  "Test if MARKER is current point"
-  (and (eq (marker-buffer marker) (current-buffer))
-       (= (marker-position marker) (point))))
-
-(defun vemacs/push-mark-maybe ()
-  "Push mark onto `global-mark-ring' if mark head or tail is not current location"
-  (if (not global-mark-ring) (error "global-mark-ring empty")
-    (unless (or (vemacs/marker-is-point-p (car global-mark-ring))
-                (vemacs/marker-is-point-p (car (reverse global-mark-ring))))
-      (push-mark))))
-
-(defun vemacs/backward-global-mark ()
-  "Use `pop-global-mark', pushing current point if not on ring."
-  (interactive)
-  (vemacs/push-mark-maybe)
-  (when (vemacs/marker-is-point-p (car global-mark-ring))
-    (call-interactively 'pop-global-mark))
-  (call-interactively 'pop-global-mark))
-
-(defun vemacs/forward-global-mark ()
-  "Hack `pop-global-mark' to go in reverse, pushing current point if not on ring."
-  (interactive)
-  (vemacs/push-mark-maybe)
-  (setq global-mark-ring (nreverse global-mark-ring))
-  (when (vemacs/marker-is-point-p (car global-mark-ring))
-    (call-interactively 'pop-global-mark))
-  (call-interactively 'pop-global-mark)
-  (setq global-mark-ring (nreverse global-mark-ring)))
-
 (defun vemacs/find-file ()
   (interactive)
   (if (projectile-project-p)
@@ -154,55 +124,18 @@
         (setq deactivate-mark nil))
     (if (< num-spaces 0) (vemacs/forward-global-mark) (vemacs/backward-global-mark))))
 
-(defun vemacs/meow-append ()
-  ;; https://github.com/meow-edit/meow/issues/43
-  (interactive)
-  (unless (region-active-p) (forward-char 1))
-  (if meow--temp-normal
-      (progn
-        (message "Quit temporary normal mode")
-        (meow--switch-state 'motion))
-    (meow--direction-forward)
-    (when (bound-and-true-p delete-selection-mode)
-      (meow--cancel-selection))
-    (meow--switch-state 'insert)))
 
-(defun vemacs/meow-left ()
+(defun vemacs/evil-shift-right ()
   (interactive)
-  (if (region-active-p)
-      (meow-left-expand)
-    (meow-left)))
+  (evil-shift-right evil-visual-beginning evil-visual-end)
+  (evil-normal-state)
+  (evil-visual-restore))
 
-(defun vemacs/meow-next ()
+(defun vemacs/evil-shift-left ()
   (interactive)
-  (if (region-active-p)
-      (meow-next-expand 1)
-    (meow-next 1)))
-
-(defun vemacs/meow-prev ()
-  (interactive)
-  (if (region-active-p)
-      (meow-prev-expand 1)
-    (meow-prev 1)))
-
-(defun vemacs/meow-right ()
-  (interactive)
-  (if (region-active-p)
-      (meow-right-expand)
-    (meow-right)))
-
-(defun vemacs/meow-grab-or-go-to-bottom ()
-  (interactive)
-  (if (region-active-p)
-      (meow-grab)
-    (meow-end-of-thing 'buffer)))
-
-(defun vemacs/meow-kill-or-line ()
-  (interactive)
-  (if (region-active-p)
-      (meow-kill)
-    (meow-line 1)))
-
+  (evil-shift-left evil-visual-beginning evil-visual-end)
+  (evil-normal-state)
+  (evil-visual-restore))
 ;; #############################################################################
 
 ;; Basic Emacs setup
@@ -305,7 +238,7 @@
   (electric-pair-mode t)
 
   ;; Fonts
-  (set-face-attribute 'default nil :font "Cascadia Code-12")
+  (set-face-attribute 'default nil :font "Cascadia Code-11")
   ;; Pretty simbols
   (setq-default prettify-symbols-alist '(("lambda" . ?λ)
                                          ("delta" . ?Δ)
@@ -338,12 +271,9 @@
 (use-package jsonrpc)
 (use-package eldoc
   :defer t
-  :hook (vertigo-mode . turn-on-eldoc-mode))
-;; (use-package eldoc
-;;   ;; https://www.reddit.com/r/emacs/comments/1bgurp5/how_to_turn_off_elpacausepackagecompact_warning/
-;;   ;; :ensure nil
-;;   :config
-;;   (provide 'upgraded-eldoc))
+  :hook (vertigo-mode . turn-on-eldoc-mode)
+  :config
+  (provide 'upgraded-eldoc))
 
 ;; Install icons
 (use-package all-the-icons :if (display-graphic-p))
@@ -500,150 +430,118 @@
 (use-package editorconfig
   :config (editorconfig-mode t))
 
+;; Undo backend
+(use-package undo-fu)
+
 ;; EAT - Terminal emulation
 (use-package eat)
 
-;; MEOW
-(use-package meow
-  :demand t
+;;    '("s" . eldoc-print-current-symbol-info)
+;;    '("<tab>" .  (lambda () (interactive) (vemacs/indent-region 2)))
+;;    '("<backtab>" .  (lambda () (interactive) (vemacs/indent-region -2)))
+;;    '("<escape>" . meow-cancel-selection) ;; '("<escape>" . ignore)
+;;    '("∇" . consult-global-mark)
+;;    '("C-h" . windmove-left)
+;;    '("C-l" . windmove-right)
+;;    '("C-k" . windmove-up)
+;;    '("C-j" . windmove-down)
+;;    '("C-q" . delete-window)))
+;; Evil stuff
+(use-package evil
+  :init
+  (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+  (setq evil-want-keybinding nil)
+  (setq evil-undo-system 'undo-fu)
+  (setq evil-respect-visual-line-mode t) ;; respect visual lines
+  (setq evil-search-module 'isearch) ;; use emacs' built-in search functionality.
   :bind
-  ;; Define CapsLock as a Nabla and use it as a modifier (https://www.emacswiki.org/emacs/CapsKey#toc5)
-  ;; Use nabla (aka CapsLock) as leader (https://www.emacswiki.org/emacs/CapsKey#toc5)
-  ;; ("∇" . meow-keypad)
+  ("<escape>" . keyboard-escape-quit)
   :config
-  (setq meow-use-clipboard t) ;;
-  (defun meow-setup ()
-    ;; Enable modeline indicator
-    (meow-setup-indicator)
-    ;; Define prefixes that are baypassed to keypad mode
-    (setq meow-keypad-start-keys '((?x . ?x)))
-    ;; Define the layout
-    (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-    (meow-motion-overwrite-define-key
-     '("j" . meow-next)
-     '("k" . meow-prev)
-     '("<escape>" . ignore))
-    (meow-leader-define-key
-     ;; SPC j/k will run the original command in MOTION state.
-     '("j" . "H-j")
-     '("k" . "H-k")
-     '("?" . meow-cheatsheet)
-     '(":" . execute-extended-command)
-     '(";" . eval-expression)
-     '("." . ibuffer)
-     '("," . scratch-buffer)
-     '("*" . project-search)
-     '("'" . text-scale-adjust)
-     '("b" . consult-buffer)
-     '("c" . comment-line)
-     '("w" . save-buffer)
-     '("a" . lsp-execute-code-action)
-     '("o" . vemacs/dired)
-     '("f" . vemacs/find-file)
-     '("h" . replace-string)
-     '("d" . consult-flymake)
-     '("t" . eat)
-     '("T" . eat-project)
-     '("r" . async-shell-command)
-     '("m" . compile)
-     ;; '("u" . undo-tee-visualize)
-     '("s" . vemacs/auto-split-window))
-    (meow-normal-define-key
-     '("0" . meow-expand-0)
-     '("9" . meow-expand-9)
-     '("8" . meow-expand-8)
-     '("7" . meow-expand-7)
-     '("6" . meow-expand-6)
-     '("5" . meow-expand-5)
-     '("4" . meow-expand-4)
-     '("3" . meow-expand-3)
-     '("2" . meow-expand-2)
-     '("1" . meow-expand-1)
-     '("-" . negative-argument)
-     '(";" . meow-reverse)
-     '("/" . meow-visit)
-     '("I" . meow-inner-of-thing) ;; '("," . meow-inner-of-thing)
-     '("A" . meow-bounds-of-thing) ;; '("." . meow-bounds-of-thing)
-     '("," . meow-beginning-of-thing) ;; '("[" . meow-beginning-of-thing)
-     '("." . meow-end-of-thing) ;; '("]" . meow-end-of-thing)
-     '("a" . vemacs/meow-append)
-     '("o" . meow-open-below) ;; '("A" . meow-open-below)
-     '("b" . meow-back-word)
-     '("B" . meow-back-symbol)
-     '("c" . meow-change)
-     '("x" . meow-delete) ;; '("d" . meow-delete)
-     '("X" . meow-backward-delete) ;; '("D" . meow-backward-delete)
-     '("e" . meow-next-word)
-     '("E" . meow-next-symbol)
-     '("f" . meow-find)
-     '("g" . meow-cancel-selection)
-     '("G" . meow-grab)
-     '("h" . vemacs/meow-left)
-     '("H" . meow-left-expand)
-     '("i" . meow-insert)
-     '("O" . meow-open-above) ;; '("I" . meow-open-above)
-     '("j" . vemacs/meow-next)
-     '("J" . meow-next-expand)
-     '("k" . vemacs/meow-prev)
-     '("K" . meow-prev-expand)
-     '("l" . vemacs/meow-right)
-     '("L" . meow-right-expand)
-     '("m" . meow-join)
-     '("n" . meow-search)
-     '("Q" . meow-block) ;; '("o" . meow-block)
-     ;; '("C-B" . meow-to-block) ;; '("O" . meow-to-block)
-     '("p" . meow-yank)
-     '("P" . meow-yank-pop) ;; This presents a paste menu
-     '("q" . meow-quit)
-     ;; '("Q" . meow-goto-line)
-     '("r" . meow-replace)
-     '("R" . meow-swap-grab)
-     '("d" . vemacs/meow-kill-or-line)
-     '("t" . meow-till)
-     '("u" . meow-undo)
-     '("U" . meow-undo-in-selection)
-     '("v" . meow-visit)
-     '("w" . meow-mark-word)
-     '("W" . meow-mark-symbol)
-     '("V" . meow-line) ;; '("x" . meow-line)
-     '(":" . meow-goto-line) ;; '("X" . meow-goto-line)
-     '("y" . meow-save)
-     '("Y" . meow-sync-grab)
-     '("z" . meow-pop-selection)
-     '("'" . repeat)
-     '("ç" . git-gutter:next-hunk)
-     '("Ç" . git-gutter:previous-hunk)
-     '("<tab>" .  (lambda () (interactive) (vemacs/indent-region 2)))
-     '("<backtab>" .  (lambda () (interactive) (vemacs/indent-region -2)))
-     '("<escape>" . meow-cancel-selection) ;; '("<escape>" . ignore)
-     '("∇" . consult-global-mark)
-     '("C-h" . windmove-left)
-     '("C-l" . windmove-right)
-     '("C-k" . windmove-up)
-     '("C-j" . windmove-down)
-     '("C-q" . delete-window)))
-  (meow-setup)
-  (meow-global-mode 1))
+  (evil-mode 1)
+  ;; Vim remapings - do not work in :bind
+  ;; NORMAL mode
+  (define-key evil-normal-state-map "j" "gj")
+  (define-key evil-normal-state-map "k" "gk")
+  (define-key evil-normal-state-map "w" "viw")
+  (define-key evil-normal-state-map "W" "viW")
+  (define-key evil-normal-state-map "q" 'delete-window)
+  (define-key evil-normal-state-map (kbd "<tab>") 'evil-jump-backward)
+  (define-key evil-normal-state-map (kbd "<backtab>") 'evil-jump-forward)
+  (define-key evil-normal-state-map "ç" 'git-gutter:next-hunk)
+  (define-key evil-normal-state-map "Ç" 'git-gutter:previous-hunk)
+  (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
+  (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
+  (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
+  (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
+  ;; VISIAL mode
+  (define-key evil-visual-state-map (kbd "<tab>") 'vemacs/evil-shift-right)
+  (define-key evil-visual-state-map (kbd "<backtab>") 'vemacs/evil-shift-left)
+  )
+
+(use-package evil-collection
+  :after evil
+  :config
+  (setq evil-want-integration t)
+  (evil-collection-init))
+
+(use-package evil-surround
+  :after evil
+  :config (global-evil-surround-mode))
 
 ;; Key-chord, to deal with sequances of keys, like jj to escape insert mode
 (use-package key-chord
+  :after evil
   :config
   (key-chord-mode 1)
   ;; Insert mode
-  (key-chord-define meow-insert-state-keymap "jj" 'meow-insert-exit)
-  ;; Normal mode
-  ;; (key-chord-define meow-normal-state-keymap "gd" '(lambda () (interactive) (save-mark-and-excursion (dumb-jump-go))))
-  (key-chord-define meow-normal-state-keymap "gd" 'xref-find-definitions)
-  (key-chord-define meow-normal-state-keymap "gD" 'dumb-jump-quick-look))
+  (key-chord-define meow-insert-state-keymap "jj" 'evil-normal-state))
+;; Normal mode
+;; (key-chord-define meow-normal-state-keymap "gd" '(lambda () (interactive) (save-mark-and-excursion (dumb-jump-go))))
+;; (key-chord-define meow-normal-state-keymap "gd" 'xref-find-definitions)
+;; (key-chord-define meow-normal-state-keymap "gD" 'dumb-jump-quick-look))
+
+;; Which-key and general.el stuff
+(use-package which-key
+  :config
+  (which-key-setup-side-window-bottom)
+  (which-key-mode))
+
+(use-package general
+  :config
+  (general-evil-setup)
+  (general-nmap
+    :prefix "SPC"
+    ;; TODO: Add names to which-key
+    ":" 'execute-extended-command
+    ";" 'eval-expression
+    "." 'ibuffer
+    "," 'scratch-buffer
+    "*" 'project-search
+    "'" 'text-scale-adjust
+    "b" 'consult-buffer
+    "c" 'comment-line
+    "w" 'save-buffer
+    "a" 'eglot-code-action-inline
+    "o" 'vemacs/dired
+    "f" 'vemacs/find-file
+    "h" 'replace-string
+    "d" 'consult-flymake
+    "t" 'eat
+    "T" 'eat-project
+    "r" 'async-shell-command
+    "m" 'command
+    "u" 'undo-tree
+    "s" 'vemacs/auto-split-window
+    ))
 
 ;; Enable vertico
 (use-package vertico
   :bind (:map vertico-map
-         ("C-j" . vertico-next)
-         ("C-k" . vertico-previous)
-         ("C-f" . vertico-exit)
-         :map minibuffer-local-map
-         ("M-h" . backward-kill-word))
+              ("C-j" . vertico-next)
+              ("C-k" . vertico-previous)
+              ("C-f" . vertico-exit)
+              :map minibuffer-local-map
+              ("M-h" . backward-kill-word))
   :custom
   (vertico-cycle t)
   :init
@@ -830,12 +728,6 @@
   :bind (:map corfu-map
               ("C-j" . corfu-next)
               ("C-k" . corfu-previous)))
-
-;; Which-key
-(use-package which-key
-  :config
-  (which-key-setup-side-window-bottom)
-  (which-key-mode))
 
 ;; PDF Tools
 (use-package pdf-tools
