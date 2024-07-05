@@ -36,9 +36,9 @@
 (defvar elpaca-builds-directory (expand-file-name "builds/" elpaca-directory))
 (defvar elpaca-repos-directory (expand-file-name "repos/" elpaca-directory))
 (defvar elpaca-order '(elpaca :repo "https://github.com/progfolio/elpaca.git"
-                              :ref nil :depth 1
-                              :files (:defaults "elpaca-test.el" (:exclude "extensions"))
-                              :build (:not elpaca--activate-package)))
+                       :ref nil :depth 1
+                       :files (:defaults "elpaca-test.el" (:exclude "extensions"))
+                       :build (:not elpaca--activate-package)))
 (let* ((repo  (expand-file-name "elpaca/" elpaca-repos-directory))
        (build (expand-file-name "elpaca/" elpaca-builds-directory))
        (order (cdr elpaca-order))
@@ -72,8 +72,8 @@
 
 ;; Install use-package support
 (elpaca elpaca-use-package
-  ;; Enable use-package :ensure support for Elpaca.
-  (elpaca-use-package-mode))
+        ;; Enable use-package :ensure support for Elpaca.
+        (elpaca-use-package-mode))
 (setq use-package-always-ensure t)
 
 ;; #############################################################################
@@ -231,8 +231,8 @@
   (hl-line-mode t)
 
   ;; Enable and use relative line numbering
-  (global-display-line-numbers-mode t)
-  (setq display-line-numbers 'relative)
+  (global-display-line-numbers-mode 1)
+  (setq display-line-numbers-type 'relative)
 
   ;; Automatically pair parentheses
   (electric-pair-mode t)
@@ -319,6 +319,7 @@
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
   :config
+  (setq doom-modeline-modal t)
   (setq doom-modeline-height 15))
 
 ;; Dims non-active windows
@@ -436,112 +437,14 @@
 ;; EAT - Terminal emulation
 (use-package eat)
 
-;;    '("s" . eldoc-print-current-symbol-info)
-;;    '("<tab>" .  (lambda () (interactive) (vemacs/indent-region 2)))
-;;    '("<backtab>" .  (lambda () (interactive) (vemacs/indent-region -2)))
-;;    '("<escape>" . meow-cancel-selection) ;; '("<escape>" . ignore)
-;;    '("∇" . consult-global-mark)
-;;    '("C-h" . windmove-left)
-;;    '("C-l" . windmove-right)
-;;    '("C-k" . windmove-up)
-;;    '("C-j" . windmove-down)
-;;    '("C-q" . delete-window)))
-;; Evil stuff
-(use-package evil
-  :init
-  (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
-  (setq evil-want-keybinding nil)
-  (setq evil-undo-system 'undo-fu)
-  (setq evil-respect-visual-line-mode t) ;; respect visual lines
-  (setq evil-search-module 'isearch) ;; use emacs' built-in search functionality.
-  :bind
-  ("<escape>" . keyboard-escape-quit)
-  :config
-  (evil-mode 1)
-  ;; Vim remapings - do not work in :bind
-  ;; NORMAL mode
-  (define-key evil-normal-state-map "j" "gj")
-  (define-key evil-normal-state-map "k" "gk")
-  (define-key evil-normal-state-map "w" "viw")
-  (define-key evil-normal-state-map "W" "viW")
-  (define-key evil-normal-state-map "q" 'delete-window)
-  (define-key evil-normal-state-map (kbd "<tab>") 'evil-jump-backward)
-  (define-key evil-normal-state-map (kbd "<backtab>") 'evil-jump-forward)
-  (define-key evil-normal-state-map "ç" 'git-gutter:next-hunk)
-  (define-key evil-normal-state-map "Ç" 'git-gutter:previous-hunk)
-  (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
-  (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
-  (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
-  (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
-  ;; VISIAL mode
-  (define-key evil-visual-state-map (kbd "<tab>") 'vemacs/evil-shift-right)
-  (define-key evil-visual-state-map (kbd "<backtab>") 'vemacs/evil-shift-left)
-  )
-
-(use-package evil-collection
-  :after evil
-  :config
-  (setq evil-want-integration t)
-  (evil-collection-init))
-
-(use-package evil-surround
-  :after evil
-  :config (global-evil-surround-mode))
-
-;; Key-chord, to deal with sequances of keys, like jj to escape insert mode
-(use-package key-chord
-  :after evil
-  :config
-  (key-chord-mode 1)
-  ;; Insert mode
-  (key-chord-define meow-insert-state-keymap "jj" 'evil-normal-state))
-;; Normal mode
-;; (key-chord-define meow-normal-state-keymap "gd" '(lambda () (interactive) (save-mark-and-excursion (dumb-jump-go))))
-;; (key-chord-define meow-normal-state-keymap "gd" 'xref-find-definitions)
-;; (key-chord-define meow-normal-state-keymap "gD" 'dumb-jump-quick-look))
-
-;; Which-key and general.el stuff
-(use-package which-key
-  :config
-  (which-key-setup-side-window-bottom)
-  (which-key-mode))
-
-(use-package general
-  :config
-  (general-evil-setup)
-  (general-nmap
-    :prefix "SPC"
-    ;; TODO: Add names to which-key
-    ":" 'execute-extended-command
-    ";" 'eval-expression
-    "." 'ibuffer
-    "," 'scratch-buffer
-    "*" 'project-search
-    "'" 'text-scale-adjust
-    "b" 'consult-buffer
-    "c" 'comment-line
-    "w" 'save-buffer
-    "a" 'eglot-code-action-inline
-    "o" 'vemacs/dired
-    "f" 'vemacs/find-file
-    "h" 'replace-string
-    "d" 'consult-flymake
-    "t" 'eat
-    "T" 'eat-project
-    "r" 'async-shell-command
-    "m" 'command
-    "u" 'undo-tree
-    "s" 'vemacs/auto-split-window
-    ))
-
 ;; Enable vertico
 (use-package vertico
   :bind (:map vertico-map
-              ("C-j" . vertico-next)
-              ("C-k" . vertico-previous)
-              ("C-f" . vertico-exit)
-              :map minibuffer-local-map
-              ("M-h" . backward-kill-word))
+         ("C-j" . vertico-next)
+         ("C-k" . vertico-previous)
+         ("C-f" . vertico-exit)
+         :map minibuffer-local-map
+         ("M-h" . backward-kill-word))
   :custom
   (vertico-cycle t)
   :init
@@ -728,6 +631,194 @@
   :bind (:map corfu-map
               ("C-j" . corfu-next)
               ("C-k" . corfu-previous)))
+
+;; Evil stuff
+(use-package evil
+  :demand t
+  :init
+  (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
+  (setq evil-want-keybinding nil)
+  (setq evil-undo-system 'undo-fu)
+  (setq evil-respect-visual-line-mode t) ;; respect visual lines
+  (setq evil-search-module 'isearch) ;; use emacs' built-in search functionality.
+  (setq evil-want-C-u-scroll t)
+  (evil-mode)
+  :bind
+  ("<escape>" . keyboard-escape-quit)
+  :config
+  ;; Vim remapings - do not work in :bind
+  ;; NORMAL mode
+  (define-key evil-normal-state-map (kbd "j") "gj")
+  (define-key evil-normal-state-map (kbd "k") "gk")
+  (define-key evil-normal-state-map (kbd "w") "viw")
+  (define-key evil-normal-state-map (kbd "W") "viW")
+  (define-key evil-normal-state-map (kbd "q") 'delete-window)
+  (define-key evil-normal-state-map (kbd "C-q") 'delete-window)
+  (define-key evil-normal-state-map "∇" 'consult-global-mark)
+  (define-key evil-normal-state-map (kbd "<tab>") 'evil-jump-backward)
+  (define-key evil-normal-state-map (kbd "<backtab>") 'evil-jump-forward)
+  (define-key evil-normal-state-map (kbd "ç") 'git-gutter:next-hunk)
+  (define-key evil-normal-state-map (kbd "Ç") 'git-gutter:previous-hunk)
+  (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
+  (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
+  (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
+  (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
+  ;; VISIAL mode
+  (define-key evil-visual-state-map (kbd "<tab>") 'vemacs/evil-shift-right)
+  (define-key evil-visual-state-map (kbd "<backtab>") 'vemacs/evil-shift-left)
+  )
+
+(use-package evil-collection
+  :after evil
+  :config
+  (setq evil-want-integration t)
+  (evil-collection-init))
+
+(use-package evil-surround
+  :after evil
+  :config (global-evil-surround-mode))
+
+;; Key-chord, to deal with sequances of keys, like jj to escape insert mode
+(use-package key-chord
+  :after evil
+  :config
+  (key-chord-mode 1)
+  ;; Insert mode
+  (key-chord-define meow-insert-state-keymap "jj" 'evil-normal-state))
+;; Normal mode
+;; (key-chord-define meow-normal-state-keymap "gd" '(lambda () (interactive) (save-mark-and-excursion (dumb-jump-go))))
+;; (key-chord-define meow-normal-state-keymap "gd" 'xref-find-definitions)
+;; (key-chord-define meow-normal-state-keymap "gD" 'dumb-jump-quick-look))
+
+;; Which-key and general.el stuff
+;; (use-package which-key
+;;   :config
+;;   (which-key-setup-side-window-bottom)
+;;   (which-key-mode))
+(use-package which-key
+  :init
+  (which-key-mode)
+  :config
+  (which-key-setup-side-window-bottom)
+  (setq which-key-side-window-location 'bottom
+	      which-key-sort-order #'which-key-key-order-alpha
+	      which-key-sort-uppercase-first nil
+	      which-key-add-column-padding 1
+	      which-key-max-display-columns nil
+	      which-key-min-display-lines 6
+	      which-key-side-window-slot -10
+	      which-key-side-window-max-height 0.25
+	      which-key-idle-delay 0.8
+	      which-key-max-description-length 25
+	      which-key-allow-imprecise-window-fit t
+	      which-key-separator " → " ))
+
+(use-package general
+  :after evil
+  :config
+  (general-evil-setup)
+  (general-nmap
+    :prefix "SPC"
+    ;; TODO: Add names to which-key
+    ":" 'execute-extended-command
+    ";" 'eval-expression
+    "." 'ibuffer
+    "," 'scratch-buffer
+    "*" 'project-search
+    "'" 'text-scale-adjust
+    "b" 'consult-buffer
+    "c" 'comment-line
+    "w" 'save-buffer
+    "a" 'eglot-code-action-inline
+    "o" 'vemacs/dired
+    "f" 'vemacs/find-file
+    "h" 'replace-string
+    "d" 'consult-flymake
+    "t" 'eat
+    "T" 'eat-project
+    "r" 'async-shell-command
+    "m" 'command
+    ;; "u" 'undo-tree
+    "s" 'vemacs/auto-split-window
+    ))
+
+;; Dired
+;; (use-package dired
+;; :ensure nil
+;; :bind
+;; (("M-RET" . dired-display-file)
+;; ("h" . dired-up-directory)
+;; ("H" . mono/close-dired)
+;; ("l" . mono/dired-open)
+;; ("L" . mono/dired-open-split)
+;; ("m" . mono/dired-toggle-mark)
+;; ("t" . dired-toggle-marks)
+;; ("f" . dired-do-search)           ; Search marked files
+;; ("a" . mono/dired-create-path)
+;; ("y" . mono/dired-do-yank)
+;; ("p" . mono/dired-do-paste)
+;; ("c" . diredp-do-command-in-marked)
+;; ("." . dired-mark-files-regexp)
+;; ("s" . dired-mark-extension)
+;; ("G" . diredp-do-grep-recursive)
+;; ("Y" . dired-do-copy)
+;; ("D" . dired-do-delete)
+;; ("J" . dired-goto-file)
+;; ("M" . dired-do-chmod)
+;; ("O" . dired-do-chown)
+;; ("P" . dired-do-print)
+;; ("R" . dired-do-rename)
+;; ("T" . dired-do-touch)
+;; ("C" . dired-copy-filenamecopy-filename-as-kill) ; copies filename to kill ring.
+;; ("Z" . dired-do-compress)
+;; ("+" . dired-create-directory)
+;; ("-" . dired-do-kill-lines)
+;; ("% l" . dired-downcase)
+;; ("% m" . dired-mark-files-regexp)
+;; ("% u" . dired-upcase)
+;; ("* %" . dired-mark-files-regexp)
+;; ("* ." . dired-mark-extension)
+;; ("* /" . dired-mark-directories)
+;; ("; d" . epa-dired-do-decrypt)
+;; ("; e" . epa-dired-do-encrypt)))
+(use-package dired
+  :ensure nil
+  :bind (:map dired-mode-map 
+              ("M-RET" . dired-display-file)
+              ("h" . dired-up-directory)
+              ("H" . mono/close-dired)
+              ("l" . mono/dired-open)
+              ("L" . mono/dired-open-split)
+              ("m" . mono/dired-toggle-mark)
+              ("t" . dired-toggle-marks)
+              ("f" . dired-do-search)
+              ("a" . mono/dired-create-path)
+              ("y" . mono/dired-do-yank)
+              ("p" . mono/dired-do-paste)
+              ("c" . diredp-do-command-in-marked)
+              ("." . dired-mark-files-regexp)
+              ("s" . dired-mark-extension)
+              ("G" . diredp-do-grep-recursive)
+              ("Y" . dired-do-copy)
+              ("D" . dired-do-delete)
+              ("J" . dired-goto-file)
+              ("M" . dired-do-chmod)
+              ("O" . dired-do-chown)
+              ("P" . dired-do-print)
+              ("R" . dired-do-rename)
+              ("T" . dired-do-touch)
+              ("C" . dired-copy-filename-as-kill)
+              ("Z" . dired-do-compress)
+              ("+" . dired-create-directory)
+              ("-" . dired-do-kill-lines)
+              ("% l" . dired-downcase)
+              ("% m" . dired-mark-files-regexp)
+              ("% u" . dired-upcase)
+              ("* %" . dired-mark-files-regexp)
+              ("* ." . dired-mark-extension)
+              ("* /" . dired-mark-directories)
+              ("; d" . epa-dired-do-decrypt)
+              ("; e" . epa-dired-do-encrypt)))
 
 ;; PDF Tools
 (use-package pdf-tools
