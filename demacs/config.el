@@ -9,6 +9,9 @@
 (setq user-full-name "JNSFilipe"
       user-mail-address "jose.filipe@ieee.org")
 
+;; Setting it to 100mb seems to strike a nice balance between GC pauses and performance.
+(setq gc-cons-threshold (* 100 1024 1024))
+
 ;; Doom exposes five (optional) variables for controlling fonts in Doom:
 ;;
 ;; - `doom-font' -- the primary font to use
@@ -42,30 +45,17 @@
 (setq doom-theme 'doom-tokyo-night)
 ;; (setq doom-theme 'doom-ayu-dark)
 ;; (load-theme 'modus-vivendi :no-confirm)
-(defun splashscreen-banner ()
-  (let* ((banner '("   ⣴⣶⣤⡤⠦⣤⣀⣤⠆     ⣈⣭⣿⣶⣿⣦⣼⣆          "
-                   "    ⠉⠻⢿⣿⠿⣿⣿⣶⣦⠤⠄⡠⢾⣿⣿⡿⠋⠉⠉⠻⣿⣿⡛⣦       "
-                   "          ⠈⢿⣿⣟⠦ ⣾⣿⣿⣷    ⠻⠿⢿⣿⣧⣄     "
-                   "           ⣸⣿⣿⢧ ⢻⠻⣿⣿⣷⣄⣀⠄⠢⣀⡀⠈⠙⠿⠄    "
-                   "          ⢠⣿⣿⣿⠈    ⣻⣿⣿⣿⣿⣿⣿⣿⣛⣳⣤⣀⣀   "
-                   "   ⢠⣧⣶⣥⡤⢄ ⣸⣿⣿⠘  ⢀⣴⣿⣿⡿⠛⣿⣿⣧⠈⢿⠿⠟⠛⠻⠿⠄  "
-                   "  ⣰⣿⣿⠛⠻⣿⣿⡦⢹⣿⣷   ⢊⣿⣿⡏  ⢸⣿⣿⡇ ⢀⣠⣄⣾⠄   "
-                   " ⣠⣿⠿⠛ ⢀⣿⣿⣷⠘⢿⣿⣦⡀ ⢸⢿⣿⣿⣄ ⣸⣿⣿⡇⣪⣿⡿⠿⣿⣷⡄  "
-                   " ⠙⠃   ⣼⣿⡟  ⠈⠻⣿⣿⣦⣌⡇⠻⣿⣿⣷⣿⣿⣿ ⣿⣿⡇ ⠛⠻⢷⣄ "
-                   "      ⢻⣿⣿⣄   ⠈⠻⣿⣿⣿⣷⣿⣿⣿⣿⣿⡟ ⠫⢿⣿⡆     "
-                   "       ⠻⣿⣿⣿⣿⣶⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⡟⢀⣀⣤⣾⡿⠃     "
-                   "                                   "
-                   "   -<  E    M    A    C    S  >-   "))
-         (longest-line (apply #'max (mapcar #'length banner))))
-    (put-text-property
-     (point)
-     (dolist (line banner (point))
-       (insert (+doom-dashboard--center
-                +doom-dashboard--width
-                (concat line (make-string (max 0 (- longest-line (length line))) 32)))
-               "\n"))
-     'face 'doom-dashboard-banner)))
-(setq +doom-dashboard-ascii-banner-fn #'splashscreen-banner)
+(use-package dashboard
+  :config
+  (setq dashboard-projects-backend 'projectile
+        dashboard-banner-logo-title nil
+        dashboard-startup-banner 'logo
+        dashboard-center-content t
+        dashboard-set-footer nil
+        dashboard-page-separator "\n\n\n"
+        dashboard-items '((projects . 10)
+                          (recents  . 10)))
+  (dashboard-setup-startup-hook))
 
 ;; Config Copilot
 (use-package! copilot
@@ -74,34 +64,16 @@
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
+;; (setq global-display-line-numbers-mode 'relative)
+(global-display-line-numbers-mode 1)
 (setq display-line-numbers-type 'relative)
-
-;; Configure obsidian notes
-(use-package! obsidian
-  :ensure t
-  :demand t
-  :config
-  (obsidian-specify-path obsidian-notes-dir)
-  (global-obsidian-mode t)
-  :custom
-  ;; This directory will be used for `obsidian-capture' if set.
-  (obsidian-inbox-directory "inbox")
-  ;; Create missing files in inbox? - when clicking on a wiki link
-  ;; t: in inbox, nil: next to the file with the link
-  ;; default: t
-  (obsidian-wiki-link-create-file-in-inbox t)
-  ;; The directory for daily notes (file name is YYYY-MM-DD.md)
-  (obsidian-daily-notes-directory "daily")
-  :bind (:map obsidian-mode-map)
-  ;; Replace C-c C-o with Obsidian.el's implementation. It's ok to use another key binding.
-  ("C-c C-o" . obsidian-follow-link-at-point)
-  ;; Jump to backlinks
-  ("C-c C-b" . obsidian-backlink-jump)
-  ;; If you prefer you can use `obsidian-insert-link'
-  ("C-c C-l" . obsidian-insert-wikilink))
 
 ;; Set Projectile path
 (setq projectile-project-search-path '("~/Documents/GitHub/" "~/.local/share/"))
+
+;; Load Drag-stuff with default keybinds (Alt+arrows)
+(use-package! drag-stuff
+  :config (drag-stuff-define-keys))
 
 ;; Whenever you reconfigure a package, make sure to wrap your config in an
 ;; `after!' block, otherwise Doom's defaults may override your settings. E.g.
@@ -135,46 +107,39 @@
 ;; You can also try 'gd' (or 'C-c c d') to jump to their definition and see how
 ;; they are implemented.
 
-;; TODO: replace splashscreen
-;; Setup dashboard
-;; (setq fancy-splash-image (concat doom-private-dir "splash.png"))
-
 ;; Keybinds!
 (load-file "~/.config/doom/keybinds.el")
 
-;; Jump through git hunks
-(after! git-gutter
-  (set-window-buffer nil (current-buffer)))
-
+;; TODO: Fix git-gutter signs
 ;; Use git-gutter signs, instead just colours
-(after! git-gutter-fringe
-  (fringe-mode '13)
-  (fringe-helper-define 'git-gutter-fr:added nil
-    "...XX..."
-    "...XX..."
-    "...XX..."
-    "XXXXXXXX"
-    "XXXXXXXX"
-    "...XX..."
-    "...XX..."
-    "...XX...")
-  (fringe-helper-define 'git-gutter-fr:deleted nil
-    "........"
-    "........"
-    "........"
-    "XXXXXXXX"
-    "XXXXXXXX"
-    "........"
-    "........"
-    "........")
-  (fringe-helper-define 'git-gutter-fr:modified nil
-    "........"
-    "........"
-    "..X....X"
-    ".XXX..XX"
-    "XX.XXXX."
-    "X...XX.."
-    "........"
-    "........"))
+;; (after! diff-hl
+;;   (fringe-mode '13)
+;;   (fringe-helper-define 'git-gutter-fr:added nil
+;;                         "...XX..."
+;;                         "...XX..."
+;;                         "...XX..."
+;;                         "XXXXXXXX"
+;;                         "XXXXXXXX"
+;;                         "...XX..."
+;;                         "...XX..."
+;;                         "...XX...")
+;;   (fringe-helper-define 'git-gutter-fr:deleted nil
+;;                         "........"
+;;                         "........"
+;;                         "........"
+;;                         "XXXXXXXX"
+;;                         "XXXXXXXX"
+;;                         "........"
+;;                         "........"
+;;                         "........")
+;;   (fringe-helper-define 'git-gutter-fr:modified nil
+;;                         "........"
+;;                         "........"
+;;                         "..X....X"
+;;                         ".XXX..XX"
+;;                         "XX.XXXX."
+;;                         "X...XX.."
+;;                         "........"
+;;                         "........"))
 
 ;; TODO: Shortcuts mimicking my vim config

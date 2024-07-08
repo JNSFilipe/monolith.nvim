@@ -1,12 +1,9 @@
 ;; -*- no-byte-compile: t; -*-
 ;;; $DOOMDIR/packages.el
 
-(load-file "~/.config/doom/defs.el")
-
 ;; To install a package with Doom you must declare them here and run 'doom sync'
 ;; on the command line, then restart Emacs for the changes to take effect -- or
 ;; use 'M-x doom/reload'.
-
 
 ;; To install SOME-PACKAGE from MELPA, ELPA or emacsmirror:
 ;; (package! some-package)
@@ -17,13 +14,15 @@
 ;; Icons stuff
 (package! all-the-icons)
 (package! nerd-icons)
+;; Simpler dashboard than the doom one
+(package! dashboard)
 ;; Dired pluggins
 (package! dired+)
 ;; Copilot
 (package! copilot
   :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el" "dist")))
-;; Obsidian notes
-(package! obsidian)
+;; For... Dragging Text Around?
+(package! drag-stuff)
 
 ;; To install a package directly from a remote git repo, you must specify a
 ;; `:recipe'. You'll find documentation on what `:recipe' accepts here:

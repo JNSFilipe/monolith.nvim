@@ -64,23 +64,6 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
     (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
     (abort-recursive-edit)))
 
-(defun mono/navigate ()
-  "Navigate to anchors in the project if they exist, otherwise use mono/find-file."
-  (interactive)
-  (if (and (projectile-project-p)
-           (anchor/anchors-in-project))
-      (call-interactively 'anchor/search-project)
-    (call-interactively 'mono/find-file)))
-
-(defun mono/tab-navigate ()
-  "Navigate to anchors in the project if they exist, otherwise use mono/find-file."
-  (interactive)
-  (if (and (projectile-project-p)
-           (not (anchor/no-last-buffer))
-           (anchor/anchors-in-project))
-      (call-interactively 'anchor/last-jump)
-    (switch-to-buffer (other-buffer (current-buffer) 1))))
-
 (defun mono/run-make-or-compile ()
   "Run `+make/run` if a Makefile exists, otherwise `compile`."
   (interactive)

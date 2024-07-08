@@ -1,5 +1,4 @@
 (load-file "~/.config/doom/defs.el")
-(load-file "~/.config/doom/anchor.el")
 (load-file "~/.config/doom/mono.el")
 
 ;; Make which-key appear faster
@@ -27,7 +26,11 @@
         :n "C-h" #'evil-window-left ;; TODO: This is not working in C files
         :n "C-l" #'evil-window-right
         :n "C-j" #'evil-window-down
-        :n "C-k" #'evil-window-up)
+        :n "C-k" #'evil-window-up
+        ;; Some ideas stolen from Meow
+        :n "w" "viw"
+        :n "W" "viW"
+        )
   ;; Escape insert with jj and jk
   (key-chord-mode 1)
   (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
@@ -73,9 +76,9 @@
         :n "; e" #'epa-dired-do-encrypt))
 
 ;; Jump through git hunks
-(after! git-gutter
-  (map! "º" #'git-gutter:next-hunk
-        "ª" #'git-gutter:previous-hunk))
+(after! diff-hl
+  (map! :n "ç" #'diff-hl-next-hunk
+        :n "Ç" #'diff-hl-previous-hunk))
 
 (map!
  ;; Manage project opening/switching
@@ -83,10 +86,9 @@
  "C-a" #'projectile-switch-open-project
  ;; Kill current buffer
  "C-q" #'kill-this-buffer
- ;; Anchors
- "ç" #'anchor/next
- "Ç" #'anchor/prev
- :n "<tab>" #'mono/tab-navigate
+ ;; Jump navigation
+ :n "<tab>" #'better-jumper-jump-backward
+ :n "<backtab>" #'better-jumper-jump-forward
  ;; Navigate buffers
  :n "<" #'previous-buffer
  :n ">" #'next-buffer)
@@ -133,9 +135,10 @@
         :desc "Eval" ";" #'eval-expression
         :desc "Scratch Buffer" "," #'doom/open-scratch-buffer
         :desc "IBuffer" "." #'ibuffer
-        :desc "Search Buffer" "w" #'+default/search-buffer
+        :desc "Search Buffer" "v" #'+default/search-buffer
         :desc "Search Project" "*" #'+default/search-project
         :desc "Adjust Font" "'" #'text-scale-adjust
+        :desc "Write Buffer" "w" #'save-buffer
         :desc "Code Actions" "a" #'lsp-execute-code-action
         :desc "Dired" "o" #'mono/dired
         :desc "Files" "f" #'mono/find-file
@@ -150,10 +153,7 @@
         :desc "Undo Tree" "u" #'undo-tree-visualize
         :desc "Yanks" :n "y" #'consult-yank-pop
         :desc "Yanks" :v "y" #'consult-yank-replace
-        :desc "Anchors" "ç" nil
-        :desc "Drop" "çç" #'anchor/drop
-        :desc "Search in Buffer" "çp" #'anchor/search-buffer
-        :desc "Navigate Files" "SPC" #'mono/navigate
+        :desc "Navigate Files" "SPC" #'mono/find-file
         :desc "Notes" "n" nil
         :desc "Capture Note Daily" "nn" #'obsidian-daily-note
         :desc "Capture Note" "nc" #'obsidian-capture
