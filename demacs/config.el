@@ -109,37 +109,3 @@
 
 ;; Keybinds!
 (load-file "~/.config/doom/keybinds.el")
-
-;; TODO: Fix git-gutter signs
-;; Use git-gutter signs, instead just colours
-;; (after! diff-hl
-;;   (fringe-mode '13)
-;;   (fringe-helper-define 'git-gutter-fr:added nil
-;;                         "...XX..."
-;;                         "...XX..."
-;;                         "...XX..."
-;;                         "XXXXXXXX"
-;;                         "XXXXXXXX"
-;;                         "...XX..."
-;;                         "...XX..."
-;;                         "...XX...")
-;;   (fringe-helper-define 'git-gutter-fr:deleted nil
-;;                         "........"
-;;                         "........"
-;;                         "........"
-;;                         "XXXXXXXX"
-;;                         "XXXXXXXX"
-;;                         "........"
-;;                         "........"
-;;                         "........")
-;;   (fringe-helper-define 'git-gutter-fr:modified nil
-;;                         "........"
-;;                         "........"
-;;                         "..X....X"
-;;                         ".XXX..XX"
-;;                         "XX.XXXX."
-;;                         "X...XX.."
-;;                         "........"
-;;                         "........"))
-
-;; TODO: Shortcuts mimicking my vim config
