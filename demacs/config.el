@@ -45,6 +45,11 @@
 (setq doom-theme 'doom-tokyo-night)
 ;; (setq doom-theme 'doom-ayu-dark)
 ;; (load-theme 'modus-vivendi :no-confirm)
+
+(after! doom-modeline
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config))
+
 (use-package dashboard
   :config
   (setq dashboard-projects-backend 'projectile
