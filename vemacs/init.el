@@ -349,8 +349,8 @@
         dashboard-center-content t
         dashboard-set-footer nil
         dashboard-page-separator "\n\n\n"
-        dashboard-items '((projects . 10)
-                          (recents  . 10)))
+        dashboard-items '((projects . 5)
+                          (recents  . 5)))
   (dashboard-setup-startup-hook))
 
 ;; Flymake - Inline static analysis
