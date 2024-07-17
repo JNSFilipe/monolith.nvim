@@ -356,9 +356,24 @@
 
 ;; Flymake - Inline static analysis
 (use-package flymake
+  :after eldoc
   :hook (prog-mode . flymake-mode)
   :config
-  (setq help-at-pt-display-when-idle t))
+
+  ;; Show diagnoses in minibuffer
+  ;; https://github.com/joaotavora/eglot/discussions/898
+  (add-hook 'eglot-managed-mode-hook
+            (lambda ()
+              ;; Show flymake diagnostics first.
+              (setq eldoc-documentation-functions
+                    (cons #'flymake-eldoc-function
+                          (remove #'flymake-eldoc-function eldoc-documentation-functions)))
+              ;; Show all eldoc feedback.
+              (setq eldoc-documentation-strategy #'eldoc-documentation-compose)))
+
+  ;; Ensure flymake tooltips appear on the right
+  (setq flymake-fringe-indicator-position 'right-fringe))
+  
 
 ;; Treesitter
 (use-package tree-sitter
