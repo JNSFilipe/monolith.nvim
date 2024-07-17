@@ -652,6 +652,7 @@
   (define-key evil-normal-state-map (kbd "k") "gk")
   (define-key evil-normal-state-map (kbd "w") "viw")
   (define-key evil-normal-state-map (kbd "W") "viW")
+  (define-key evil-normal-state-map (kbd "$") "g_") ;; https://stackoverflow.com/questions/20165596/select-entire-line-in-vim-without-the-new-line-character
   (define-key evil-normal-state-map (kbd "q") 'delete-window)
   (define-key evil-normal-state-map (kbd "C-q") 'delete-window)
   (define-key evil-normal-state-map "∇" 'consult-global-mark)
@@ -664,6 +665,7 @@
   (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
   (define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
   ;; VISIAL mode
+  (define-key evil-visual-state-map (kbd "$") "g_") ;; https://stackoverflow.com/questions/20165596/select-entire-line-in-vim-without-the-new-line-character
   (define-key evil-visual-state-map (kbd "<tab>") 'vemacs/evil-shift-right)
   (define-key evil-visual-state-map (kbd "<backtab>") 'vemacs/evil-shift-left)
   )
