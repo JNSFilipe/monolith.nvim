@@ -680,6 +680,9 @@
   :after evil
   :config (global-evil-surround-mode))
 
+;; Smart comments (build on top of comment-dwin)
+(use-package smart-comment)
+
 ;; Key-chord, to deal with sequances of keys, like jj to escape insert mode
 (use-package key-chord
   :after evil
