@@ -687,18 +687,11 @@
   (key-chord-mode 1)
   ;; Insert mode
   (key-chord-define meow-insert-state-keymap "jj" 'evil-normal-state))
-;; Normal mode
-;; (key-chord-define meow-normal-state-keymap "gd" '(lambda () (interactive) (save-mark-and-excursion (dumb-jump-go))))
-;; (key-chord-define meow-normal-state-keymap "gd" 'xref-find-definitions)
-;; (key-chord-define meow-normal-state-keymap "gD" 'dumb-jump-quick-look))
 
 ;; Which-key and general.el stuff
-;; (use-package which-key
-;;   :config
-;;   (which-key-setup-side-window-bottom)
-;;   (which-key-mode))
 (use-package which-key
   :init
+  (which-key-setup-side-window-bottom)
   (which-key-mode)
   :config
   (which-key-setup-side-window-bottom)
@@ -719,30 +712,38 @@
   :after evil
   :config
   (general-evil-setup)
-  (general-nmap
-    :prefix "SPC"
+
+  (defconst my-keybindings
     ;; TODO: Add names to which-key
-    ":" 'execute-extended-command
-    ";" 'eval-expression
-    "." 'ibuffer
-    "," 'scratch-buffer
-    "*" 'project-search
-    "'" 'text-scale-adjust
-    "b" 'consult-buffer
-    "c" 'comment-line
-    "w" 'save-buffer
-    "a" 'eglot-code-action-inline
-    "o" 'vemacs/dired
-    "f" 'vemacs/find-file
-    "h" 'replace-string
-    "d" 'consult-flymake
-    "t" 'eat
-    "T" 'eat-project
-    "r" 'async-shell-command
-    "m" 'command
-    ;; "u" 'undo-tree
-    "s" 'vemacs/auto-split-window
-    ))
+    '((":" . execute-extended-command)
+      (";" . eval-expression)
+      ("." . ibuffer)
+      ("," . scratch-buffer)
+      ("*" . project-search)
+      ("'" . text-scale-adjust)
+      ("b" . consult-buffer)
+      ("c" . smart-comment)
+      ("w" . save-buffer)
+      ("a" . eglot-code-action-inline)
+      ("o" . vemacs/dired)
+      ("f" . vemacs/find-file)
+      ("h" . replace-string)
+      ("d" . consult-flymake)
+      ("t" . eat)
+      ("T" . eat-project)
+      ("r" . async-shell-command)
+      ("m" . command)
+      ("p" . projectile-switch-project)
+      ;; ("u" . undo-tree)
+      ("s" . vemacs/auto-split-window)))
+
+  (dolist (binding my-keybindings)
+    (general-nmap
+      :prefix "SPC"
+      (car binding) (cdr binding))
+    (general-vmap
+      :prefix "SPC"
+      (car binding) (cdr binding))))
 
 ;; Dired
 ;; (use-package dired
