@@ -683,6 +683,10 @@
 ;; Smart comments (build on top of comment-dwin)
 (use-package smart-comment)
 
+;; Highlight FIXME/TODO/BUG
+(use-package fic-mode
+  :config (fic-mode))
+
 ;; Key-chord, to deal with sequances of keys, like jj to escape insert mode
 (use-package key-chord
   :after evil
