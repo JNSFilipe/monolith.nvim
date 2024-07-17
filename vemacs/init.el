@@ -270,9 +270,10 @@
 ;; Without this, flymake whines about installed version of eldoc being too low
 (use-package jsonrpc)
 (use-package eldoc
-  :defer t
+  ;; :defer t
   :hook (vertigo-mode . turn-on-eldoc-mode)
   :config
+  (eldoc-idle-delay 0.3)
   (provide 'upgraded-eldoc))
 
 ;; Install icons
