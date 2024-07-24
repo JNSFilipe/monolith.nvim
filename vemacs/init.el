@@ -26,7 +26,6 @@
 ;; - [ ] Add way to search documentation
 ;; - [ ] Add copilot
 ;; - [x] Solve warning at the beginning -- DISABLED WARINING AT BEGINGI, NOT EXACTLY SOLVED
-;; - [ ] FIND A KEY TO BIND meow-block TO!!!
 
 ;; #############################################################################
 ;; Bootstrap elpaca
@@ -336,10 +335,14 @@
   (setq projectile-sort-order 'access-time)
   :bind
   ("C-SPC" . projectile-switch-project))
-;; ;; TODO: this might not be needed
-;; (use-package perspective
-;;   :init
-;;   (persp-mode))
+
+;; Create persistent session
+(use-package perspective
+  :init
+  (persp-mode))
+
+;; Create different perspectives per project
+(use-package persp-projectile)
 
 ;; A startup screen extracted from Spacemacs
 (use-package dashboard
