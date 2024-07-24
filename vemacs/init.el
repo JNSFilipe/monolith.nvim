@@ -699,6 +699,11 @@
   :after evil
   :config (global-evil-surround-mode))
 
+(unless (display-graphic-p)
+  (use-package evil-terminal-cursor-changer
+    :after evil
+    :config (etcc-on)))
+
 ;; Smart comments (build on top of comment-dwin)
 (use-package smart-comment)
 
