@@ -699,6 +699,9 @@
   :after evil
   :config (global-evil-surround-mode))
 
+(use-package evil-iedit-state
+  :after evil)
+;; Change cursor in insert mode, when in nw mode
 (unless (display-graphic-p)
   (use-package evil-terminal-cursor-changer
     :after evil
@@ -763,7 +766,7 @@
       ("t" . eat)
       ("T" . eat-project)
       ("r" . async-shell-command)
-      ("m" . command)
+      ("m" . compile)
       ("p" . projectile-switch-project)
       ;; ("u" . undo-tree)
       ("s" . vemacs/auto-split-window)))
