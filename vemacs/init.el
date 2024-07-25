@@ -411,6 +411,16 @@
   (eglot-autoshutdown t))
 (use-package consult-eglot)
 
+;; Jupytext in emacs
+(use-package code-cells
+  :hook (python-mode . code-cells-mode-maybe)
+  :config
+  (with-eval-after-load 'code-cells
+    (let ((map code-cells-mode-map))
+      (define-key map (kbd "M-p") 'code-cells-backward-cell)
+      (define-key map (kbd "M-n") 'code-cells-forward-cell)
+      (define-key map (kbd "C-c C-c") 'code-cells-eval))))
+
 ;; Auto-formatting
 (use-package format-all
   :commands format-all-mode
