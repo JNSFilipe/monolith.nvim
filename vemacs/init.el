@@ -23,8 +23,9 @@
 (setq gc-cons-threshold (* 100 1024 1024))
 
 ;; TODO:
-;; - [ ] Add way to search documentation
 ;; - [ ] Add copilot
+;; - [ ] Make dired work with zip/tar/rar/etc files
+;; - [ ] Make dired see *.pdsproj as zip files
 ;; - [x] Solve warning at the beginning -- DISABLED WARINING AT BEGINGI, NOT EXACTLY SOLVED
 
 ;; #############################################################################
@@ -78,6 +79,10 @@
 ;; #############################################################################
 ;; Helper functions
 ;; #############################################################################
+
+(defvar dired-copy-paste-func nil)
+(defvar dired-copy-paste-stored-file-list nil)
+
 (defun vemacs/find-file ()
   (interactive)
   (if (projectile-project-p)
@@ -135,6 +140,92 @@
   (evil-shift-left evil-visual-beginning evil-visual-end)
   (evil-normal-state)
   (evil-visual-restore))
+
+(defun vemacs/dired-open ()
+  "In Dired, open the file or directory under the cursor.
+Opens directories in Emacs. Opens files with Emacs if possible, otherwise uses xdg-open."
+  (interactive)
+  (let ((file (dired-get-file-for-visit)))
+    (if (file-directory-p file)
+        (dired-find-file)
+      (if (file-executable-p file)
+          (start-process "" nil "xdg-open" file)
+        (find-file file)))))
+
+(defun vemacs/dired-open-split ()
+  "Open the current item in Dired in a new right split.
+If it's a directory, open in Dired. If it's a file Emacs can open, open it in Emacs.
+Otherwise, open it using xdg-open."
+  (interactive)
+  (let ((file (dired-get-file-for-visit)))
+    (if (file-directory-p file)
+        (progn
+          (split-window-right)
+          (other-window 1)
+          (dired file))
+      (if (file-exists-p file)
+          (progn
+            (split-window-right)
+            (other-window 1)
+            (if (file-readable-p file)
+                (find-file file)
+              (start-process "" nil "xdg-open" file)))
+        (message "File does not exist")))))
+
+(defun vemacs/dired-create-path (name)
+  "Create a file or directory based on the input NAME.
+If NAME ends with a '/', it creates a directory, otherwise a file."
+  (interactive "sEnter file or directory name: ")
+  (let ((dir (if (string-suffix-p "/" name)
+                 name
+               (file-name-directory name))))
+    (when dir
+      (make-directory dir t))
+    (unless (string-suffix-p "/" name)
+      (write-region "" nil name))))
+
+(defun vemacs/close-dired ()
+  "Kill the current dired buffer and close its window."
+  (interactive)
+  (when (eq major-mode 'dired-mode)
+    (kill-this-buffer)
+    (delete-window)))
+
+(defun vemacs/dired-do-yank ()
+  "In dired-mode, copy a file/dir on current line or all marked file/dir(s)."
+  (interactive)
+  (setq dired-copy-paste-stored-file-list (dired-get-marked-files)
+        dired-copy-paste-func 'dired-copy-file)
+  (message
+   (format "%S is/are copied."dired-copy-paste-stored-file-list)))
+
+(defun vemacs/dired-do-paste ()
+  "In dired-mode, paste cut/copied file/dir(s) into current directory."
+  (interactive)
+  (let ((stored-file-list nil))
+    (dolist (stored-file dired-copy-paste-stored-file-list)
+      (condition-case nil
+          (progn
+            (funcall dired-copy-paste-func stored-file (dired-current-directory) 1)
+            (push stored-file stored-file-list))))
+    ;; (error nil)
+
+    (if (eq dired-copy-paste-func 'rename-file)
+        (setq dired-copy-paste-stored-file-list nil
+              dired-copy-paste-func nil))
+    (revert-buffer)
+    (message
+     (format "%d file/dir(s) pasted into current directory." (length stored-file-list)))))
+
+(defun vemacs/dired-toggle-mark ()
+  "Toggle the mark on the current file and stay on the same line."
+  (interactive)
+  (save-excursion
+    (beginning-of-line)
+    (if (looking-at dired-re-mark)
+        (dired-unmark 1)
+      (dired-mark 1))))
+
 ;; #############################################################################
 
 ;; Basic Emacs setup
@@ -789,83 +880,49 @@
       :prefix "SPC"
       (car binding) (cdr binding))))
 
-;; Dired
-;; (use-package dired
-;; :ensure nil
-;; :bind
-;; (("M-RET" . dired-display-file)
-;; ("h" . dired-up-directory)
-;; ("H" . mono/close-dired)
-;; ("l" . mono/dired-open)
-;; ("L" . mono/dired-open-split)
-;; ("m" . mono/dired-toggle-mark)
-;; ("t" . dired-toggle-marks)
-;; ("f" . dired-do-search)           ; Search marked files
-;; ("a" . mono/dired-create-path)
-;; ("y" . mono/dired-do-yank)
-;; ("p" . mono/dired-do-paste)
-;; ("c" . diredp-do-command-in-marked)
-;; ("." . dired-mark-files-regexp)
-;; ("s" . dired-mark-extension)
-;; ("G" . diredp-do-grep-recursive)
-;; ("Y" . dired-do-copy)
-;; ("D" . dired-do-delete)
-;; ("J" . dired-goto-file)
-;; ("M" . dired-do-chmod)
-;; ("O" . dired-do-chown)
-;; ("P" . dired-do-print)
-;; ("R" . dired-do-rename)
-;; ("T" . dired-do-touch)
-;; ("C" . dired-copy-filenamecopy-filename-as-kill) ; copies filename to kill ring.
-;; ("Z" . dired-do-compress)
-;; ("+" . dired-create-directory)
-;; ("-" . dired-do-kill-lines)
-;; ("% l" . dired-downcase)
-;; ("% m" . dired-mark-files-regexp)
-;; ("% u" . dired-upcase)
-;; ("* %" . dired-mark-files-regexp)
-;; ("* ." . dired-mark-extension)
-;; ("* /" . dired-mark-directories)
-;; ("; d" . epa-dired-do-decrypt)
-;; ("; e" . epa-dired-do-encrypt)))
 (use-package dired
   :ensure nil
-  :bind (:map dired-mode-map 
-              ("M-RET" . dired-display-file)
-              ("h" . dired-up-directory)
-              ("H" . mono/close-dired)
-              ("l" . mono/dired-open)
-              ("L" . mono/dired-open-split)
-              ("m" . mono/dired-toggle-mark)
-              ("t" . dired-toggle-marks)
-              ("f" . dired-do-search)
-              ("a" . mono/dired-create-path)
-              ("y" . mono/dired-do-yank)
-              ("p" . mono/dired-do-paste)
-              ("c" . diredp-do-command-in-marked)
-              ("." . dired-mark-files-regexp)
-              ("s" . dired-mark-extension)
-              ("G" . diredp-do-grep-recursive)
-              ("Y" . dired-do-copy)
-              ("D" . dired-do-delete)
-              ("J" . dired-goto-file)
-              ("M" . dired-do-chmod)
-              ("O" . dired-do-chown)
-              ("P" . dired-do-print)
-              ("R" . dired-do-rename)
-              ("T" . dired-do-touch)
-              ("C" . dired-copy-filename-as-kill)
-              ("Z" . dired-do-compress)
-              ("+" . dired-create-directory)
-              ("-" . dired-do-kill-lines)
-              ("% l" . dired-downcase)
-              ("% m" . dired-mark-files-regexp)
-              ("% u" . dired-upcase)
-              ("* %" . dired-mark-files-regexp)
-              ("* ." . dired-mark-extension)
-              ("* /" . dired-mark-directories)
-              ("; d" . epa-dired-do-decrypt)
-              ("; e" . epa-dired-do-encrypt)))
+  :after evil-collection
+  :hook (dired-mode . dired-omit-mode)
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+    (kbd "M-RET") 'dired-display-file
+    "h" 'dired-up-directory
+    "H" 'vemacs/close-dired
+    "l" 'vemacs/dired-open
+    "L" 'vemacs/dired-open-split
+    "m" 'vemacs/dired-toggle-mark
+    "t" 'dired-toggle-marks
+    "f" 'dired-do-search
+    "a" 'vemacs/dired-create-path
+    "y" 'vemacs/dired-do-yank
+    "p" 'vemacs/dired-do-paste
+    "c" 'diredp-do-command-in-marked
+    "r" 'dired-mark-files-regexp
+    "," 'dired-omit-mode ;; For toggling dot files
+    "." 'dired-mark-extension
+    "G" 'diredp-do-grep-recursive
+    "Y" 'dired-do-copy
+    "D" 'dired-do-delete
+    "J" 'dired-goto-file
+    "M" 'dired-do-chmod
+    "O" 'dired-do-chown
+    "P" 'dired-do-print
+    "R" 'dired-do-rename
+    "T" 'dired-do-touch
+    "C" 'dired-copy-filename-as-kill
+    "Z" 'dired-do-compress
+    "+" 'dired-create-directory
+    "-" 'dired-do-kill-lines
+    "%l" 'dired-downcase
+    "%m" 'dired-mark-files-regexp
+    "%u" 'dired-upcase
+    "*%" 'dired-mark-files-regexp
+    "*." 'dired-mark-extension
+    "*/" 'dired-mark-directories
+    ";d" 'epa-dired-do-decrypt
+    ";e" 'epa-dired-do-encrypt)
+  :custom (dired-omit-files (rx (seq bol "."))))
 
 ;; PDF Tools
 (use-package pdf-tools
