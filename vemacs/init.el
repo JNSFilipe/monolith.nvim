@@ -303,6 +303,10 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
    ;; Store automatic customization options elsewhere
    custom-file (locate-user-emacs-file "custom.el"))
 
+  ;; Disable confirm kill when in nw mode
+  (unless (display-graphic-p)
+    (setq confirm-kill-emacs nil))
+
   ;; Never mix tabs and spaces. Never use tabs, period.
   ;; We need the setq-default here because this becomes
   ;; a buffer-local variable when set.
