@@ -471,7 +471,13 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
 
   ;; Ensure flymake tooltips appear on the right
   (setq flymake-fringe-indicator-position 'right-fringe))
-  
+
+;; Languages
+(use-package go-mode :defer t)
+(use-package zig-mode :defer t)
+(use-package rust-mode :defer t)
+(use-package python-mode :defer t)
+(use-package haskell-mode :defer t)
 
 ;; Treesitter
 (use-package tree-sitter
@@ -482,7 +488,7 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
          (cpp-mode . tree-sitter-hl-mode)
          (go-mode . tree-sitter-hl-mode)
          (zig-mode . tree-sitter-hl-mode)
-         (haskel-mode . tree-sitter-hl-mode)
+         (haskell-mode . tree-sitter-hl-mode)
          (ocaml-mode . tree-sitter-hl-mode)
          (latex-mode . tree-sitter-hl-mode)))
 (use-package tree-sitter-langs)
