@@ -362,9 +362,9 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
   (setq x-select-enable-clipboard t))
 
 ;; Without this, flymake whines about installed version of eldoc being too low
-(use-package jsonrpc)
+(use-package jsonrpc :defer t)
 (use-package eldoc
-  ;; :defer t
+  :defer t
   :hook (vertigo-mode . turn-on-eldoc-mode)
   :config
   (eldoc-idle-delay 0.3)
@@ -454,6 +454,7 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
 
 ;; Flymake - Inline static analysis
 (use-package flymake
+  :defer t
   :after eldoc
   :hook (prog-mode . flymake-mode)
   :config
@@ -481,6 +482,7 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
 
 ;; Treesitter
 (use-package tree-sitter
+  :defer t
   :hook ((python-mode . tree-sitter-hl-mode)
          (rust-mode . tree-sitter-hl-mode)
          (sh-mode . tree-sitter-hl-mode)
@@ -495,25 +497,26 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
 
 ;; Eglot - LSP Support
 (use-package eglot
+  :defer t
   :init (defalias 'start-lsp-server #'eglot)
   :hook ((go-mode . eglot-ensure)
-         (haskell-mode . eglot-ensure)
          (rust-mode . eglot-ensure)
          (python-mode . eglot-ensure)
          (sh-mode . eglot-ensure)
          (c-mode . eglot-ensure)
          (cpp-mode . eglot-ensure)
          (zig-mode . eglot-ensure)
-         (haskel-mode . eglot-ensure)
+         (haskell-mode . eglot-ensure)
          (ocaml-mode . eglot-ensure)
          (latex-mode . eglot-ensure))
   (prog-mode . eglot-ensure)
   :custom
   (eglot-autoshutdown t))
-(use-package consult-eglot)
+(use-package consult-eglot :defer t)
 
 ;; Jupytext in emacs
 (use-package code-cells
+  :defer t
   :hook (python-mode . code-cells-mode-maybe)
   :config
   (with-eval-after-load 'code-cells
@@ -524,6 +527,7 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
 
 ;; Auto-formatting
 (use-package format-all
+  :defer t
   :commands format-all-mode
   :hook (prog-mode . format-all-mode)
   :config
@@ -535,20 +539,24 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
 
 ;; Rainbow Delimiters
 (use-package rainbow-delimiters
+  :defer t
   :hook (prog-mode . rainbow-delimiters-mode))
 
 ;; Aggressive Indent, seems useful but on probationn for now
 (use-package aggressive-indent
+  :defer t
   :hook (prog-mode . aggressive-indent-mode))
 
 ;; Magit
 (use-package magit
+  :defer t
   :bind (("C-x g" . magit-status)
          ("C-x C-g" . magit-status)))
 
 ;; Git signs
 ;; https://ianyepan.github.io/posts/emacs-git-gutter/
 (use-package git-gutter
+  :defer t
   :hook (prog-mode . git-gutter-mode)
   :config
   (custom-set-variables
@@ -559,13 +567,14 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
 
 ;; EditorConfig support
 (use-package editorconfig
+  :defer t
   :config (editorconfig-mode t))
 
 ;; Undo backend
-(use-package undo-fu)
+(use-package undo-fu :defer t)
 
 ;; EAT - Terminal emulation
-(use-package eat)
+(use-package eat :defer t)
 
 ;; Enable vertico
 (use-package vertico
@@ -819,10 +828,11 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
     :config (etcc-on)))
 
 ;; Smart comments (build on top of comment-dwin)
-(use-package smart-comment)
+(use-package smart-comment :defer t)
 
 ;; Highlight FIXME/TODO/BUG
 (use-package fic-mode
+  :defer t
   :config (fic-mode))
 
 ;; Key-chord, to deal with sequances of keys, like jj to escape insert mode
@@ -835,6 +845,7 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
 
 ;; Which-key and general.el stuff
 (use-package which-key
+  :defer t
   :init
   (which-key-setup-side-window-bottom)
   (which-key-mode)
@@ -936,6 +947,7 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
 
 ;; PDF Tools
 (use-package pdf-tools
+  :defer t
   :config
   (pdf-tools-install))
 
