@@ -371,6 +371,45 @@ require('lazy').setup({
     },
   },
 
+  -- Compile mode for nvim
+  {
+    "ej-shafran/compile-mode.nvim",
+    tag = "v5.2",
+    -- you can just use the latest version:
+    -- branch = "latest",
+    -- or the most up-to-date updates:
+    -- branch = "nightly",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      -- if you want to enable coloring of ANSI escape codes in
+      -- compilation output, add:
+      { "m00qek/baleia.nvim", tag = "v1.3.0" },
+    },
+    config = function()
+      ---@type CompileModeOpts
+      vim.g.compile_mode = {
+        -- to add ANSI escape code support, add:
+        baleia_setup = true,
+      }
+    end
+  },
+
+  -- LazyGit
+  {
+    "kdheepak/lazygit.nvim",
+    cmd = {
+      "LazyGit",
+      "LazyGitConfig",
+      "LazyGitCurrentFile",
+      "LazyGitFilter",
+      "LazyGitFilterCurrentFile",
+    },
+    -- optional for floating window border decoration
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+  },
+
   {
     'stevearc/overseer.nvim',
     dependencies = { 'stevearc/dressing.nvim', 'rcarriga/nvim-notify' },
@@ -719,6 +758,9 @@ vim.o.virtualedit = "block"
 -- Disable wrapping of lines longer than the width of window
 vim.o.wrap = false
 
+-- Native nvim remappings
+vim.keymap.set('n', 'w', 'viw') -- make w select the word under the cursor
+
 -- [[ Highlight on yank ]]
 -- See `:help vim.highlight.on_yank()`
 local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
@@ -826,6 +868,7 @@ local on_attach = function(_, bufnr)
   nmap('gd', require('telescope.builtin').lsp_definitions, 'Goto definition')
   nmap('gr', require('telescope.builtin').lsp_references, 'Goto references')
   nmap('gI', require('telescope.builtin').lsp_implementations, 'Goto implementation')
+  nmap('<M-x>', require('telescope.builtin').commands, 'M-x')
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
@@ -848,8 +891,8 @@ end
 -- document existing key chains
 require('which-key').register {
   ['<leader>g'] = { name = ' Git', _ = 'which_key_ignore' },
-  ['<leader>gh'] = { name = 'Hunk', _ = 'which_key_ignore' },
-  ['<leader>gt'] = { name = 'Toggle', _ = 'which_key_ignore' },
+  -- ['<leader>gh'] = { name = 'Hunk', _ = 'which_key_ignore' },
+  -- ['<leader>gt'] = { name = 'Toggle', _ = 'which_key_ignore' },
   -- ['<leader>u'] = { name = '󱓍 UndoTree', _ = 'which_key_ignore' },
   -- ['<leader>f'] = { name = ' Find', _ = 'which_key_ignore' },
   -- ['<leader>c'] = { name = ' Code', _ = 'which_key_ignore' },
@@ -906,12 +949,12 @@ vim.keymap.set('i', 'jj', '<Esc>', { desc = 'Escape insert mode' })
 vim.keymap.set('i', 'jk', '<Esc>', { desc = 'Escape insert mode' })
 
 -- Git
-vim.keymap.set('n', '<leader>gn', require('gitsigns').next_hunk, { desc = 'Jump to next hunk' })
-vim.keymap.set('n', '<leader>gp', require('gitsigns').prev_hunk, { desc = 'Jump to previous hunk' })
-vim.keymap.set('n', 'º', require('gitsigns').next_hunk, { desc = 'Jump to next hunk' })
-vim.keymap.set('n', 'ª', require('gitsigns').prev_hunk, { desc = 'Jump to previous hunk' })
-vim.keymap.set('n', 'ª', require('gitsigns').prev_hunk, { desc = 'Jump to previous hunk' })
-vim.keymap.set('n', '<leader>gg', "<cmd>Telescope git_signs<cr>", { desc = 'List git hunks in buffer' })
+-- vim.keymap.set('n', '<leader>gn', require('gitsigns').next_hunk, { desc = 'Jump to next hunk' })
+-- vim.keymap.set('n', '<leader>gp', require('gitsigns').prev_hunk, { desc = 'Jump to previous hunk' })
+vim.keymap.set('n', 'ç', require('gitsigns').next_hunk, { desc = 'Jump to next hunk' })
+vim.keymap.set('n', 'Ç', require('gitsigns').prev_hunk, { desc = 'Jump to previous hunk' })
+vim.keymap.set('n', '<leader>gh', "<cmd>Telescope git_signs<cr>", { desc = 'List git hunks in buffer' })
+vim.keymap.set('n', '<leader>gg', "<cmd>LazyGit<cr>", { desc = 'LazyGit' })
 
 -- UndoTree
 vim.keymap.set('n', '<leader>u', vim.cmd.UndotreeToggle, { desc = 'Undo' })
@@ -932,7 +975,7 @@ vim.keymap.set('n', '<leader>/',
       previewer = true,
     })
   end, { desc = 'Search Buffer' })
-vim.keymap.set('n', '<leader>w', function()
+vim.keymap.set('n', '<leader>v', function()
   require("telescope.builtin").current_buffer_fuzzy_find { default_text = vim.fn.expand("<cword>") }
 end, { desc = 'Find Word' })
 vim.keymap.set('n', '<leader>d', require('telescope.builtin').diagnostics, { desc = 'Diagnostics' })
@@ -972,6 +1015,9 @@ vim.keymap.set('n', '<leader>s',
     -- Open Telescope file picker in the new split
     require('telescope.builtin').find_files()
   end, { desc = 'Split Window' })
+
+-- Compile mode
+vim.keymap.set('n', '<leader>m', '<cmd>Compile<cr>', { desc = 'Dired' })
 
 -- <++> Anchor
 -- vim.keymap.set('n', '<leader>aa', require('anchor').dropAnchor, { desc = 'Drop Anchor' })
