@@ -14,13 +14,13 @@
 #define DEMACS_CONFIG_CACHE "$HOME/.emacs_saves"
 #define DEMACS_REPO "https://github.com/doomemacs/doomemacs"
 // Vanilla EMACS
-#define VEMACS_CONFIG_PATH "$HOME/.emacs.d"
+#define VEMACS_CONFIG_PATH "$HOME/.vemacs.d"
 #endif
 
 // EDITORS
 // #define NEOVIM
-#define DEMACS
-// #define VEMACS
+// #define DEMACS
+#define VEMACS
 
 // OPTIONS
 #define FORCE_INSTALL

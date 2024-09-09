@@ -410,6 +410,7 @@ require('lazy').setup({
     },
   },
 
+  -- Overseer, to run tasks assyncronally
   {
     'stevearc/overseer.nvim',
     dependencies = { 'stevearc/dressing.nvim', 'rcarriga/nvim-notify' },
@@ -418,23 +419,23 @@ require('lazy').setup({
     end
   },
 
-  {
-    "X3eRo0/dired.nvim",
-    dependencies = { "MunifTanjim/nui.nvim" },
-    config = function()
-      -- TODO: Add keyybinds for opening current folder in other window
-      -- TODO: make modifiable
-      require("dired").setup({
-        keybinds = {
-          dired_enter = "l",
-          dired_back = "h"
-        }
-      })
-    end
-  },
+  -- {
+  --   "X3eRo0/dired.nvim",
+  --   dependencies = { "MunifTanjim/nui.nvim" },
+  --   config = function()
+  --     -- TODO: Add keyybinds for opening current folder in other window
+  --     -- TODO: make modifiable
+  --     require("dired").setup({
+  --       keybinds = {
+  --         dired_enter = "l",
+  --         dired_back = "h"
+  --       }
+  --     })
+  --   end
+  -- },
 
+  -- Add indentation guides even on blank lines
   {
-    -- Add indentation guides even on blank lines
     'lukas-reineke/indent-blankline.nvim',
     main = 'ibl',
     opts = {
@@ -864,6 +865,7 @@ local on_attach = function(_, bufnr)
 
   nmap('<leader>h', vim.lsp.buf.rename, 'Rename')
   nmap('<leader>aa', vim.lsp.buf.code_action, 'Code action')
+  nmap('<leader>w', function() vim.api.nvim_command('w') end, 'Save buffer')
 
   nmap('gd', require('telescope.builtin').lsp_definitions, 'Goto definition')
   nmap('gr', require('telescope.builtin').lsp_references, 'Goto references')
@@ -1018,6 +1020,16 @@ vim.keymap.set('n', '<leader>s',
 
 -- Compile mode
 vim.keymap.set('n', '<leader>m', '<cmd>Compile<cr>', { desc = 'Dired' })
+
+-- Run Async Tasks
+vim.keymap.set('n', '<leader>r',
+  function()
+    local input = vim.fn.input("Async Run: ")
+    vim.cmd("OverseerRunCmd " .. input)
+    vim.cmd("OverseerToggle")
+  end,
+  { desc = 'Run' })
+vim.keymap.set('n', '<leader>R', '<cmd>OverseerToggle<cr>', { desc = 'Toggle Run Output' })
 
 -- <++> Anchor
 -- vim.keymap.set('n', '<leader>aa', require('anchor').dropAnchor, { desc = 'Drop Anchor' })

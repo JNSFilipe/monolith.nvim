@@ -358,6 +358,11 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
   ;; DISABLE WARNINGS AT INITIALIZATION, REMOVE FOR DEBUG, IT IS A LAZY WORKAROUND!!!
   (setq warning-minimum-level :emergency)
 
+  ;; For corfu
+  (tab-always-indent 'complete)
+  (text-mode-ispell-word-completion nil)
+  (read-extended-command-predicate #'command-completion-default-include-p)
+
   ;; Share system/emacs clipboard
   (setq x-select-enable-clipboard t))
 
@@ -480,6 +485,25 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
 (use-package python-mode :defer t)
 (use-package haskell-mode :defer t)
 
+;; Syntax highlighting
+(use-package auctex
+  :ensure t
+  :defer t)
+(use-package adaptive-wrap
+  :ensure t
+  :hook (LaTeX-mode . adaptive-wrap-prefix-mode))
+(use-package latex-preview-pane
+  :ensure t
+  :hook (LaTeX-mode . latex-preview-pane-mode))
+(use-package cdlatex
+  :ensure t
+  :hook (LaTeX-mode . cdlatex-mode))
+
+;; Linting/static analysis
+(use-package flycheck
+  :ensure t
+  :hook (LaTeX-mode . flycheck-mode))
+
 ;; Treesitter
 (use-package tree-sitter
   :defer t
@@ -494,6 +518,16 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
          (ocaml-mode . tree-sitter-hl-mode)
          (latex-mode . tree-sitter-hl-mode)))
 (use-package tree-sitter-langs)
+;; Possible alternative, see:
+;; https://arne.me/blog/emacs-config-from-scratch-part-three
+;; (use-package treesit-auto
+;;   :after tree-sitter
+;;   :custom
+;;   (treesit-auto-install 'prompt)
+;;   :config
+;;   (treesit-auto-add-to-auto-mode-alist 'all)
+;;   (global-treesit-auto-mode))
+
 
 ;; Eglot - LSP Support
 (use-package eglot
@@ -508,6 +542,7 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
          (zig-mode . eglot-ensure)
          (haskell-mode . eglot-ensure)
          (ocaml-mode . eglot-ensure)
+         (tex-mode . eglot-ensure)
          (latex-mode . eglot-ensure))
   (prog-mode . eglot-ensure)
   :custom
@@ -721,6 +756,7 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
 (use-package orderless
   :custom
   (completion-styles '(orderless basic))
+  (completion-category-defaults nil)
   (completion-category-overrides '((file (styles basic partial-completion)))))
 
 ;; Embark
@@ -758,6 +794,12 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
+;; Sinppets
+(use-package yasnippet
+  :defer t
+  :config
+  (yas-global-mode 1))
+
 ;; Autocompletion
 (use-package corfu
   :init
@@ -766,15 +808,26 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
   :config
   ;; Enable auto completion and configure quitting
   (setq corfu-auto t
-        corfu-quit-no-match 'separator)
+        corfu-quit-no-match 'separator
+        corfu-cycle t)
   :bind (:map corfu-map
               ("C-j" . corfu-next)
               ("C-k" . corfu-previous)))
 
+;; Use Dabbrev with Corfu!
+(use-package dabbrev
+  ;; Swap M-/ and C-M-/
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand))
+  :config
+  (add-to-list 'dabbrev-ignored-buffer-regexps "\\` ")
+  ;; Since 29.1, use `dabbrev-ignored-buffer-regexps' on older.
+  (add-to-list 'dabbrev-ignored-buffer-modes 'doc-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'pdf-view-mode)
+  (add-to-list 'dabbrev-ignored-buffer-modes 'tags-table-mode))
+
 ;; Evil stuff
-(use-package evil
-  :demand t
-  :init
+(use-package evil :demand t :init
   (setq evil-want-integration t) ;; This is optional since it's already set to t by default.
   (setq evil-want-keybinding nil)
   (setq evil-undo-system 'undo-fu)
@@ -852,17 +905,17 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
   :config
   (which-key-setup-side-window-bottom)
   (setq which-key-side-window-location 'bottom
-	      which-key-sort-order #'which-key-key-order-alpha
-	      which-key-sort-uppercase-first nil
-	      which-key-add-column-padding 1
-	      which-key-max-display-columns nil
-	      which-key-min-display-lines 6
-	      which-key-side-window-slot -10
-	      which-key-side-window-max-height 0.25
-	      which-key-idle-delay 0.8
-	      which-key-max-description-length 25
-	      which-key-allow-imprecise-window-fit t
-	      which-key-separator " → " ))
+	which-key-sort-order #'which-key-key-order-alpha
+	which-key-sort-uppercase-first nil
+	which-key-add-column-padding 1
+	which-key-max-display-columns nil
+	which-key-min-display-lines 6
+	which-key-side-window-slot -10
+	which-key-side-window-max-height 0.25
+	which-key-idle-delay 0.8
+	which-key-max-description-length 25
+	which-key-allow-imprecise-window-fit t
+	which-key-separator " → " ))
 
 (use-package general
   :after evil
@@ -895,11 +948,11 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
 
   (dolist (binding my-keybindings)
     (general-nmap
-      :prefix "SPC"
-      (car binding) (cdr binding))
+     :prefix "SPC"
+     (car binding) (cdr binding))
     (general-vmap
-      :prefix "SPC"
-      (car binding) (cdr binding))))
+     :prefix "SPC"
+     (car binding) (cdr binding))))
 
 (use-package dired
   :ensure nil
@@ -946,10 +999,10 @@ If NAME ends with a '/', it creates a directory, otherwise a file."
   :custom (dired-omit-files (rx (seq bol "."))))
 
 ;; PDF Tools
-(use-package pdf-tools
-  :defer t
-  :config
-  (pdf-tools-install))
+;; (use-package pdf-tools
+;;   :defer t
+;;   :config
+;;   (pdf-tools-install))
 
 (provide 'init)
 ;;; init.el ends here

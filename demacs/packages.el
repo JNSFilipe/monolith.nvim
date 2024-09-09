@@ -16,8 +16,10 @@
 (package! nerd-icons)
 ;; Simpler dashboard than the doom one
 (package! dashboard)
-;; Dired pluggins
-(package! dired+)
+;; Simpler Git  Gutter
+(package! git-gutter)
+;; ;; Dired pluggins
+;; (package! dired+)
 ;; Copilot
 (package! copilot
   :recipe (:host github :repo "copilot-emacs/copilot.el" :files ("*.el" "dist")))

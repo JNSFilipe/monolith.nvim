@@ -21,16 +21,20 @@
   ;; Map tab key to indent region when in visual mode
   (map! :v "<tab>" #'mono/evil-shift-right
         :v "<backtab>" #'mono/evil-shift-left
+        :n "<escape>" #'keyboard-escape-quit
+        :n "∇" #'consult-global-mark
         :n "j" "gj" ;; Enable easier navigation in wrapped lines
         :n "k" "gk" ;; Enable easier navigation in wrapped lines
         :n "C-h" #'evil-window-left ;; TODO: This is not working in C files
         :n "C-l" #'evil-window-right
         :n "C-j" #'evil-window-down
         :n "C-k" #'evil-window-up
+        :n "C-q" #'evil-window-delete
         ;; Some ideas stolen from Meow
+        :n "$" "g_" ;; https://stackoverflow.com/questions/20165596/select-entire-line-in-vim-without-the-new-line-character
         :n "w" "viw"
-        :n "W" "viW"
-        )
+        :n "W" "viW")
+
   ;; Escape insert with jj and jk
   (key-chord-mode 1)
   (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
@@ -76,13 +80,12 @@
         :n "; e" #'epa-dired-do-encrypt))
 
 ;; Jump through git hunks
-(after! diff-hl
-  (map! :n "ç" #'diff-hl-next-hunk
-        :n "Ç" #'diff-hl-previous-hunk))
+(after! git-gutter
+  (map! :n "ç" #'git-gutter:next-hunk
+        :n "Ç" #'git-gutter:previous-hunk))
 
 (map!
  ;; Manage project opening/switching
- "C-SPC" #'projectile-switch-project
  "C-a" #'projectile-switch-open-project
  ;; Kill current buffer
  "C-q" #'kill-this-buffer
@@ -143,11 +146,13 @@
         :desc "Dired" "o" #'mono/dired
         :desc "Files" "f" #'mono/find-file
         :desc "Buffers" "b" #'consult-buffer
-        :desc "EShell" "t" #'+eshell/toggle
+        :desc "Terminal" "t" #'+eshell/here
+        :desc "Terminal in Proj" "T" #'projectile-run-eshell
         :desc "Toggle Comment" "c" #'comment-line
         :desc "Diagnostics" "d" #'consult-lsp-diagnostics
         :desc "Replace" "h" #'replace-string
         :desc "Run" "r" #'async-shell-command
+        :desc "Run in Eshell" "R" #'eshell-command
         :desc "Make" "m" #'mono/run-make-or-compile
         :desc "Split Window" "s" #'mono/auto-split-window
         :desc "Undo Tree" "u" #'undo-tree-visualize
@@ -158,5 +163,6 @@
         :desc "Capture Note Daily" "nn" #'obsidian-daily-note
         :desc "Capture Note" "nc" #'obsidian-capture
         :desc "Find in Notes" "nf" #'obsidian-jump
+        :desc "Switch Project" "p" #'projectile-switch-project
         ;; TODO: make shortcut to find TODOs in notes
         :desc "Switch to Notes" "ns" (lambda () (interactive) (projectile-switch-project-by-name obsidian-notes-dir))))

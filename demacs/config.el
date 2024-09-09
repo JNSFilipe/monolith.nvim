@@ -24,8 +24,9 @@
 ;; See 'C-h v doom-font' for documentation and more examples of what they
 ;; accept. For example:
 ;;
-(setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 14 :weight 'semi-bold)
-      doom-variable-pitch-font (font-spec :family "Fira Sans" :size 14))
+;; (setq doom-font (font-spec :family "JetBrainsMono Nerd Font" :size 14 :weight 'semi-bold)
+;;       doom-variable-pitch-font (font-spec :family "Fira Sans" :size 14))
+(setq doom-font (font-spec :family "Cascadia Code" :size 14 :weight 'semi-bold))
 
 ;; Set terminal name for TRAMP agent (useful to disable fancy features when using TRAMP, cause this is going to be the value of $TERM)
 (setq tramp-terminal-type "tramp")
@@ -50,6 +51,7 @@
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config))
 
+;; Simpler dashboard
 (use-package dashboard
   :config
   (setq dashboard-projects-backend 'projectile
@@ -61,6 +63,17 @@
         dashboard-items '((projects . 10)
                           (recents  . 10)))
   (dashboard-setup-startup-hook))
+
+;; Simpler git gutter
+(use-package git-gutter
+  :defer t
+  :hook (prog-mode . git-gutter-mode)
+  :config
+  (custom-set-variables
+   '(git-gutter:modified-sign "~")
+   '(git-gutter:added-sign "+")
+   '(git-gutter:deleted-sign "-"))
+  (setq git-gutter:update-interval 0.2))
 
 ;; Config Copilot
 (use-package! copilot
